@@ -1,4 +1,8 @@
-import p_img1 from './p_img1.png'
+import ContinueSticker from './ContinueSticker62cm-1.png'
+import NonfictionSticker from './NonfictionSticker.jpg'
+import StallertalkSticker from './StallertalkSticker-1.png'
+import TheCageSticker from './TheCageSticker-1.png'
+import TurbulentShirt from './TurbulentShirt.png'
 import p_img2_1 from './p_img2_1.png'
 import p_img2_2 from './p_img2_2.png'
 import p_img2_3 from './p_img2_3.png'
@@ -77,6 +81,7 @@ import cross_icon from './cross_icon.png'
 export const assets = {
     logo,
     hero_img,
+    TurbulentShirt,
     cart_icon,
     dropdown_icon,
     exchange_icon,
@@ -98,61 +103,61 @@ export const assets = {
 export const products = [
     {
         _id: "aaaaa",
-        name: "Women Round Neck Cotton Top",
-        description: "A lightweight, usually knitted, pullover shirt, close-fitting and with a round neckline and short sleeves, worn as an undershirt or outer garment.",
-        price: 100,
-        image: [p_img1],
-        category: "Women",
-        subCategory: "Topwear",
-        sizes: ["S", "M", "L"],
+        name: "TURBULENT T-SHIRT",
+        description: "A heavyweight, lose-fitting and short sleeves shirt.",
+        price: 250,
+        image: [TurbulentShirt],
+        category: "TEES",
+        subCategory: "",
+        sizes: ["S", "M", "L", "XL"],
         date: 1716634345448,
         bestseller: true
     },
     {
         _id: "aaaab",
-        name: "Men Round Neck Pure Cotton T-shirt",
-        description: "A lightweight, usually knitted, pullover shirt, close-fitting and with a round neckline and short sleeves, worn as an undershirt or outer garment.",
-        price: 200,
-        image: [p_img2_1,p_img2_2,p_img2_3,p_img2_4],
-        category: "Men",
-        subCategory: "Topwear",
-        sizes: ["M", "L", "XL"],
+        name: "續 STICKER",
+        description: "FROM STICKER PACK vol1.",
+        price: 10,
+        image: [ContinueSticker],
+        category: "ACCESSORIES",
+        subCategory: "",
+        sizes: [""],
         date: 1716621345448,
-        bestseller: true
+        bestseller: false
     },
     {
         _id: "aaaac",
-        name: "Girls Round Neck Cotton Top",
-        description: "A lightweight, usually knitted, pullover shirt, close-fitting and with a round neckline and short sleeves, worn as an undershirt or outer garment.",
-        price: 220,
-        image: [p_img3],
-        category: "Kids",
-        subCategory: "Topwear",
-        sizes: ["S", "L", "XL"],
+        name: "NON-FICTION STICKER",
+        description: "FROM STICKER PACK vol1.",
+        price: 10,
+        image: [NonfictionSticker],
+        category: "ACCESSORIES",
+        subCategory: "",
+        sizes: [""],
         date: 1716234545448,
         bestseller: true
     },
     {
         _id: "aaaad",
-        name: "Men Round Neck Pure Cotton T-shirt",
-        description: "A lightweight, usually knitted, pullover shirt, close-fitting and with a round neckline and short sleeves, worn as an undershirt or outer garment.",
-        price: 110,
-        image: [p_img4],
-        category: "Men",
-        subCategory: "Topwear",
-        sizes: ["S", "M", "XXL"],
+        name: "Stallertalk Sticker",
+        description: "FROM STICKER PACK vol1.",
+        price: 10,
+        image: [StallertalkSticker],
+        category: "ACCESSORIES",
+        subCategory: "",
+        sizes: [""],
         date: 1716621345448,
         bestseller: true
     },
     {
         _id: "aaaae",
-        name: "Women Round Neck Cotton Top",
-        description: "A lightweight, usually knitted, pullover shirt, close-fitting and with a round neckline and short sleeves, worn as an undershirt or outer garment.",
-        price: 130,
-        image: [p_img5],
-        category: "Women",
-        subCategory: "Topwear",
-        sizes: ["M", "L", "XL"],
+        name: "The Cage Sticker",
+        description: "FROM STICKER PACK vol1.",
+        price: 10,
+        image: [TheCageSticker],
+        category: "ACCESSORIES",
+        subCategory: "",
+        sizes: [""],
         date: 1716622345448,
         bestseller: true
     },
