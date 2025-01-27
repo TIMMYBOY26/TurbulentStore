@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { ShopContext } from "../context/ShopContext";
 import Title from "./Title";
-import { ProductItem } from "./ProductItem";
+import { ProductItem } from "../components/ProductItem";
 
 const BestSeller = () => {
   const { products } = useContext(ShopContext);
@@ -25,7 +25,7 @@ const BestSeller = () => {
         {bestSeller.map((item, index) => (
           <ProductItem
             key={index}
-            id={item.id}
+            id={item._id}
             image={item.image}
             name={item.name}
             price={item.price}

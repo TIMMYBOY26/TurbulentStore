@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { ShopContext } from "../context/ShopContext";
 import Title from "./Title";
-import { ProductItem } from "./ProductItem";
+import { ProductItem } from "../components/ProductItem";
 
 const LatestCollection = () => {
   const { products } = useContext(ShopContext);
@@ -16,7 +16,7 @@ const LatestCollection = () => {
       <div className="text-center py-8 text-3xl">
         <Title text1={"LATEST"} text2={"COLLECTIONS"} />
         <p className="w-3/4 m-auto text-xs sm:text-sm md:text-base text-gray-600">
-          This is the latest merch designed by TURBULENT
+          Latest merch designed by TURBULENT
         </p>
       </div>
 
@@ -25,7 +25,7 @@ const LatestCollection = () => {
         {latestProducts.map((item, index) => (
           <ProductItem
             key={index}
-            id={item.id}
+            id={item._id}
             image={item.image}
             name={item.name}
             price={item.price}
