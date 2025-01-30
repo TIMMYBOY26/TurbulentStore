@@ -31,7 +31,7 @@ const Product = () => {
       <div className="flex gap-12 sm:gap-12 flex-col sm:flex-row">
         {/* Product Images */}
         <div className="flex-1 flex flex-col-reverse gap-3 sm:flex-row">
-          <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:w-[20%] w-full">
+          <div className="flex sm:flex-col overflow-x-auto hide-scrollbar justify-between sm:w-[20%] w-full">
             {/* Small Images */}
             {productData.image.map((item, index) => (
               <img
@@ -65,9 +65,8 @@ const Product = () => {
               {productData.sizes.map((item, index) => (
                 <button
                   onClick={() => setSize(item)}
-                  className={`border py-2 px-4 bg-gray-100 ${
-                    item === size ? "border-blue-500" : ""
-                  }`}
+                  className={`border py-2 px-4 bg-gray-100 ${item === size ? "border-blue-500" : ""
+                    }`}
                   key={index}
                 >
                   {item}

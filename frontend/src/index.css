@@ -23,3 +23,16 @@ a.active hr {
     color: white;
   }
 }
+
+/* Add this to your CSS file */
+.hide-scrollbar {
+  overflow-y: hidden;
+  /* Hide vertical scrollbar */
+  scrollbar-width: none;
+  /* For Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* For Chrome, Safari, and Opera */
+}
