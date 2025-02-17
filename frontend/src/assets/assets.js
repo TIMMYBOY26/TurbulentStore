@@ -5,9 +5,12 @@ import StallertalkSticker from "./StallertalkSticker-1.png";
 import TheCageSticker from "./TheCageSticker-1.png";
 import TurbulentShirt from "./TurbulentShirt1.png";
 import TurbulentShirtBack from "./TurbulentShirtBack1.png";
+import TurbulentShirtChart from "./TurbulentShirtChart.jpg";
+import TurbulentShirtFrontBack from "./TurbulentShirtFrontBack.jpg";
 import fpsLogo from "./fps-logo.png";
 
 import hero_img from "./hero_img.png";
+import background from "./hero_img.png";
 import cart_icon from "./cart_icon.png";
 import bin_icon from "./bin_icon.png";
 import dropdown_icon from "./dropdown_icon.png";
@@ -28,6 +31,9 @@ export const assets = {
   logo,
   hero_img,
   TurbulentShirt,
+  TurbulentShirtBack,
+  TurbulentShirtChart,
+  TurbulentShirtFrontBack,
   cart_icon,
   dropdown_icon,
   exchange_icon,
@@ -52,10 +58,10 @@ export const products = [
     name: "TURBULENT T-SHIRT",
     description: "A heavyweight, lose-fitting and short sleeves shirt.",
     price: 250,
-    image: [TurbulentShirt, TurbulentShirtBack, TurbulentShirt, TurbulentShirt],
+    image: [TurbulentShirt, TurbulentShirtBack, TurbulentShirtFrontBack, TurbulentShirtChart],
     category: "TEES",
     subCategory: "",
-    sizes: ["S", "M", "L", "XL"],
+    sizes: ["S", "M", "L", "XL", "XXL"],
     date: 1716634345448,
     bestseller: true,
   },

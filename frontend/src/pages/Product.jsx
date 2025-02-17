@@ -1,21 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
-import { assets } from "../assets/assets";
 import RelatedProducts from "../components/RelatedProducts";
 
 const Product = () => {
   const { productId } = useParams();
   const { products, currency, addToCart } = useContext(ShopContext);
   const [productData, setProductData] = useState(false);
-  const [image, setImage] = useState("");
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [size, setSize] = useState("");
 
   const fetchProductData = async () => {
     products.map((item) => {
       if (item._id === productId) {
         setProductData(item);
-        setImage(item.image[0]);
         return null;
       }
     });
@@ -25,27 +23,68 @@ const Product = () => {
     fetchProductData();
   }, [productId, products]);
 
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0 ? productData.image.length - 1 : prevIndex - 1
+    );
+  };
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === productData.image.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
   return productData ? (
     <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100">
       {/* Product Data */}
       <div className="flex gap-12 sm:gap-12 flex-col sm:flex-row">
         {/* Product Images */}
         <div className="flex-1 flex flex-col-reverse gap-3 sm:flex-row">
-          <div className="flex sm:flex-col overflow-x-auto hide-scrollbar justify-between sm:w-[20%] w-full">
-            {/* Small Images */}
+          {/* Arrow Buttons for Small Screens */}
+          <div className="sm:hidden flex justify-between w-full">
+            <button
+              onClick={handlePrevImage}
+              className="bg-gray-200 p-2 rounded-full transition-transform duration-200 hover:scale-105 active:scale-95"
+            >
+              &lt; {/* Left Arrow */}
+            </button>
+            <button
+              onClick={handleNextImage}
+              className="bg-gray-200 p-2 rounded-full transition-transform duration-200 hover:scale-105 active:scale-95"
+            >
+              &gt; {/* Right Arrow */}
+            </button>
+          </div>
+
+          {/* Small Images for Larger Screens */}
+          <div className="hidden sm:flex sm:flex-col overflow-x-auto hide-scrollbar justify-between sm:w-[20%] w-full">
             {productData.image.map((item, index) => (
               <img
-                onClick={() => setImage(item)}
+                onClick={() => setCurrentImageIndex(index)}
                 src={item}
                 key={index}
-                className="w-[20%] sm:w-auto h-auto mb-2 flex-shrink-0 cursor-pointer"
+                className="w-full h-auto mb-2 flex-shrink-0 cursor-pointer"
                 alt=""
               />
             ))}
           </div>
-          {/* Large Image */}
-          <div className="w-full sm:w-[75%]">
-            <img className="w-full h-auto" src={image} alt="" />
+
+          {/* Large Image with Sliding Effect */}
+          <div className="w-full sm:w-[75%] h-[500px] relative overflow-hidden">
+            {productData.image.map((src, index) => (
+              <img
+                key={index}
+                className={`absolute w-full h-full object-contain transition-transform duration-500 ease-in-out transform ${currentImageIndex === index
+                    ? 'translate-x-0'
+                    : currentImageIndex > index
+                      ? '-translate-x-full'
+                      : 'translate-x-full'
+                  }`}
+                src={src}
+                alt=""
+              />
+            ))}
           </div>
         </div>
 
@@ -65,8 +104,7 @@ const Product = () => {
               {productData.sizes.map((item, index) => (
                 <button
                   onClick={() => setSize(item)}
-                  className={`border py-2 px-4 bg-gray-100 ${item === size ? "border-blue-500" : ""
-                    }`}
+                  className={`border py-2 px-4 bg-gray-100 ${item === size ? "border-blue-500" : ""}`}
                   key={index}
                 >
                   {item}
@@ -81,14 +119,14 @@ const Product = () => {
             </button>
             <hr className="mt-8 sm:w-4/5" />
             <div className="text-sm text-gray-500 mt-5 flex flex-col gap-1">
-              <p>Oiginal product.</p>
-              <p>Cash on delivery is avalible on this product.</p>
+              <p>Original product.</p>
+              <p>Cash on delivery is available on this product.</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* display related products */}
+      {/* Display related products */}
       <RelatedProducts category={productData.category} />
     </div>
   ) : (
