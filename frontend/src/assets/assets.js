@@ -8,6 +8,9 @@ import TurbulentShirtBack from "./TurbulentShirtBack1.png";
 import TurbulentShirtChart from "./TurbulentShirtChart.jpg";
 import TurbulentShirtFrontBack from "./TurbulentShirtFrontBack.jpg";
 import fpsLogo from "./fps-logo.png";
+import paymeLogo from "./payme.png"
+import paymeCode from "./paymecode.jpg"
+
 
 import hero_img from "./hero_img.png";
 import background from "./hero_img.png";
@@ -50,6 +53,8 @@ export const assets = {
   razorpay_logo,
   cross_icon,
   fpsLogo,
+  paymeLogo,
+  paymeCode
 };
 
 export const products = [
