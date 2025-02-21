@@ -60,7 +60,7 @@ const ShopContextProvider = (props) => {
           if (cartItems[items][item] > 0) {
             totalCount += cartItems[items][item];
           }
-        } catch (error) {}
+        } catch (error) { }
       }
     }
     return totalCount;
@@ -96,7 +96,7 @@ const ShopContextProvider = (props) => {
           if (cartItems[items][item] > 0) {
             totalAmount += itemInfo.price * cartItems[items][item];
           }
-        } catch (error) {}
+        } catch (error) { }
       }
     }
     return totalAmount;
@@ -143,7 +143,7 @@ const ShopContextProvider = (props) => {
   useEffect(() => {
     if (!token && localStorage.getItem("token")) {
       setToken(localStorage.getItem("token"));
-      console.log(localStorage.getItem("token"), "!i can get token ");
+      // console.log(localStorage.getItem("token"), "!i can get token ");
       getUserCart(localStorage.getItem("token"));
     } else {
       console.log("!!!!no token this time");

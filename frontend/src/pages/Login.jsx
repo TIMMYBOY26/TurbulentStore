@@ -38,7 +38,7 @@ const Login = () => {
           setToken(response.data.token);
           localStorage.setItem("token", response.data.token);
           getUserCart(response.data.token); // Fetch user cart after login
-          console.log(response.data.token, "I am token from login");
+          // console.log(response.data.token, "I am token from login");
         } else {
           toast.error(response.data.message);
         }
