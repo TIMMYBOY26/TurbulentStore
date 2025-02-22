@@ -48,8 +48,8 @@ const placeOrder = async (req, res) => {
         await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
         // Send Telegram notification
-        const message = `New Order Placed:\nOrder Number: ${orderNumber}\nAmount: ${amount}\nAddress: ${address}`;
-        await sendTelegramNotification('769583801', message); // Replace with your chat ID
+        const message = `收到新訂單:\n訂單號碼 : ${orderNumber}\n金額: $${amount}`;
+        await sendTelegramNotification('-1002324020435', message); // Replace with your chat ID
 
         res.json({ success: true, message: "Order Placed", orderNumber }); // Return order number
     } catch (error) {
