@@ -44,6 +44,7 @@ const Hero = () => {
           src={assets.hero_img}
           alt="Hero"
         />
+
       </div>
     </div>
   );

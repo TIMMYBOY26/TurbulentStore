@@ -6,6 +6,8 @@ import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 
 const List = ({ token }) => {
     const [list, setList] = useState([]);
+    const [editPriceId, setEditPriceId] = useState(null); // State to track the product price being edited
+    const [newPrice, setNewPrice] = useState(""); // State to track the new price
 
     const fetchList = async () => {
         try {
@@ -38,6 +40,30 @@ const List = ({ token }) => {
         }
     };
 
+    const updateProduct = async (id) => {
+        try {
+            const response = await axios.post(backendUrl + '/api/product/update', { id, price: newPrice }, { headers: { token } });
+
+            if (response.data.success) {
+                toast.success("Product updated!"); // Success toast for update
+                setEditPriceId(null); // Exit price editing mode
+                await fetchList(); // Refresh the list after update
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message); // Error toast for catch block
+        }
+    };
+
+    const handleKeyDown = (e, id) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            updateProduct(id);
+        }
+    };
+
     useEffect(() => {
         fetchList(); // Fetch the product list on component mount
     }, []);
@@ -63,7 +89,21 @@ const List = ({ token }) => {
                             <img className='w-12' src={item.image[0]} alt="" />
                             <p>{item.name}</p>
                             <p>{item.category}</p>
-                            <p>{currency}{item.price}</p>
+                            {editPriceId === item._id ? (
+                                <input
+                                    type="text"
+                                    value={newPrice}
+                                    onChange={(e) => setNewPrice(e.target.value)}
+                                    onBlur={() => updateProduct(item._id)} // Update product on input blur
+                                    onKeyDown={(e) => handleKeyDown(e, item._id)}
+                                    className="border p-1"
+                                    autoFocus
+                                />
+                            ) : (
+                                <p onClick={() => { setEditPriceId(item._id); setNewPrice(item.price); }} className='cursor-pointer'>
+                                    {currency}{item.price}
+                                </p>
+                            )}
                             <p onClick={() => removeProduct(item._id)} className='text-right md:text-center cursor-pointer text-lg'>X</p>
                         </div>
                     ))

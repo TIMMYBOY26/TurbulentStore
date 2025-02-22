@@ -61,6 +61,17 @@ const listProduct = async (req, res) => {
     }
 }
 
+// fuction for update product price
+const updateProduct = async (req, res) => {
+    const { id, price } = req.body;
+    try {
+        await productModel.findByIdAndUpdate(id, { price });
+        res.json({ success: true, message: 'Product price updated!' });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
+
 // fuction for remove product 
 const removeProduct = async (req, res) => {
     try {
@@ -85,4 +96,4 @@ const singleProduct = async (req, res) => {
     }
 }
 
-export { listProduct, addProduct, removeProduct, singleProduct }
+export { listProduct, addProduct, removeProduct, singleProduct, updateProduct }

@@ -45,6 +45,8 @@ const Product = () => {
     }
   };
 
+  const isSoldOut = productData && productData.sizes.length === 0;
+
   return productData ? (
     <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100">
       {/* Product Data */}
@@ -121,12 +123,21 @@ const Product = () => {
                 </button>
               ))}
             </div>
-            <button
-              onClick={handleAddToCart}
-              className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700"
-            >
-              {token ? "ADD TO CART" : "LOGIN TO ADD TO CART"}
-            </button>
+            {isSoldOut ? (
+              <button
+                className="bg-gray-400 text-white px-8 py-3 text-sm cursor-not-allowed"
+                disabled
+              >
+                SORRY SOLD OUT
+              </button>
+            ) : (
+              <button
+                onClick={handleAddToCart}
+                className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700"
+              >
+                {token ? "ADD TO CART" : "LOGIN TO ADD TO CART"}
+              </button>
+            )}
             <hr className="mt-8 sm:w-4/5" />
             <div className="text-sm text-gray-500 mt-5 flex flex-col gap-1">
               <p>Original product.</p>
@@ -137,7 +148,7 @@ const Product = () => {
       </div>
 
       {/* Display related products */}
-      <RelatedProducts category={productData.category} />
+      <RelatedProducts category={productData.category} currentProductId={productId} />
     </div>
   ) : (
     <div className="opacity-0"></div>

@@ -176,9 +176,8 @@ const Add = ({ token }) => {
               }
             >
               <p
-                className={`${
-                  sizes.includes("S") ? "bg-blue-300" : "bg-slate-200"
-                } px-3 py-1 cursor-pointer`}
+                className={`${sizes.includes("S") ? "bg-blue-300" : "bg-slate-200"
+                  } px-3 py-1 cursor-pointer`}
               >
                 S
               </p>
@@ -193,9 +192,8 @@ const Add = ({ token }) => {
               }
             >
               <p
-                className={`${
-                  sizes.includes("M") ? "bg-blue-300" : "bg-slate-200"
-                } px-3 py-1 cursor-pointer`}
+                className={`${sizes.includes("M") ? "bg-blue-300" : "bg-slate-200"
+                  } px-3 py-1 cursor-pointer`}
               >
                 M
               </p>
@@ -210,9 +208,8 @@ const Add = ({ token }) => {
               }
             >
               <p
-                className={`${
-                  sizes.includes("L") ? "bg-blue-300" : "bg-slate-200"
-                } px-3 py-1 cursor-pointer`}
+                className={`${sizes.includes("L") ? "bg-blue-300" : "bg-slate-200"
+                  } px-3 py-1 cursor-pointer`}
               >
                 L
               </p>
@@ -227,9 +224,8 @@ const Add = ({ token }) => {
               }
             >
               <p
-                className={`${
-                  sizes.includes("XL") ? "bg-blue-300" : "bg-slate-200"
-                } px-3 py-1 cursor-pointer`}
+                className={`${sizes.includes("XL") ? "bg-blue-300" : "bg-slate-200"
+                  } px-3 py-1 cursor-pointer`}
               >
                 XL
               </p>
@@ -244,9 +240,8 @@ const Add = ({ token }) => {
               }
             >
               <p
-                className={`${
-                  sizes.includes("XXL") ? "bg-blue-300" : "bg-slate-200"
-                } px-3 py-1 cursor-pointer`}
+                className={`${sizes.includes("XXL") ? "bg-blue-300" : "bg-slate-200"
+                  } px-3 py-1 cursor-pointer`}
               >
                 XXL
               </p>
@@ -254,18 +249,17 @@ const Add = ({ token }) => {
             <div
               onClick={() =>
                 setSizes((prev) =>
-                  prev.includes("N／A")
-                    ? prev.filter((item) => item !== "N／A")
-                    : [...prev, "N／A"]
+                  prev.includes("STICKER")
+                    ? prev.filter((item) => item !== "STICKER")
+                    : [...prev, "STICKER"]
                 )
               }
             >
               <p
-                className={`${
-                  sizes.includes("N／A") ? "bg-blue-300" : "bg-slate-200"
-                } px-3 py-1 cursor-pointer`}
+                className={`${sizes.includes("STICKER") ? "bg-blue-300" : "bg-slate-200"
+                  } px-3 py-1 cursor-pointer`}
               >
-                N／A
+                STICKER
               </p>
             </div>
           </div>
