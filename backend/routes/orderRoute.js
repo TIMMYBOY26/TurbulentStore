@@ -1,5 +1,5 @@
 import express from "express";
-import { placeOrder, placeOrderPayme, placeOrderFps, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, updateStatus } from '../controllers/orderController.js'
+import { placeOrder, placeOrderPayme, placeOrderFps, allOrders, userOrders, updateStatus } from '../controllers/orderController.js'
 import adminAuth from '../middleware/adminAuth.js'
 import authUser from '../middleware/auth.js'
 
@@ -13,8 +13,6 @@ orderRouter.post('/status', adminAuth, updateStatus)
 orderRouter.post('/place', authUser, placeOrder)
 orderRouter.post('/payme', authUser, placeOrderPayme)
 orderRouter.post('/fps', authUser, placeOrderFps)
-orderRouter.post('/stripe', authUser, placeOrderStripe)
-orderRouter.post('/razorpay', authUser, placeOrderRazorpay)
 
 // User Feature
 orderRouter.post('/userorders', authUser, userOrders)

@@ -1,10 +1,18 @@
 import orderModel from "../models/orderModel.js";
-import userModel from "../models/userModel.js"
+import userModel from "../models/userModel.js";
+
+// Function to generate a unique order number
+const generateOrderNumber = async () => {
+    const lastOrder = await orderModel.findOne().sort({ orderNumber: -1 }).exec();
+    return lastOrder ? lastOrder.orderNumber + 1 : 1; // Start from 1 if no orders exist
+};
 
 // Placing orders using COD Method
 const placeOrder = async (req, res) => {
     try {
         const { userId, items, amount, address } = req.body;
+        const orderNumber = await generateOrderNumber(); // Generate order number
+
         const orderData = {
             userId,
             items,
@@ -12,26 +20,28 @@ const placeOrder = async (req, res) => {
             amount,
             paymentMethod: "COD",
             payment: false,
-            date: Date.now()
-        }
+            date: Date.now(),
+            orderNumber // Assign generated order number
+        };
 
-        const newOrder = new orderModel(orderData)
-        await newOrder.save()
+        const newOrder = new orderModel(orderData);
+        await newOrder.save();
 
-        await userModel.findByIdAndUpdate(userId, { cartData: {} })
+        await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
-        res.json({ success: true, message: "Order Placed" })
-
+        res.json({ success: true, message: "Order Placed", orderNumber }); // Return order number
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: error.message })
+        res.json({ success: false, message: error.message });
     }
-}
+};
 
 // Placing orders using PayMe Method
 const placeOrderPayme = async (req, res) => {
     try {
         const { userId, items, amount, address } = req.body;
+        const orderNumber = await generateOrderNumber(); // Generate order number
+
         const orderData = {
             userId,
             items,
@@ -39,26 +49,28 @@ const placeOrderPayme = async (req, res) => {
             amount,
             paymentMethod: "PayMe",
             payment: false,
-            date: Date.now()
-        }
+            date: Date.now(),
+            orderNumber // Assign generated order number
+        };
 
-        const newOrder = new orderModel(orderData)
-        await newOrder.save()
+        const newOrder = new orderModel(orderData);
+        await newOrder.save();
 
-        await userModel.findByIdAndUpdate(userId, { cartData: {} })
+        await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
-        res.json({ success: true, message: "Order Placed" })
-
+        res.json({ success: true, message: "Order Placed", orderNumber }); // Return order number
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: error.message })
+        res.json({ success: false, message: error.message });
     }
-}
+};
 
 // Placing orders using FPS Method
 const placeOrderFps = async (req, res) => {
     try {
         const { userId, items, amount, address } = req.body;
+        const orderNumber = await generateOrderNumber(); // Generate order number
+
         const orderData = {
             userId,
             items,
@@ -66,34 +78,22 @@ const placeOrderFps = async (req, res) => {
             amount,
             paymentMethod: "FPS",
             payment: false,
-            date: Date.now()
-        }
+            date: Date.now(),
+            orderNumber // Assign generated order number
+        };
 
-        const newOrder = new orderModel(orderData)
-        await newOrder.save()
+        const newOrder = new orderModel(orderData);
+        await newOrder.save();
 
-        await userModel.findByIdAndUpdate(userId, { cartData: {} })
+        await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
-        res.json({ success: true, message: "Order Placed" })
-
+        res.json({ success: true, message: "Order Placed", orderNumber }); // Return order number
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: error.message })
+        res.json({ success: false, message: error.message });
     }
-}
+};
 
-
-// Placing orders using Stripe Method
-
-const placeOrderStripe = async (req, res) => {
-
-}
-
-// Placing orders using Razorpay Method
-
-const placeOrderRazorpay = async (req, res) => {
-
-}
 
 // All Orders data for admin Panel
 const allOrders = async (req, res) => {
@@ -131,4 +131,4 @@ const updateStatus = async (req, res) => {
     }
 }
 
-export { placeOrder, placeOrderPayme, placeOrderFps, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, updateStatus }
+export { placeOrder, placeOrderPayme, placeOrderFps, allOrders, userOrders, updateStatus }

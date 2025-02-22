@@ -54,6 +54,8 @@ const Orders = ({ token }) => {
                         <div className='grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-x-gray-200 p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-gray-700' key={index}>
                             <img className='w-12' src={assets.parcel_icon} alt="" />
                             <div>
+                                <p className='text-sm sm:text-[15px]'>Order Number : {order.orderNumber}</p>
+                                <hr />
                                 <div>
                                     {order.items.map((item, index) => {
                                         if (index === order.items.length - 1) {
@@ -79,12 +81,11 @@ const Orders = ({ token }) => {
                             </div>
                             <p className='text-sm sm:text-[20px]'>{currency}{order.amount}</p>
                             <select onChange={(event) => statusHandler(event, order._id)} value={order.status} className='p-2 font-semibold'>
-                                <option value="Confirming Payment">付款確認中</option>
-                                <option value="OrderPlaced">已下單 </option>
-                                <option value="Packing">貨物準備中</option>
-                                <option value="Shipped">運送中</option>
-                                <option value="Out for Delivery">交收中</option>
-                                <option value="Delivered">已收貨</option>
+                                <option value="付款確認中">付款確認中</option>
+                                <option value="安排交收中">安排交收中 </option>
+                                <option value="貨物安排中">貨物安排中</option>
+                                <option value="已發貨">已發貨</option>
+                                <option value="訂單已完成">訂單已完成</option>
                             </select>
                         </div>
                     ))
