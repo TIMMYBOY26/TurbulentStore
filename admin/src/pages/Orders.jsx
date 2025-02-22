@@ -79,11 +79,12 @@ const Orders = ({ token }) => {
                             </div>
                             <p className='text-sm sm:text-[20px]'>{currency}{order.amount}</p>
                             <select onChange={(event) => statusHandler(event, order._id)} value={order.status} className='p-2 font-semibold'>
-                                <option value="OrderPlaced">Order Placed</option>
-                                <option value="Packing">Packing</option>
-                                <option value="Shipped">Shipped</option>
-                                <option value="Out for Delivery">Out for Delivery</option>
-                                <option value="Delivered">Delivered</option>
+                                <option value="Confirming Payment">付款確認中</option>
+                                <option value="OrderPlaced">已下單 </option>
+                                <option value="Packing">貨物準備中</option>
+                                <option value="Shipped">運送中</option>
+                                <option value="Out for Delivery">交收中</option>
+                                <option value="Delivered">已收貨</option>
                             </select>
                         </div>
                     ))
