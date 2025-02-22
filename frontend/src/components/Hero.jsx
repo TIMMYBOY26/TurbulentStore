@@ -33,7 +33,7 @@ const Hero = () => {
             </div>
             <hr />
             <div className="flex items-center gap-2">
-              <p className="font-semibold text-sm md:text-base">//Feel The Dynamic...</p>
+              <p className="font-semibold text-sm md:text-base">// Feel The Dynamic...</p>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { assets } from "../assets/assets";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useLocation } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 
 const Navbar = ({ setHeroVisible }) => {
@@ -14,6 +14,8 @@ const Navbar = ({ setHeroVisible }) => {
     setCartItems,
   } = useContext(ShopContext);
 
+  const location = useLocation(); // Get the current route
+
   const logout = () => {
     navigate("/login");
     localStorage.removeItem("token");
@@ -26,8 +28,16 @@ const Navbar = ({ setHeroVisible }) => {
     setHeroVisible(!visible); // Toggle the visibility of the Hero component
   };
 
+  const handleSearchClick = () => {
+    if (location.pathname === "/") {
+      navigate("/collection"); // Redirect to collection page if on home page
+    } else {
+      setShowSearch(true);
+    }
+  };
+
   return (
-    <div className="flex items-center justify-between py-5 font-medium ">
+    <div className="flex items-center justify-between py-5 font-medium">
       <Link to="/">
         <img src={assets.logo} className="w-36" alt="" />
       </Link>
@@ -52,7 +62,7 @@ const Navbar = ({ setHeroVisible }) => {
 
       <div className="flex items-center gap-6">
         <img
-          onClick={() => setShowSearch(true)}
+          onClick={handleSearchClick}
           src={assets.search_icon}
           className="w-5 cursor-pointer"
           alt=""
@@ -102,41 +112,42 @@ const Navbar = ({ setHeroVisible }) => {
       </div>
 
       {/* Sidebar menu for small screen */}
-      <div
-        className={`absolute top-0 right-0 bottom-0 overflow-hidden bg-white transition-all ${visible ? "w-full" : "w-0"
-          }`}
-      >
-        <div className="flex flex-col text-gray-600">
-          <div
-            onClick={toggleDropdown}
-            className="flex items-center gap-4 p-3 cursor-pointer"
-          >
-            <img className="h-4 rotate-180" src={assets.dropdown_icon} alt="" />
-            <p>Back</p>
+      {location.pathname !== "/login" && (
+        <div
+          className={`absolute top-0 right-0 bottom-0 overflow-hidden bg-white transition-all ${visible ? "w-full" : "w-0"}`}
+        >
+          <div className="flex flex-col text-gray-600">
+            <div
+              onClick={toggleDropdown}
+              className="flex items-center gap-4 p-3 cursor-pointer"
+            >
+              <img className="h-4 rotate-180" src={assets.dropdown_icon} alt="" />
+              <p>Back</p>
+            </div>
+            <NavLink
+              onClick={toggleDropdown}
+              className="py-2 pl-6 border"
+              to="/"
+            >
+              HOME
+            </NavLink>
+            <NavLink
+              onClick={toggleDropdown}
+              className="py-2 pl-6 border"
+              to="/collection"
+            >
+              COLLECTION
+            </NavLink>
+            <NavLink
+              onClick={toggleDropdown}
+              className="py-2 pl-6 border"
+              to="/contact"
+            >
+              CONTACT
+            </NavLink>
           </div>
-          <NavLink
-            onClick={toggleDropdown}
-            className="py-2 pl-6 border"
-            to="/"
-          >
-            HOME
-          </NavLink>
-          <NavLink
-            onClick={toggleDropdown}
-            className="py-2 pl-6 border"
-            to="/collection"
-          >
-            COLLECTION
-          </NavLink>
-          <NavLink
-            onClick={toggleDropdown}
-            className="py-2 pl-6 border"
-            to="/contact"
-          >
-            CONTACT
-          </NavLink>
         </div>
-      </div>
+      )}
     </div>
   );
 };
