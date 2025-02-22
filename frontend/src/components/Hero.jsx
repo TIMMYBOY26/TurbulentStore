@@ -1,28 +1,50 @@
 import React from "react";
 import { assets } from "../assets/assets";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const Hero = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  const handleHeroClick = () => {
+    navigate("/collection"); // Redirect to the collection page
+  };
+
   return (
-    <div className="flex flex-col sm:flex-row border border-gray-400">
-      {/* Hero left */}
-      <div className="w-full sm:w-1/2 flex items-center justify-center py-10 sm:py-0">
-        <div className="text-[#414141]">
-          <div className="flex items-center gap-2">
-            <p className="w-8 md:w-11 h-[2px] bg-[#414141]"></p>
-            <p className=" font-medium text-sm md:text-base">OUT BESTSELLERS</p>
-          </div>
-          <h1 className="prata-regular text-3xl lg:text-5xl leading-relaxed">
-            Latest Arrivals
-          </h1>
-          <div className="flex items-center gap-2">
-            <p className="font-semibold text-sm md:text-base">SHOP NOW</p>
-            <p className="w-8 md:w-11 h-[2px] bg-[#414141]"></p>
+    <div
+      className="flex flex-col sm:flex-row cursor-pointer transition-transform duration-300 hover:scale-105" // Added hover effect for the entire hero section
+      style={{
+        backgroundImage: `url(${assets.hero_bg})`, // Background image path
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+      onClick={handleHeroClick} // Add onClick event
+    >
+      {/* Hero Content Grouped Together */}
+      <div className="flex flex-col sm:flex-row w-full">
+        {/* Hero left */}
+        <div className="w-full sm:w-1/2 flex items-center justify-center py-10 sm:py-0">
+          <div className="text-[#ffffff]">
+            <h1 className="prata-regular text-3xl lg:text-5xl leading-relaxed">
+              Latest Merch
+            </h1>
+            <br />
+            <div className="flex items-center gap-2">
+              <p className="font-semibold text-sm md:text-lg">\\FROM TURBULENT</p>
+            </div>
+            <hr />
+            <div className="flex items-center gap-2">
+              <p className="font-semibold text-sm md:text-base">//Feel The Dynamic...</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Hero right */}
-      <img className="w-full sm:w-1/2" src={assets.TurbulentShirtFrontBack} alt="" />
+        {/* Hero right */}
+        <img
+          className="w-full sm:w-1/2" // Added transform effects for hover and active states
+          src={assets.hero_img}
+          alt="Hero"
+        />
+      </div>
     </div>
   );
 };

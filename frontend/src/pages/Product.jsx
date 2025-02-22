@@ -1,14 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import RelatedProducts from "../components/RelatedProducts";
 
 const Product = () => {
   const { productId } = useParams();
-  const { products, currency, addToCart } = useContext(ShopContext);
+  const { products, currency, addToCart, token } = useContext(ShopContext);
   const [productData, setProductData] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [size, setSize] = useState("");
+  const navigate = useNavigate(); // Use navigate for redirection
 
   const fetchProductData = async () => {
     products.map((item) => {
@@ -33,6 +34,15 @@ const Product = () => {
     setCurrentImageIndex((prevIndex) =>
       prevIndex === productData.image.length - 1 ? 0 : prevIndex + 1
     );
+  };
+
+  const handleAddToCart = () => {
+    if (token) {
+      addToCart(productData._id, size);
+    } else {
+      // Redirect to login page if not logged in
+      navigate("/login");
+    }
   };
 
   return productData ? (
@@ -76,10 +86,10 @@ const Product = () => {
               <img
                 key={index}
                 className={`absolute w-full h-full object-contain transition-transform duration-500 ease-in-out transform ${currentImageIndex === index
-                    ? 'translate-x-0'
-                    : currentImageIndex > index
-                      ? '-translate-x-full'
-                      : 'translate-x-full'
+                  ? 'translate-x-0'
+                  : currentImageIndex > index
+                    ? '-translate-x-full'
+                    : 'translate-x-full'
                   }`}
                 src={src}
                 alt=""
@@ -112,10 +122,10 @@ const Product = () => {
               ))}
             </div>
             <button
-              onClick={() => addToCart(productData._id, size)}
+              onClick={handleAddToCart}
               className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700"
             >
-              ADD TO CART
+              {token ? "ADD TO CART" : "LOGIN TO ADD TO CART"}
             </button>
             <hr className="mt-8 sm:w-4/5" />
             <div className="text-sm text-gray-500 mt-5 flex flex-col gap-1">

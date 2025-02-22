@@ -48,7 +48,7 @@ const placeOrder = async (req, res) => {
         await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
         // Send Telegram notification
-        const message = `收到新訂單:\n訂單號碼 : ${orderNumber}\n金額: $${amount}`;
+        const message = `收到新訂單:\n訂單號碼 : ${orderNumber}\n金額: $${amount}\n付款方式 : 現金交收`;
         await sendTelegramNotification('-1002324020435', message); // Replace with your chat ID
 
         res.json({ success: true, message: "Order Placed", orderNumber }); // Return order number
@@ -80,6 +80,10 @@ const placeOrderPayme = async (req, res) => {
 
         await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
+        // Send Telegram notification
+        const message = `收到新訂單:\n訂單號碼 : ${orderNumber}\n金額: $${amount}\n付款方式 : PayMe`;
+        await sendTelegramNotification('-1002324020435', message); // Replace with your chat ID
+
         res.json({ success: true, message: "Order Placed", orderNumber }); // Return order number
     } catch (error) {
         console.log(error);
@@ -108,6 +112,10 @@ const placeOrderFps = async (req, res) => {
         await newOrder.save();
 
         await userModel.findByIdAndUpdate(userId, { cartData: {} });
+
+        // Send Telegram notification
+        const message = `收到新訂單:\n訂單號碼 : ${orderNumber}\n金額: $${amount}\n付款方式 : FPS`;
+        await sendTelegramNotification('-1002324020435', message); // Replace with your chat ID
 
         res.json({ success: true, message: "Order Placed", orderNumber }); // Return order number
     } catch (error) {

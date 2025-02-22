@@ -1,19 +1,15 @@
 import logo from "./Turbulent Title_Black.png";
-import ContinueSticker from "./ContinueSticker62cm-1.png";
-import NonfictionSticker from "./TurbulentNon-Fiction.png";
-import StallertalkSticker from "./StallertalkSticker-1.png";
-import TheCageSticker from "./TheCageSticker-1.png";
 import TurbulentShirt from "./TurbulentShirt1.png";
 import TurbulentShirtBack from "./TurbulentShirtBack1.png";
 import TurbulentShirtChart from "./TurbulentShirtChart.jpg";
 import TurbulentShirtFrontBack from "./TurbulentShirtFrontBack.jpg";
 import fpsLogo from "./fps-logo.png";
-import paymeLogo from "./payme.png"
-import paymeCode from "./paymecode.jpg"
-
-
+import paymeLogo from "./payme.png";
+import paymeCode from "./paymecode.jpg";
 import hero_img from "./hero_img.png";
-import background from "./hero_img.png";
+import hero_bg from "./HeroBg.jpg"
+
+
 import cart_icon from "./cart_icon.png";
 import bin_icon from "./bin_icon.png";
 import dropdown_icon from "./dropdown_icon.png";
@@ -54,68 +50,70 @@ export const assets = {
   cross_icon,
   fpsLogo,
   paymeLogo,
-  paymeCode
+  paymeCode,
+  hero_img,
+  hero_bg
 };
 
-export const products = [
-  {
-    _id: "aaaaa",
-    name: "TURBULENT T-SHIRT",
-    description: "A heavyweight, lose-fitting and short sleeves shirt.",
-    price: 250,
-    image: [TurbulentShirt, TurbulentShirtBack, TurbulentShirtFrontBack, TurbulentShirtChart],
-    category: "TEES",
-    subCategory: "",
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    date: 1716634345448,
-    bestseller: true,
-  },
-  {
-    _id: "aaaab",
-    name: "續 STICKER",
-    description: "FROM STICKER PACK vol1.",
-    price: 10,
-    image: [ContinueSticker],
-    category: "ACCESSORIES",
-    subCategory: "",
-    sizes: ["N/A"],
-    date: 1716621345448,
-    bestseller: false,
-  },
-  {
-    _id: "aaaac",
-    name: "NON-FICTION STICKER",
-    description: "FROM STICKER PACK vol1.",
-    price: 10,
-    image: [NonfictionSticker],
-    category: "ACCESSORIES",
-    subCategory: "",
-    sizes: ["N/A"],
-    date: 1716234545448,
-    bestseller: true,
-  },
-  {
-    _id: "aaaad",
-    name: "Stella-Talk Sticker",
-    description: "FROM STICKER PACK vol1.",
-    price: 10,
-    image: [StallertalkSticker],
-    category: "ACCESSORIES",
-    subCategory: "",
-    sizes: ["N/A"],
-    date: 1716621345448,
-    bestseller: true,
-  },
-  {
-    _id: "aaaae",
-    name: "The Cage Sticker",
-    description: "FROM STICKER PACK vol1.",
-    price: 10,
-    image: [TheCageSticker],
-    category: "ACCESSORIES",
-    subCategory: "",
-    sizes: ["N/A"],
-    date: 1716622345448,
-    bestseller: true,
-  },
-];
+// export const products = [
+//   {
+//     _id: "aaaaa",
+//     name: "TURBULENT T-SHIRT",
+//     description: "A heavyweight, lose-fitting and short sleeves shirt.",
+//     price: 250,
+//     image: [TurbulentShirt, TurbulentShirtBack, TurbulentShirtFrontBack, TurbulentShirtChart],
+//     category: "TEES",
+//     subCategory: "",
+//     sizes: ["S", "M", "L", "XL", "XXL"],
+//     date: 1716634345448,
+//     bestseller: true,
+//   },
+//   {
+//     _id: "aaaab",
+//     name: "續 STICKER",
+//     description: "FROM STICKER PACK vol1.",
+//     price: 10,
+//     image: [ContinueSticker],
+//     category: "ACCESSORIES",
+//     subCategory: "",
+//     sizes: ["N/A"],
+//     date: 1716621345448,
+//     bestseller: false,
+//   },
+//   {
+//     _id: "aaaac",
+//     name: "NON-FICTION STICKER",
+//     description: "FROM STICKER PACK vol1.",
+//     price: 10,
+//     image: [NonfictionSticker],
+//     category: "ACCESSORIES",
+//     subCategory: "",
+//     sizes: ["N/A"],
+//     date: 1716234545448,
+//     bestseller: true,
+//   },
+//   {
+//     _id: "aaaad",
+//     name: "Stella-Talk Sticker",
+//     description: "FROM STICKER PACK vol1.",
+//     price: 10,
+//     image: [StallertalkSticker],
+//     category: "ACCESSORIES",
+//     subCategory: "",
+//     sizes: ["N/A"],
+//     date: 1716621345448,
+//     bestseller: true,
+//   },
+//   {
+//     _id: "aaaae",
+//     name: "The Cage Sticker",
+//     description: "FROM STICKER PACK vol1.",
+//     price: 10,
+//     image: [TheCageSticker],
+//     category: "ACCESSORIES",
+//     subCategory: "",
+//     sizes: ["N/A"],
+//     date: 1716622345448,
+//     bestseller: true,
+//   },
+// ];

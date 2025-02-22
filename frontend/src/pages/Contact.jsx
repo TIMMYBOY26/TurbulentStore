@@ -21,7 +21,7 @@ const Contact = () => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Follow Us on Instagram
+            Follow us on Instagram
           </a>
         </div>
         <div className="flex flex-col items-center border p-5 rounded-lg shadow-md w-full md:w-1/3">
@@ -33,7 +33,7 @@ const Contact = () => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Message Us on WhatsApp
+            Message us on WhatsApp
           </a>
         </div>
 
