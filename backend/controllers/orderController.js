@@ -1,5 +1,23 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
+import axios from 'axios';
+
+
+const sendTelegramNotification = async (chatId, message) => {
+    const token = '7804211306:AAHkJwg-ejrIB4evQ-EHQpCV8UJJB8eQaoY'; // Replace with your bot token
+    const url = `https://api.telegram.org/bot${token}/sendMessage`;
+
+    try {
+        await axios.post(url, {
+            chat_id: chatId,
+            text: message,
+        });
+        console.log('Telegram message sent successfully!');
+    } catch (error) {
+        console.error(`Failed to send Telegram message: ${error.message}`);
+    }
+};
+
 
 // Function to generate a unique order number
 const generateOrderNumber = async () => {
@@ -28,6 +46,10 @@ const placeOrder = async (req, res) => {
         await newOrder.save();
 
         await userModel.findByIdAndUpdate(userId, { cartData: {} });
+
+        // Send Telegram notification
+        const message = `New Order Placed:\nOrder Number: ${orderNumber}\nAmount: ${amount}\nAddress: ${address}`;
+        await sendTelegramNotification('769583801', message); // Replace with your chat ID
 
         res.json({ success: true, message: "Order Placed", orderNumber }); // Return order number
     } catch (error) {
