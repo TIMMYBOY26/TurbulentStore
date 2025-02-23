@@ -10,8 +10,6 @@ import hero_img from "./hero_img.png";
 import hero_bg from "./HeroBg.jpg";
 import loginBg from "./loginBg.jpg";
 
-
-
 import cart_icon from "./cart_icon.png";
 import bin_icon from "./bin_icon.png";
 import dropdown_icon from "./dropdown_icon.png";
@@ -49,7 +47,7 @@ export const assets = {
   paymeCode,
   hero_img,
   hero_bg,
-  loginBg
+  loginBg,
 };
 
 // export const products = [
