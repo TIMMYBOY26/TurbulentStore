@@ -22,6 +22,7 @@ import menu_icon from "./menu_icon.png";
 import about_img from "./about_img.png";
 import contact_img from "./contact_img.png";
 import cross_icon from "./cross_icon.png";
+import parcel_icon from "./parcel_icon.svg";
 
 export const assets = {
   logo,
@@ -48,6 +49,7 @@ export const assets = {
   hero_img,
   hero_bg,
   loginBg,
+  parcel_icon,
 };
 
 // export const products = [

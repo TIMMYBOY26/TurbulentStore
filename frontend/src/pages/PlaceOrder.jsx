@@ -43,6 +43,7 @@ const PlaceOrder = () => {
             if (itemInfo) {
               // Include productId, size, and quantity in orderItems
               orderItems.push({
+                name: itemInfo.name,
                 productId: itemInfo._id, // Ensure productId is included
                 size: size,
                 quantity: cartItems[itemId][size],

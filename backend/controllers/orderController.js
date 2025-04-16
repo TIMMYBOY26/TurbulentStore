@@ -26,12 +26,14 @@ const generateOrderNumber = async () => {
 };
 
 // Function to reduce the size count of ordered products within a transaction
+// This function reduces the count of a product size in the database
+// Function to reduce the size count of ordered products within a transaction
 const reduceProductSizeCount = async (items, session) => {
     for (const item of items) {
-        const { productId, size, quantity } = item;
+        const { productId, size, quantity, name } = item;
 
         try {
-            console.log(`Updating productId: ${productId}, size: ${size}, quantity: ${quantity}`);
+            console.log(`Updating productId: ${productId}, name: ${name}, size: ${size}, quantity: ${quantity}`);
 
             const result = await productModel.findOneAndUpdate(
                 { _id: productId, "sizes.size": size },
@@ -44,12 +46,25 @@ const reduceProductSizeCount = async (items, session) => {
             } else {
                 const updatedSize = result.sizes.find(s => s.size === size);
                 console.log(`Updated productId: ${productId}, size: ${size}, new count: ${updatedSize.count}`);
+
+                // Check if the new count is zero and send a notification
+                if (updatedSize.count === 0) {
+                    const message = `Product out of stock:\nProduct Name: ${name}\nSize: ${size}`;
+                    await sendTelegramNotification('-1002324020435', message); // Send Telegram notification
+                }
+
+                // Check if the new count is less than 5 and send a notification
+                if (updatedSize.count <= 10 & updatedSize.count > 0) {
+                    const message = `Product running low:\nProduct: ${name}\nSize: ${size} \nStock:${updatedSize.count}`;
+                    await sendTelegramNotification('-1002324020435', message); // Send Telegram notification
+                }
             }
         } catch (error) {
             console.error(`Error updating productId: ${productId}, size: ${size}`, error);
         }
     }
 };
+
 
 // Placing orders using COD Method
 const placeOrder = async (req, res) => {

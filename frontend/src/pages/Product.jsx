@@ -126,7 +126,7 @@ const Product = () => {
                   >
                     {item.size}
                   </button>
-                  {item.count === 0 && (
+                  {item.count <= 0 && (
                     <span className="text-sm text-red-500">Sold Out</span>
                   )}
                   {item.count > 0 && (

@@ -2,6 +2,8 @@ import React, { useContext, useState, useEffect } from "react";
 import { ShopContext } from "../context/ShopContext";
 import Title from "../components/Title";
 import axios from "axios";
+import { assets } from "../assets/assets";
+
 
 const Order = () => {
   const { backendUrl, token, currency } = useContext(ShopContext);
@@ -26,6 +28,7 @@ const Order = () => {
               payment: order.payment,
               paymentMethod: order.paymentMethod,
               date: order.date,
+              amount: order.amount, // Add amount to grouped order
               items: [],
             };
           }
@@ -63,22 +66,25 @@ const Order = () => {
             className="py-4 border-b text-gray-700 flex flex-col gap-4"
           >
             <div className="flex items-start gap-6 text-sm">
-              {order.items[0].image && order.items[0].image.length > 0 ? (
-                <img className="w-16 sm:w-20" src={order.items[0].image[0]} alt="" />
-              ) : (
-                <div className="w-16 sm:w-20 bg-gray-200 flex items-center justify-center">
-                  <p>No Image Available</p>
-                </div>
-              )}
+
+              <div className="w-16 sm:w-20 bg-gray-200 flex items-center justify-center">
+                <img src={assets.parcel_icon} alt="" />
+              </div>
+
               <div>
-                {/* Display order number from the item */}
+                {/* Display order number from the first item */}
                 <p className="text-gray-500">Order Number: {order.items[0].orderNumber}</p>
-                <p className="sm:text-base font-medium">{order.items[0].name}</p>
+                <p className="sm:text-base font-medium">Items:</p>
+                {/* Display all product names */}
+                {order.items.map((item, itemIndex) => (
+                  <p key={itemIndex} className="text-gray-600">{item.name} - Size: {item.size} - Quantity: {item.quantity}</p>
+                ))}
                 <div className="flex items-center gap-3 mt-1 text-base text-gray-700">
                   <p>
                     Total: {currency}
-                    {order.items.reduce((total, item) => total + (item.price || 0) * (item.quantity || 0), 0).toFixed(2)}
+                    {order.amount} {/* Display the amount */}
                   </p>
+                  <p>Quantity: {order.items.reduce((total, item) => total + item.quantity, 0)}</p>
                 </div>
                 <p className="mt-1">
                   Order Date: <span className="text-gray-600">{new Date(order.date).toDateString()}</span>
@@ -97,6 +103,7 @@ const Order = () => {
                 Track Order
               </button>
             </div>
+
           </div>
         ))}
       </div>
