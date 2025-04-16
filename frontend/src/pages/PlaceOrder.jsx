@@ -113,7 +113,7 @@ const PlaceOrder = () => {
       {/* Left Side */}
       <div className="flex flex-col gap-4 w-full sm:max-w-[480px]">
         <div className="text-xl sm:text-2xl my-3">
-          <Title text1={"DELIVERY"} text2={"INFORMATION"} />
+          <Title text1={""} text2={"INFORMATION"} />
         </div>
 
         <div className="flex gap-3">
@@ -128,7 +128,7 @@ const PlaceOrder = () => {
             placeholder="Last Name"
           />
         </div>
-        <input required onChange={onChangeHandler} name="email" value={formData.email}
+        {/* <input required onChange={onChangeHandler} name="email" value={formData.email}
           className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
           type="email"
           placeholder="Email address"
@@ -161,7 +161,7 @@ const PlaceOrder = () => {
             type="text"
             placeholder="Country"
           />
-        </div>
+        </div> */}
         <input required onChange={onChangeHandler} name="phone" value={formData.phone}
           className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
           type="number"
