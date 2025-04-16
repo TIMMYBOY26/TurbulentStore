@@ -3,6 +3,7 @@ import {
     registerUser,
     sendLoginPasscode,  // Import the function to send the passcode
     verifyPasscode,      // Import the function for verifying the passcode
+    adminLogin,
 } from '../controllers/userController.js';
 
 const userRouter = express.Router();
@@ -18,5 +19,7 @@ userRouter.post('/send-passcode', sendLoginPasscode); // This handles sending th
 
 // New route to verify the passcode
 userRouter.post('/verify-passcode', verifyPasscode); // This handles verifying the passcode
+
+userRouter.post('/admin', adminLogin)
 
 export default userRouter;
