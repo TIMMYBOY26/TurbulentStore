@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import RelatedProducts from "../components/RelatedProducts";
+import { ToastContainer, toast } from 'react-toastify'; // Import toast functions
+import 'react-toastify/dist/ReactToastify.css'; // Import styles
 
 const Product = () => {
   const { productId } = useParams();
@@ -39,16 +41,18 @@ const Product = () => {
   const handleAddToCart = () => {
     if (token) {
       addToCart(productData._id, size);
+      toast.success("1 item added to cart successfully!"); // Show success toast
     } else {
       // Redirect to login page if not logged in
       navigate("/login");
     }
   };
 
-  const isSoldOut = productData && productData.sizes.length === 0;
-
   return productData ? (
     <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100">
+      {/* Toast Container */}
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
+
       {/* Product Data */}
       <div className="flex gap-12 sm:gap-12 flex-col sm:flex-row">
         {/* Product Images */}
@@ -113,31 +117,31 @@ const Product = () => {
           <div className="flex flex-col gap-4 my-8">
             <p>Select Size</p>
             <div className="flex gap-2">
-              {productData.sizes.map((item, index) => (
-                <button
-                  onClick={() => setSize(item)}
-                  className={`border py-2 px-4 bg-gray-100 ${item === size ? "border-blue-500" : ""}`}
-                  key={index}
-                >
-                  {item}
-                </button>
+              {productData.sizes.map((item) => (
+                <div key={item.size} className="flex flex-col items-center">
+                  <button
+                    onClick={() => item.count > 0 && setSize(item.size)}
+                    className={`border py-2 px-4 ${item.count === 0 ? "bg-gray-300 cursor-not-allowed" : "bg-gray-100"} ${item.size === size ? "border-blue-500" : ""}`}
+                    disabled={item.count === 0}
+                  >
+                    {item.size}
+                  </button>
+                  {item.count === 0 && (
+                    <span className="text-sm text-red-500">Sold Out</span>
+                  )}
+                  {item.count > 0 && (
+                    <span className="text-sm text-gray-500">{item.count} available</span>
+                  )}
+                </div>
               ))}
             </div>
-            {isSoldOut ? (
-              <button
-                className="bg-gray-400 text-white px-8 py-3 text-sm cursor-not-allowed"
-                disabled
-              >
-                SORRY SOLD OUT
-              </button>
-            ) : (
-              <button
-                onClick={handleAddToCart}
-                className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700"
-              >
-                {token ? "ADD TO CART" : "LOGIN TO ADD TO CART"}
-              </button>
-            )}
+            <button
+              onClick={handleAddToCart}
+              className={`bg-black text-white px-8 py-3 text-sm active:bg-gray-700 ${size === "" ? "cursor-not-allowed opacity-50" : ""}`}
+              disabled={size === ""}
+            >
+              {token ? "ADD TO CART" : "LOGIN TO ADD TO CART"}
+            </button>
             <hr className="mt-8 sm:w-4/5" />
             <div className="text-sm text-gray-500 mt-5 flex flex-col gap-1">
               <p>Original product.</p>

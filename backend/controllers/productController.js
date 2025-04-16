@@ -1,8 +1,7 @@
-import { v2 as cloudinary } from "cloudinary"
-import productModel from "../models/productModel.js"
+import { v2 as cloudinary } from "cloudinary";
+import productModel from "../models/productModel.js";
 
-
-// fuction for add product 
+// Function for adding a product 
 const addProduct = async (req, res) => {
     try {
         const { name, description, price, category, sizes, bestseller } = req.body;
@@ -20,14 +19,18 @@ const addProduct = async (req, res) => {
             })
         );
 
-        const sizesParsed = JSON.parse(sizes);
+        // Parse sizes to include size and count
+        const sizesParsed = JSON.parse(sizes).map(size => ({
+            size: size.size,  // e.g., "M"
+            count: Number(size.count)  // e.g., 10
+        }));
 
         const productData = {
             name,
             description,
             category,
             price: Number(price),
-            bestseller: bestseller === "true" ? true : false,
+            bestseller: bestseller === "true",
             sizes: sizesParsed,
             image: imagesUrl,
             date: Date.now(),
@@ -44,52 +47,62 @@ const addProduct = async (req, res) => {
     }
 };
 
-
-// fuction for list product 
+// Function for listing products 
 const listProduct = async (req, res) => {
     try {
         const products = await productModel.find({});
-        res.json({ success: true, products })
+        res.json({ success: true, products });
 
     } catch (error) {
         console.log(error);
         res.json({ success: false, message: error.message });
     }
-}
+};
 
-// fuction for update product price
+// Function for updating product price
 const updateProduct = async (req, res) => {
-    const { id, price } = req.body;
+    const { id, price, sizes } = req.body;
     try {
-        await productModel.findByIdAndUpdate(id, { price });
-        res.json({ success: true, message: 'Product price updated!' });
+        const updateData = { price };
+
+        // Update sizes if provided
+        if (sizes) {
+            const sizesParsed = JSON.parse(sizes).map(size => ({
+                size: size.size,
+                count: Number(size.count)
+            }));
+            updateData.sizes = sizesParsed;
+        }
+
+        await productModel.findByIdAndUpdate(id, updateData);
+        res.json({ success: true, message: 'Product updated!' });
     } catch (error) {
         res.json({ success: false, message: error.message });
     }
-}
+};
 
-// fuction for remove product 
+// Function for removing a product 
 const removeProduct = async (req, res) => {
     try {
-        await productModel.findByIdAndDelete(req.body.id)
-        res.json({ success: true, messae: "Product Removed" })
+        await productModel.findByIdAndDelete(req.body.id);
+        res.json({ success: true, message: "Product Removed" });
     } catch (error) {
         console.log(error);
         res.json({ success: false, message: error.message });
     }
-}
+};
 
-// fuction for single product info
+// Function for single product info
 const singleProduct = async (req, res) => {
     try {
-        const { productId } = req.body
-        const product = await productModel.findById(productId)
-        res.json({ success: true, product })
+        const { productId } = req.body;
+        const product = await productModel.findById(productId);
+        res.json({ success: true, product });
 
     } catch (error) {
         console.log(error);
         res.json({ success: false, message: error.message });
     }
-}
+};
 
-export { listProduct, addProduct, removeProduct, singleProduct, updateProduct }
+export { listProduct, addProduct, removeProduct, singleProduct, updateProduct };

@@ -6,16 +6,17 @@ import { ToastContainer, toast } from "react-toastify"; // Import Toastify compo
 import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
 
 const Add = ({ token }) => {
-  const [image1, setImage1] = useState(false);
-  const [image2, setImage2] = useState(false);
-  const [image3, setImage3] = useState(false);
-  const [image4, setImage4] = useState(false);
+  const [image1, setImage1] = useState(null);
+  const [image2, setImage2] = useState(null);
+  const [image3, setImage3] = useState(null);
+  const [image4, setImage4] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("TEES");
   const [bestseller, setBestseller] = useState(false);
   const [sizes, setSizes] = useState([]);
+  const [sizeCount, setSizeCount] = useState({}); // New state for size counts
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -27,7 +28,7 @@ const Add = ({ token }) => {
       formData.append("price", price);
       formData.append("category", category);
       formData.append("bestseller", bestseller);
-      formData.append("sizes", JSON.stringify(sizes));
+      formData.append("sizes", JSON.stringify(sizes.map(size => ({ size, count: sizeCount[size] || 0 }))));
 
       image1 && formData.append("image1", image1);
       image2 && formData.append("image2", image2);
@@ -49,6 +50,13 @@ const Add = ({ token }) => {
       console.error(error);
       toast.error(error.message || "An error occurred."); // Error toast for catch block
     }
+  };
+
+  const handleSizeCountChange = (size, count) => {
+    setSizeCount((prev) => ({
+      ...prev,
+      [size]: count,
+    }));
   };
 
   return (
@@ -157,111 +165,42 @@ const Add = ({ token }) => {
               onChange={(e) => setPrice(e.target.value)}
               value={price}
               className="w-full px-3 py-2 sm:w-[120px]"
-              type="Number"
+              type="number"
               placeholder="25"
+              required
             />
           </div>
         </div>
 
         <div>
-          <p className="mb-2 ">Product Sizes</p>
+          <p className="mb-2">Product Sizes</p>
           <div className="flex gap-3">
-            <div
-              onClick={() =>
-                setSizes((prev) =>
-                  prev.includes("S")
-                    ? prev.filter((item) => item !== "S")
-                    : [...prev, "S"]
-                )
-              }
-            >
-              <p
-                className={`${sizes.includes("S") ? "bg-blue-300" : "bg-slate-200"
-                  } px-3 py-1 cursor-pointer`}
-              >
-                S
-              </p>
-            </div>
-            <div
-              onClick={() =>
-                setSizes((prev) =>
-                  prev.includes("M")
-                    ? prev.filter((item) => item !== "M")
-                    : [...prev, "M"]
-                )
-              }
-            >
-              <p
-                className={`${sizes.includes("M") ? "bg-blue-300" : "bg-slate-200"
-                  } px-3 py-1 cursor-pointer`}
-              >
-                M
-              </p>
-            </div>
-            <div
-              onClick={() =>
-                setSizes((prev) =>
-                  prev.includes("L")
-                    ? prev.filter((item) => item !== "L")
-                    : [...prev, "L"]
-                )
-              }
-            >
-              <p
-                className={`${sizes.includes("L") ? "bg-blue-300" : "bg-slate-200"
-                  } px-3 py-1 cursor-pointer`}
-              >
-                L
-              </p>
-            </div>
-            <div
-              onClick={() =>
-                setSizes((prev) =>
-                  prev.includes("XL")
-                    ? prev.filter((item) => item !== "XL")
-                    : [...prev, "XL"]
-                )
-              }
-            >
-              <p
-                className={`${sizes.includes("XL") ? "bg-blue-300" : "bg-slate-200"
-                  } px-3 py-1 cursor-pointer`}
-              >
-                XL
-              </p>
-            </div>
-            <div
-              onClick={() =>
-                setSizes((prev) =>
-                  prev.includes("XXL")
-                    ? prev.filter((item) => item !== "XXL")
-                    : [...prev, "XXL"]
-                )
-              }
-            >
-              <p
-                className={`${sizes.includes("XXL") ? "bg-blue-300" : "bg-slate-200"
-                  } px-3 py-1 cursor-pointer`}
-              >
-                XXL
-              </p>
-            </div>
-            <div
-              onClick={() =>
-                setSizes((prev) =>
-                  prev.includes("STICKER")
-                    ? prev.filter((item) => item !== "STICKER")
-                    : [...prev, "STICKER"]
-                )
-              }
-            >
-              <p
-                className={`${sizes.includes("STICKER") ? "bg-blue-300" : "bg-slate-200"
-                  } px-3 py-1 cursor-pointer`}
-              >
-                STICKER
-              </p>
-            </div>
+            {["S", "M", "L", "XL", "XXL", "STICKER"].map((size) => (
+              <div key={size} className="flex flex-col items-center">
+                <p
+                  onClick={() =>
+                    setSizes((prev) =>
+                      prev.includes(size)
+                        ? prev.filter((item) => item !== size)
+                        : [...prev, size]
+                    )
+                  }
+                  className={`${sizes.includes(size) ? "bg-blue-300" : "bg-slate-200"
+                    } px-3 py-1 cursor-pointer`}
+                >
+                  {size}
+                </p>
+                {sizes.includes(size) && (
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="Count"
+                    onChange={(e) => handleSizeCountChange(size, e.target.value)}
+                    className="w-16 mt-1"
+                  />
+                )}
+              </div>
+            ))}
           </div>
         </div>
 

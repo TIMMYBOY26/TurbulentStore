@@ -35,78 +35,58 @@ const PlaceOrder = () => {
     try {
       let orderItems = [];
 
-      for (const item in cartItems) {
-        for (const size in cartItems[item]) {
-          if (cartItems[item][size] > 0) {
-            const itemInfo = structuredClone(products.find(product => product._id === item));
+      // Iterate over cartItems to build orderItems
+      for (const itemId in cartItems) { // Make sure itemId corresponds to product IDs
+        for (const size in cartItems[itemId]) {
+          if (cartItems[itemId][size] > 0) {
+            const itemInfo = structuredClone(products.find(product => product._id === itemId));
             if (itemInfo) {
-              itemInfo.size = size;
-              itemInfo.quantity = cartItems[item][size];
-              orderItems.push(itemInfo);
+              // Include productId, size, and quantity in orderItems
+              orderItems.push({
+                productId: itemInfo._id, // Ensure productId is included
+                size: size,
+                quantity: cartItems[itemId][size],
+              });
             }
           }
         }
       }
+
       let orderData = {
         address: formData,
         items: orderItems,
         amount: getCartAmount() + delivery_fee
-      }
+      };
 
+      // API call based on selected payment method
+      let response;
       switch (method) {
-        // API calls for COD
         case 'cod':
-          const response = await axios.post(backendUrl + '/api/order/place', orderData, { headers: { token } });
-          console.log(response.data);
-
-          if (response.data.success) {
-            setCartItems({});
-            navigate('/orders');
-          } else {
-            toast.error(response.data.message);
-          }
+          response = await axios.post(backendUrl + '/api/order/place', orderData, { headers: { token } });
           break;
-
-
-        default:
-          break;
-
-        // API calls for PayMe
         case 'payme':
-          const responsePayMe = await axios.post(backendUrl + '/api/order/payme', orderData, { headers: { token } });
-          console.log(responsePayMe.data);
-
-          if (responsePayMe.data.success) {
-            // Handle success for PayMe payment
-            setCartItems({});
-            navigate('/orders');
-          } else {
-            toast.error(responsePayMe.data.message);
-          }
+          response = await axios.post(backendUrl + '/api/order/payme', orderData, { headers: { token } });
           break;
-
-        // API calls for FPS
         case 'fps':
-          const responseFPS = await axios.post(backendUrl + '/api/order/fps', orderData, { headers: { token } });
-          console.log(responseFPS.data);
-
-          if (responseFPS.data.success) {
-            // Handle success for FPS payment
-            setCartItems({});
-            navigate('/orders');
-          } else {
-            toast.error(responseFPS.data.message);
-          }
+          response = await axios.post(backendUrl + '/api/order/fps', orderData, { headers: { token } });
           break;
+        default:
+          throw new Error("Invalid payment method selected.");
       }
 
-
-
+      // Handle the response from the server
+      if (response.data.success) {
+        setCartItems({});
+        navigate('/orders');
+      } else {
+        toast.error(response.data.message);
+      }
     } catch (error) {
       console.error(error);
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || error.message || "An unknown error occurred.");
     }
   };
+
 
   return (
     <form onSubmit={onSubmitHandler} className="flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] border-t">

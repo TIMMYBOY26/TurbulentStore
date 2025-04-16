@@ -78,6 +78,7 @@ const List = ({ token }) => {
                     <b>Image</b>
                     <b>Name</b>
                     <b>Category</b>
+                    <b>Sizes</b>
                     <b>Price</b>
                     <b className='text-center'>Action</b>
                 </div>
@@ -89,6 +90,20 @@ const List = ({ token }) => {
                             <img className='w-12' src={item.image[0]} alt="" />
                             <p>{item.name}</p>
                             <p>{item.category}</p>
+                            <div>
+                                {/* Display sizes and counts */}
+                                {item.sizes && item.sizes.length > 0 ? (
+                                    <div className="flex flex-col">
+                                        {item.sizes.map((size) => (
+                                            <p key={size.size}>
+                                                {size.size}: {size.count}
+                                            </p>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p>No sizes available</p>
+                                )}
+                            </div>
                             {editPriceId === item._id ? (
                                 <input
                                     type="text"
