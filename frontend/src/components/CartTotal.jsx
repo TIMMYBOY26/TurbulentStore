@@ -7,13 +7,14 @@ const CartTotal = () => {
 
   return (
     <div className="w-full">
-      <div className="text-2xl">
-        <Title text2={"CART TOTALS"} />
+      <div className="text-xl sm:text-2xl my-3 text-left">
+        <Title text1={"STEP 2: "} text2={"CART TOTALS"} />
       </div>
 
       <div className="flex flex-col gap-2 mt-2 text-sm">
         <div className="flex justify-between">
-          {/* <p>Subtotal</p>
+          {/* Uncomment these lines if you want to show subtotal
+          <p>Subtotal</p>
           <p>
             {currency} {getCartAmount()}
           </p> */}
@@ -21,21 +22,21 @@ const CartTotal = () => {
         <hr />
 
         <div className="flex justify-between mt-2">
-          <b>Estimated Total</b>
+          <b>Total</b>
           <b>
             {currency}
             {getCartAmount() === 0 ? 0 : getCartAmount()}
-            {/* {getCartAmount() === 0 ? 0 : getCartAmount() + delivery_fee} */}
+            {/* Uncomment this line if you want to include delivery fee
+            {getCartAmount() === 0 ? 0 : getCartAmount() + delivery_fee} */}
           </b>
         </div>
         <div className="flex justify-between mt-2">
-          <p>+ 運費 (現金交收免運費)</p>
+          <p></p>
           <p>
-            {/* {currency} {delivery_fee} */}
+            {/* Uncomment this line if you want to show delivery fee
+          {currency} {delivery_fee} */}
           </p>
         </div>
-
-
       </div>
     </div>
   );

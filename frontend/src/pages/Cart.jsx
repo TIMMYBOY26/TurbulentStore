@@ -10,8 +10,6 @@ const Cart = () => {
   const [cartData, setCartData] = useState([]);
 
   useEffect(() => {
-
-
     if (products.length > 0) {
       const tempData = [];
       for (const items in cartItems) {
@@ -32,7 +30,7 @@ const Cart = () => {
   return (
     <div className="border-t pt-14">
       <div className="text-2xl mb-3">
-        <Title text1={"YOUR"} text2={"CART"} />
+        <Title text1={"STEP 1: "} text2={"YOUR CART"} />
       </div>
 
       <div>
@@ -60,10 +58,10 @@ const Cart = () => {
                     e.target.value === "" || e.target.value === "0"
                       ? null
                       : updateQuantity(
-                        item._id,
-                        item.size,
-                        Number(e.target.value)
-                      )
+                          item._id,
+                          item.size,
+                          Number(e.target.value)
+                        )
                   }
                   className="border max-w-10 sm:max-w-20 px-1 sm:px-2 py-1"
                   type="number"
@@ -82,16 +80,22 @@ const Cart = () => {
         })}
       </div>
 
-      {/* Display CartTotal only once below the cart items */}
+      {/* Display CartTotal and buttons */}
       <div className="flex justify-end my-10">
-        <div className="w-full sm:w-[450px]">
+        <div className="w-full sm:w-[450px] text-end">
           <CartTotal />
-          <div className="w-full text-end">
+          <div className="flex justify-between">
+            <button
+              onClick={() => navigate("/collection")}
+              className="bg-black text-white text-sm my-8 px-8 py-3 rounded hover:bg-gray-800 transition"
+            >
+              BACK
+            </button>
             <button
               onClick={() => navigate("/place-order")}
-              className="bg-black text-white text-sm my-8 px-8 py-3"
+              className="bg-black text-white text-sm my-8 px-8 py-3 rounded hover:bg-gray-800 transition"
             >
-              PROCEED TO CHECKOUT
+              NEXT STEP TO CHECKOUT
             </button>
           </div>
         </div>

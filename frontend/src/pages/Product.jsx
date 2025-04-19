@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import RelatedProducts from "../components/RelatedProducts";
-import { ToastContainer, toast } from 'react-toastify'; // Import toast functions
-import 'react-toastify/dist/ReactToastify.css'; // Import styles
+import { ToastContainer, toast } from "react-toastify"; // Import toast functions
+import "react-toastify/dist/ReactToastify.css"; // Import styles
 
 const Product = () => {
   const { productId } = useParams();
@@ -51,7 +51,17 @@ const Product = () => {
   return productData ? (
     <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100">
       {/* Toast Container */}
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
 
       {/* Product Data */}
       <div className="flex gap-12 sm:gap-12 flex-col sm:flex-row">
@@ -91,12 +101,13 @@ const Product = () => {
             {productData.image.map((src, index) => (
               <img
                 key={index}
-                className={`absolute w-full h-full object-contain transition-transform duration-500 ease-in-out transform ${currentImageIndex === index
-                  ? 'translate-x-0'
-                  : currentImageIndex > index
-                    ? '-translate-x-full'
-                    : 'translate-x-full'
-                  }`}
+                className={`absolute w-full h-full object-contain transition-transform duration-500 ease-in-out transform ${
+                  currentImageIndex === index
+                    ? "translate-x-0"
+                    : currentImageIndex > index
+                    ? "-translate-x-full"
+                    : "translate-x-full"
+                }`}
                 src={src}
                 alt=""
               />
@@ -121,7 +132,11 @@ const Product = () => {
                 <div key={item.size} className="flex flex-col items-center">
                   <button
                     onClick={() => item.count > 0 && setSize(item.size)}
-                    className={`border py-2 px-4 ${item.count === 0 ? "bg-gray-300 cursor-not-allowed" : "bg-gray-100"} ${item.size === size ? "border-blue-500" : ""}`}
+                    className={`border py-2 px-4 ${
+                      item.count === 0
+                        ? "bg-gray-300 cursor-not-allowed"
+                        : "bg-gray-100"
+                    } ${item.size === size ? "border-blue-500" : ""}`}
                     disabled={item.count === 0}
                   >
                     {item.size}
@@ -130,14 +145,18 @@ const Product = () => {
                     <span className="text-sm text-red-500">Sold Out</span>
                   )}
                   {item.count > 0 && (
-                    <span className="text-sm text-gray-500">{item.count} available</span>
+                    <span className="text-sm text-gray-500">
+                      {item.count} available
+                    </span>
                   )}
                 </div>
               ))}
             </div>
             <button
               onClick={handleAddToCart}
-              className={`bg-black text-white px-8 py-3 text-sm active:bg-gray-700 ${size === "" ? "cursor-not-allowed opacity-50" : ""}`}
+              className={`bg-black text-white px-8 py-3 text-sm active:bg-gray-700 ${
+                size === "" ? "cursor-not-allowed opacity-50" : ""
+              }`}
               disabled={size === ""}
             >
               {token ? "ADD TO CART" : "LOGIN TO ADD TO CART"}
@@ -152,7 +171,10 @@ const Product = () => {
       </div>
 
       {/* Display related products */}
-      <RelatedProducts category={productData.category} currentProductId={productId} />
+      <RelatedProducts
+        category={productData.category}
+        currentProductId={productId}
+      />
     </div>
   ) : (
     <div className="opacity-0"></div>
