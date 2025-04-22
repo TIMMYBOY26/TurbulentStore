@@ -24,7 +24,30 @@ const Product = () => {
 
   useEffect(() => {
     fetchProductData();
+    window.scrollTo(0, 0); // Scroll to top when productId changes
   }, [productId, products]);
+
+  // Swipe functionality
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
+    setStartX(touch.clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    const touch = e.touches[0];
+    setEndX(touch.clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (startX - endX > 50) {
+      handleNextImage(); // Swipe left
+    } else if (endX - startX > 50) {
+      handlePrevImage(); // Swipe right
+    }
+  };
+
+  const [startX, setStartX] = useState(0);
+  const [endX, setEndX] = useState(0);
 
   const handlePrevImage = () => {
     setCurrentImageIndex((prevIndex) =>
@@ -49,7 +72,7 @@ const Product = () => {
   };
 
   return productData ? (
-    <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100">
+    <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100 relative">
       {/* Toast Container */}
       <ToastContainer
         position="top-right"
@@ -97,7 +120,12 @@ const Product = () => {
           </div>
 
           {/* Large Image with Sliding Effect */}
-          <div className="w-full sm:w-[75%] h-[500px] relative overflow-hidden">
+          <div
+            className="w-full sm:w-[75%] h-[500px] relative overflow-hidden"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
             {productData.image.map((src, index) => (
               <img
                 key={index}
@@ -110,13 +138,14 @@ const Product = () => {
                 }`}
                 src={src}
                 alt=""
+                style={{ zIndex: -1 }} // Ensure images are behind other elements
               />
             ))}
           </div>
         </div>
 
         {/* Product Information */}
-        <div className="flex-1">
+        <div className="flex-1 z-10 relative">
           <h1 className="font-medium text-2xl mt-2">{productData.name}</h1>
           <p className="mt-5 text-3xl font-medium">
             {currency}

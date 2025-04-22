@@ -5,35 +5,25 @@ import { toast } from "react-toastify";
 import { assets } from "../assets/assets"; // Import assets
 
 const Login = () => {
-  const { token, setToken, navigate, backendUrl, getUserCart } = useContext(ShopContext);
+  const { token, setToken, navigate, backendUrl, getUserCart } =
+    useContext(ShopContext);
 
   const [email, setEmail] = useState("");
   const [passcode, setPasscode] = useState("");
   const [isPasscodeSent, setIsPasscodeSent] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [name, setName] = useState("");
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
     try {
-      if (isRegistering) {
-        // Register user
-        const response = await axios.post(backendUrl + "/api/user/register", {
-          name,
-          email,
-        });
-        if (response.data.success) {
-          setIsRegistering(false);
-          toast.success("User registered successfully!");
-        } else {
-          toast.error(response.data.message);
-        }
-      } else if (isPasscodeSent) {
+      if (isPasscodeSent) {
         // Verify passcode
-        const response = await axios.post(backendUrl + "/api/user/verify-passcode", {
-          email,
-          passcode,
-        });
+        const response = await axios.post(
+          backendUrl + "/api/user/verify-passcode",
+          {
+            email,
+            passcode,
+          }
+        );
         if (response.data.success) {
           setToken(response.data.token); // Set the token in context
           localStorage.setItem("token", response.data.token); // Store token in local storage
@@ -46,9 +36,12 @@ const Login = () => {
         }
       } else {
         // Send passcode
-        const response = await axios.post(backendUrl + "/api/user/send-passcode", {
-          email,
-        });
+        const response = await axios.post(
+          backendUrl + "/api/user/send-passcode",
+          {
+            email,
+          }
+        );
         if (response.data.success) {
           setIsPasscodeSent(true);
           toast.success("Passcode sent to your email.");
@@ -69,17 +62,22 @@ const Login = () => {
   }, [token, navigate]);
 
   return (
-    <div className="w-full px-30 py-40 pt-20 border" style={{
-      backgroundImage: `url(${assets.loginBg})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-    }}>
+    <div
+      className="w-full px-30 py-40 pt-20 border"
+      style={{
+        backgroundImage: `url(${assets.loginBg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       <form
         onSubmit={onSubmitHandler}
         className="form-container flex flex-col items-center w-[90%] sm:max-w-96 m-auto mt-14 gap-4 text-gray-900"
       >
         <div className="inline-flex items-center gap-2 mb-2 mt-10">
-          <p className="prata-regular text-3xl">{isRegistering ? "Register" : isPasscodeSent ? "Verify Passcode" : "Login"}</p>
+          <p className="prata-regular text-3xl">
+            {isPasscodeSent ? "Verify Passcode" : "Login"}
+          </p>
         </div>
 
         <input
@@ -90,17 +88,6 @@ const Login = () => {
           placeholder="Email"
           required
         />
-
-        {isRegistering && (
-          <input
-            onChange={(e) => setName(e.target.value)}
-            value={name}
-            type="text"
-            className="w-full px-3 py-2 border border-gray-800"
-            placeholder="Name"
-            required
-          />
-        )}
 
         {isPasscodeSent && (
           <input
@@ -118,14 +105,7 @@ const Login = () => {
         </div>
 
         <button className="bg-black text-white font-light px-8 py-2 mt-4 hover:bg-gray-800 hover:text-blue-300 transition duration-300 ease-in-out">
-          {isRegistering ? "Register" : isPasscodeSent ? "Verify Passcode" : "Send Passcode"}
-        </button>
-
-        <button
-          className="bg-black text-white font-light px-8 py-2 mt-4 hover:bg-gray-800 hover:text-blue-300 transition duration-300 ease-in-out"
-          onClick={() => setIsRegistering(!isRegistering)}
-        >
-          {isRegistering ? "Already have an account? Login" : "New user? Register"}
+          {isPasscodeSent ? "Verify Passcode" : "Send Passcode"}
         </button>
       </form>
     </div>

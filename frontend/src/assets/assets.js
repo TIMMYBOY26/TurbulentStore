@@ -13,6 +13,7 @@ import loginBg from "./loginBg.jpg";
 import cart_icon from "./cart_icon.png";
 import bin_icon from "./bin_icon.png";
 import dropdown_icon from "./dropdown_icon.png";
+import support_icon from "./support_img.png";
 import exchange_icon from "./exchange_icon.png";
 import profile_icon from "./profile_icon.png";
 import quality_icon from "./quality_icon.png";
@@ -50,6 +51,7 @@ export const assets = {
   hero_bg,
   loginBg,
   parcel_icon,
+  support_icon,
 };
 
 // export const products = [
