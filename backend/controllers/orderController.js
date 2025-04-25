@@ -5,7 +5,7 @@ import axios from "axios";
 
 // Function to send Telegram notifications
 const sendTelegramNotification = async (chatId, message) => {
-  const token = "YOUR_TELEGRAM_BOT_TOKEN"; // Replace with your bot token
+  const token = "7804211306:AAHkJwg-ejrIB4evQ-EHQpCV8UJJB8eQaoY"; // Replace with your bot token
   const url = `https://api.telegram.org/bot${token}/sendMessage`;
 
   try {

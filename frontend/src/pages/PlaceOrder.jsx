@@ -291,7 +291,7 @@ const PlaceOrder = () => {
                     </p>
                     {method === "fps" && (
                       <ol className="list-decimal list-inside mt-2">
-                        <li>FPS識別碼: 117417618</li>
+                        <li>FPS識別碼: 2394658</li>
                         <li>
                           <a
                             href="https://wa.me/85293442688"
@@ -301,6 +301,12 @@ const PlaceOrder = () => {
                           >
                             Send payment completed capture
                           </a>
+                          (If you using PC) scan QR code to FPS
+                          <img
+                            className="h-40 w-40 mx-4"
+                            src={assets.fpsCode}
+                            alt="PayMe Code"
+                          />
                         </li>
                         <li>
                           <button
@@ -428,7 +434,7 @@ const PlaceOrder = () => {
                     </p>
                     {method === "fpsTradeIn" && (
                       <ol className="list-decimal list-inside mt-2">
-                        <li>FPS識別碼: 117417618</li>
+                        <li>FPS識別碼: 2394658</li>
                         <li>
                           <a
                             href="https://wa.me/85293442688"
@@ -438,6 +444,12 @@ const PlaceOrder = () => {
                           >
                             Send payment completed capture
                           </a>
+                          (If you using PC) scan QR code to FPS
+                          <img
+                            className="h-40 w-40 mx-4"
+                            src={assets.fpsCode}
+                            alt="PayMe Code"
+                          />
                         </li>
                         <li>
                           <button

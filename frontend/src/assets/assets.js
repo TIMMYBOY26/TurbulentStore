@@ -6,6 +6,7 @@ import TurbulentShirtFrontBack from "./TurbulentShirtFrontBack.jpg";
 import fpsLogo from "./fps-logo.png";
 import paymeLogo from "./payme.png";
 import paymeCode from "./paymecode.jpg";
+import fpsCode from "./fpscode.jpg";
 import hero_img from "./hero_img.png";
 import hero_bg from "./HeroBg.jpg";
 import loginBg from "./loginBg.jpg";
@@ -45,6 +46,7 @@ export const assets = {
   contact_img,
   cross_icon,
   fpsLogo,
+  fpsCode,
   paymeLogo,
   paymeCode,
   hero_img,
