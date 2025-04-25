@@ -159,8 +159,8 @@ const PlaceOrder = () => {
       console.error(error);
       toast.error(
         error.response?.data?.message ||
-          error.message ||
-          "An unknown error occurred."
+        error.message ||
+        "An unknown error occurred."
       );
     }
   };
@@ -231,9 +231,8 @@ const PlaceOrder = () => {
                     className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full"
                   >
                     <p
-                      className={`min-w-3.5 h-3.5 border rounded-full ${
-                        method === "payme" ? "bg-green-400" : ""
-                      }`}
+                      className={`min-w-3.5 h-3.5 border rounded-full ${method === "payme" ? "bg-green-400" : ""
+                        }`}
                     ></p>
                     <p className="text-gray-500 text-sm font-medium mx-4">
                       Delivery (By PayMe)
@@ -284,9 +283,8 @@ const PlaceOrder = () => {
                     className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full"
                   >
                     <p
-                      className={`min-w-3.5 h-3.5 border rounded-full ${
-                        method === "fps" ? "bg-green-400" : ""
-                      }`}
+                      className={`min-w-3.5 h-3.5 border rounded-full ${method === "fps" ? "bg-green-400" : ""
+                        }`}
                     ></p>
                     <p className="text-gray-500 text-sm font-medium mx-4">
                       Delivery (By FPS)
@@ -335,9 +333,8 @@ const PlaceOrder = () => {
                     className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full mb-3"
                   >
                     <p
-                      className={`min-w-3.5 h-3.5 border rounded-full ${
-                        method === "cod" ? "bg-green-400" : ""
-                      }`}
+                      className={`min-w-3.5 h-3.5 border rounded-full ${method === "cod" ? "bg-green-400" : ""
+                        }`}
                     ></p>
                     <p className="text-gray-500 text-sm font-medium mx-4">
                       Trade in person (By cash)
@@ -371,9 +368,8 @@ const PlaceOrder = () => {
                     className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full mb-3"
                   >
                     <p
-                      className={`min-w-3.5 h-3.5 border rounded-full ${
-                        method === "paymeTradeIn" ? "bg-green-400" : ""
-                      }`}
+                      className={`min-w-3.5 h-3.5 border rounded-full ${method === "paymeTradeIn" ? "bg-green-400" : ""
+                        }`}
                     ></p>
                     <p className="text-gray-500 text-sm font-medium mx-4">
                       Trade in person (By PayMe)
@@ -382,7 +378,7 @@ const PlaceOrder = () => {
                       <ol className="list-decimal list-inside mt-2">
                         <li>
                           <a
-                            href="https://payme.hsbc/turbulentstore"
+                            href="https://payme.hsbc/69b506a1e1ac40f0a3ef436a57b245af"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-500 hover:underline"
@@ -424,9 +420,8 @@ const PlaceOrder = () => {
                     className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full"
                   >
                     <p
-                      className={`min-w-3.5 h-3.5 border rounded-full ${
-                        method === "fpsTradeIn" ? "bg-green-400" : ""
-                      }`}
+                      className={`min-w-3.5 h-3.5 border rounded-full ${method === "fpsTradeIn" ? "bg-green-400" : ""
+                        }`}
                     ></p>
                     <p className="text-gray-500 text-sm font-medium mx-4">
                       Trade in person (By FPS)
