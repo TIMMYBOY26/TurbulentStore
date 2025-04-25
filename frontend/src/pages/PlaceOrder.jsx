@@ -14,7 +14,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-lg p-6 w-11/12 sm:w-96">
         <h2 className="text-xl font-bold mb-4">Confirm Your Order</h2>
-        <p>*Please ensure you have sent payment complted capture</p>
+        <p>*Please ensure you have sent payment capture</p>
         <br />
         <p>Are you sure you want to place this order?</p>
         <div className="flex justify-end mt-6">
@@ -218,7 +218,8 @@ const PlaceOrder = () => {
               >
                 Delivery by 順豐速運
               </h3>
-              <h5>(free delivery within Hong Kong area)</h5>
+              <h5>(Free delivery within Hong Kong area)</h5>
+              <h5>(WhatsApp確認地址後預計兩星期內到貨)</h5>
               <br />
               {isFreeDeliveryOpen && (
                 <div className="flex flex-col gap-3">
@@ -260,7 +261,8 @@ const PlaceOrder = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            Send payment completed capture to us
+                            Upload payment completed capture & delivery address
+                            to us
                           </a>
                         </li>
                         <li>
@@ -296,7 +298,7 @@ const PlaceOrder = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            Send payment completed capture
+                            Upload payment completed capture & delivery address
                           </a>
                         </li>
                         <li>
