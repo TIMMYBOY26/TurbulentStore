@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Title from "../components/Title";
 import CartTotal from "../components/CartTotal";
 import { assets } from "../assets/assets";
@@ -39,8 +39,6 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
 const PlaceOrder = () => {
   const [method, setMethod] = useState("cod");
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // State for expandable sections
   const [isFreeDeliveryOpen, setIsFreeDeliveryOpen] = useState(false);
   const [isTradeInOpen, setIsTradeInOpen] = useState(false);
 
@@ -170,6 +168,11 @@ const PlaceOrder = () => {
   const handlePaymentMethodChange = (selectedMethod) => {
     setMethod(selectedMethod);
   };
+
+  useEffect(() => {
+    // Scroll to top when the component mounts
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <>

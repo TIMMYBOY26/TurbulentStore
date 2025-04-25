@@ -8,7 +8,7 @@ const Footer = () => {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth' // Optional: smooth scrolling
+      behavior: "smooth", // Optional: smooth scrolling
     });
   };
 
@@ -19,16 +19,39 @@ const Footer = () => {
           <p className="text-xl font-medium mb-5">Turbulent Store</p>
           <ul className="flex flex-col gap-1 text-gray-600">
             <li>
-              <Link to="/" onClick={scrollToTop} className="hover:underline">Home</Link>
+              <Link to="/" onClick={scrollToTop} className="hover:underline">
+                Home
+              </Link>
             </li>
             <li>
-              <Link to="/contact" onClick={scrollToTop} className="hover:underline">Contact Us</Link>
+              <Link
+                to="/contact"
+                onClick={scrollToTop}
+                className="hover:underline"
+              >
+                Contact Us
+              </Link>
             </li>
             {token && ( // Conditionally render Orders link
               <li>
-                <Link to="/orders" onClick={scrollToTop} className="hover:underline">Orders</Link>
+                <Link
+                  to="/orders"
+                  onClick={scrollToTop}
+                  className="hover:underline"
+                >
+                  My Orders
+                </Link>
               </li>
             )}
+            <li>
+              <Link
+                to="/cart"
+                onClick={scrollToTop}
+                className="hover:underline"
+              >
+                My Cart
+              </Link>
+            </li>
           </ul>
         </div>
         <hr />
