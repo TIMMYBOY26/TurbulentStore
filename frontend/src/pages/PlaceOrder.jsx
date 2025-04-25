@@ -291,7 +291,15 @@ const PlaceOrder = () => {
                     </p>
                     {method === "fps" && (
                       <ol className="list-decimal list-inside mt-2">
-                        <li>FPS識別碼: 2394658</li>
+                        <li>FPS識別碼: 2394658
+                          <br />
+                          (If you using PC) scan QR code to FPS
+                          <img
+                            className="h-40 w-40 mx-4"
+                            src={assets.fpsCode}
+                            alt="PayMe Code"
+                          />
+                        </li>
                         <li>
                           <a
                             href="https://wa.me/85293442688"
@@ -299,14 +307,10 @@ const PlaceOrder = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            Send payment completed capture
+                            Send payment completed capture & delivery address
+                            to us
                           </a>
-                          (If you using PC) scan QR code to FPS
-                          <img
-                            className="h-40 w-40 mx-4"
-                            src={assets.fpsCode}
-                            alt="PayMe Code"
-                          />
+
                         </li>
                         <li>
                           <button
@@ -406,7 +410,7 @@ const PlaceOrder = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            Send payment completed capture
+                            Send payment completed capture & Arrange meet up
                           </a>
                         </li>
                         <li>
@@ -435,6 +439,12 @@ const PlaceOrder = () => {
                     {method === "fpsTradeIn" && (
                       <ol className="list-decimal list-inside mt-2">
                         <li>FPS識別碼: 2394658</li>
+                        (If you using PC) scan QR code to FPS
+                        <img
+                          className="h-40 w-40 mx-4"
+                          src={assets.fpsCode}
+                          alt="PayMe Code"
+                        />
                         <li>
                           <a
                             href="https://wa.me/85293442688"
@@ -442,14 +452,8 @@ const PlaceOrder = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            Send payment completed capture
+                            Send payment completed capture & Arrange meet up
                           </a>
-                          (If you using PC) scan QR code to FPS
-                          <img
-                            className="h-40 w-40 mx-4"
-                            src={assets.fpsCode}
-                            alt="PayMe Code"
-                          />
                         </li>
                         <li>
                           <button
