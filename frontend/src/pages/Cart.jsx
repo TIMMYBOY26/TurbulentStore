@@ -30,7 +30,7 @@ const Cart = () => {
   return (
     <div className="border-t pt-14">
       <div className="text-2xl mb-3">
-        <Title text1={"STEP 1: "} text2={"YOUR CART"} />
+        <Title text1={"STEP 1: "} text2={"CHECK YOUR CART"} />
       </div>
 
       <div>
@@ -83,7 +83,8 @@ const Cart = () => {
       {/* Display CartTotal and buttons */}
       <div className="flex justify-end my-10">
         <div className="w-full sm:w-[450px] text-end">
-          <CartTotal />
+          <CartTotal step="2" />
+
           <div className="flex justify-between">
             <button
               onClick={() => navigate("/collection")}

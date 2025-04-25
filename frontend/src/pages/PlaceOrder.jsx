@@ -185,13 +185,9 @@ const PlaceOrder = () => {
         </div>
         {/* Right Side */}
         <div className="mt-8">
-          <div className="mt-7 min-w-80">
-            <CartTotal />
-          </div>
-
           <div className="mt-12">
             <div className="text-xl sm:text-2xl my-3">
-              <Title text1={"STEP 3: "} text2={" SELECT YOUR PAYMENT METHOD"} />
+              <Title text1={"STEP 2: "} text2={" SELECT PAYMENT METHOD"} />
             </div>
             <div className="flex gap-3 flex-col lg:flex-row">
               <div
@@ -315,17 +311,22 @@ const PlaceOrder = () => {
                 )}
               </div>
             </div>
+          </div>
 
-            <div className="w-full flex justify-between mt-8">
-              <button
-                type="button"
-                onClick={() => navigate("/cart")}
-                className="bg-gray-300 text-black px-4 py-2 text-sm rounded flex items-center"
-              >
-                <span className="mr-2">←</span> {/* Left arrow */}
-                BACK TO CART
-              </button>
-            </div>
+          {/* Move CartTotal section here */}
+          <div className="mt-7 min-w-80">
+            <CartTotal step="3" />
+          </div>
+
+          <div className="w-full flex justify-between mt-8">
+            <button
+              type="button"
+              onClick={() => navigate("/cart")}
+              className="bg-gray-300 text-black px-4 py-2 text-sm rounded flex items-center"
+            >
+              <span className="mr-2">←</span> {/* Left arrow */}
+              BACK TO CART
+            </button>
           </div>
         </div>
       </form>
