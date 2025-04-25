@@ -11,6 +11,8 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [passcode, setPasscode] = useState("");
   const [isPasscodeSent, setIsPasscodeSent] = useState(false);
+  const [cooldown, setCooldown] = useState(false); // Cooldown state
+  const [countdown, setCountdown] = useState(30); // Countdown state
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
@@ -52,6 +54,41 @@ const Login = () => {
     } catch (error) {
       console.log(error);
       toast.error(error.message);
+    }
+  };
+
+  const resendPasscodeHandler = async () => {
+    if (cooldown) return; // Prevent action if cooldown is active
+
+    try {
+      const response = await axios.post(
+        backendUrl + "/api/user/resend-passcode",
+        {
+          email,
+        }
+      );
+      if (response.data.success) {
+        toast.success("New passcode sent to your email.");
+        setCooldown(true); // Activate cooldown
+        setCountdown(30); // Set countdown to 30 seconds
+
+        // Start cooldown timer
+        const countdownInterval = setInterval(() => {
+          setCountdown((prev) => {
+            if (prev <= 1) {
+              clearInterval(countdownInterval); // Clear interval when countdown reaches 0
+              setCooldown(false); // Reset cooldown
+              return 0; // Stop countdown
+            }
+            return prev - 1; // Decrease countdown
+          });
+        }, 1000); // Update every second
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Error resending passcode.");
     }
   };
 
@@ -100,9 +137,21 @@ const Login = () => {
           />
         )}
 
-        <div className="w-full flex justify-between text-sm mt-[-8px]">
-          <p className="cursor-pointer">Forgot your password?</p>
-        </div>
+        {isPasscodeSent && ( // Only show this when verifying passcode
+          <div className="w-full flex justify-between text-sm mt-[-8px]">
+            <p
+              className={`cursor-pointer ${
+                cooldown ? "text-gray-800" : "text-blue-600"
+              }`}
+              onClick={resendPasscodeHandler}
+              style={{ pointerEvents: cooldown ? "none" : "auto" }} // Disable interaction if cooldown is active
+            >
+              {cooldown
+                ? `Please wait ${countdown}s to resend passcode`
+                : "Resend email passcode"}
+            </p>
+          </div>
+        )}
 
         <button className="bg-black text-white font-light px-8 py-2 mt-4 hover:bg-gray-800 hover:text-blue-300 transition duration-300 ease-in-out">
           {isPasscodeSent ? "Verify Passcode" : "Send Passcode"}
