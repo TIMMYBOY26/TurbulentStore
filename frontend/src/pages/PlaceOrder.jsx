@@ -212,15 +212,15 @@ const PlaceOrder = () => {
 
             {/* Grouped Button for Free Delivery by 順豐速運 */}
             <div className="border border-gray-300 rounded-lg p-4 mb-4">
-              <h3
-                className="text-lg font-semibold mb-2 cursor-pointer"
+              <button
+                type="button"
+                className="text-lg font-semibold mb-2 w-full text-left cursor-pointer"
                 onClick={() => setIsFreeDeliveryOpen(!isFreeDeliveryOpen)}
               >
                 Delivery by 順豐速運
-              </h3>
-              <h5>(Free delivery within Hong Kong area)</h5>
-              <h5>(WhatsApp確認地址後預計兩星期內到貨)</h5>
-              <br />
+                <h5>*Free delivery within Hong Kong area</h5>
+                <h5>WhatsApp確認地址後預計兩星期到貨</h5>
+              </button>
               {isFreeDeliveryOpen && (
                 <div className="flex flex-col gap-3">
                   <div
@@ -298,7 +298,7 @@ const PlaceOrder = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            Upload payment completed capture & delivery address
+                            Send payment completed capture
                           </a>
                         </li>
                         <li>
@@ -318,12 +318,13 @@ const PlaceOrder = () => {
 
             {/* Grouped Button for Trade in Person */}
             <div className="border border-gray-300 rounded-lg p-4 mb-4">
-              <h3
-                className="text-lg font-semibold mb-2 cursor-pointer"
+              <button
+                type="button"
+                className="text-lg font-semibold mb-2 w-full text-left cursor-pointer"
                 onClick={() => setIsTradeInOpen(!isTradeInOpen)}
               >
                 Trade in person
-              </h3>
+              </button>
               {isTradeInOpen && (
                 <div>
                   <div
