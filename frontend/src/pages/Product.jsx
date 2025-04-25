@@ -173,10 +173,18 @@ const Product = () => {
                   {item.count <= 0 && (
                     <span className="text-sm text-red-500">Sold Out</span>
                   )}
-                  {item.count > 0 && (
-                    <span className="text-sm text-gray-500">
-                      {item.count} available
+                  {item.count > 0 && item.count < 5 && (
+                    <span className="text-sm text-red-500">
+                      Last {item.count}
                     </span>
+                  )}
+                  {item.count >= 5 && item.count < 10 && (
+                    <span className="text-sm text-orange-500">
+                      Limited Stock
+                    </span>
+                  )}
+                  {item.count >= 10 && (
+                    <span className="text-sm text-gray-500">Available</span>
                   )}
                 </div>
               ))}
