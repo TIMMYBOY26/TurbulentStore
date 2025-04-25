@@ -14,6 +14,8 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-lg p-6 w-11/12 sm:w-96">
         <h2 className="text-xl font-bold mb-4">Confirm Your Order</h2>
+        <p>*Please ensure you have sent payment complted capture</p>
+        <br />
         <p>Are you sure you want to place this order?</p>
         <div className="flex justify-end mt-6">
           <button
@@ -37,6 +39,10 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
 const PlaceOrder = () => {
   const [method, setMethod] = useState("cod");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // State for expandable sections
+  const [isFreeDeliveryOpen, setIsFreeDeliveryOpen] = useState(false);
+  const [isTradeInOpen, setIsTradeInOpen] = useState(false);
 
   const {
     navigate,
@@ -127,6 +133,20 @@ const PlaceOrder = () => {
             { headers: { token } }
           );
           break;
+        case "paymeTradeIn":
+          response = await axios.post(
+            backendUrl + "/api/order/tradeInPersonPlaceOrderPayme",
+            orderData,
+            { headers: { token } }
+          );
+          break;
+        case "fpsTradeIn":
+          response = await axios.post(
+            backendUrl + "/api/order/tradeInPersonPlaceOrderFps",
+            orderData,
+            { headers: { token } }
+          );
+          break;
         default:
           throw new Error("Invalid payment method selected.");
       }
@@ -170,7 +190,7 @@ const PlaceOrder = () => {
               value={formData.firstName}
               className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
               type="text"
-              placeholder="Name"
+              placeholder="First Name"
             />
           </div>
           <input
@@ -189,131 +209,252 @@ const PlaceOrder = () => {
             <div className="text-xl sm:text-2xl my-3">
               <Title text1={"STEP 2: "} text2={" SELECT PAYMENT METHOD"} />
             </div>
-            <div className="flex gap-3 flex-col lg:flex-row">
-              <div
-                onClick={() => handlePaymentMethodChange("cod")}
-                className="flex flex-col items-start border p-2 px-3 cursor-pointer"
-              >
-                <p
-                  className={`min-w-3.5 h-3.5 border rounded-full ${
-                    method === "cod" ? "bg-green-400" : ""
-                  }`}
-                ></p>
-                <p className="text-gray-500 text-sm font-medium mx-4">
-                  Trade in person (By cash)
-                </p>
-                {method === "cod" && (
-                  <ol className="list-decimal list-inside mt-2">
-                    <li>
-                      <a
-                        href="https://wa.me/85293442688"
-                        className="mt-3 text-blue-500 hover:underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Arrange meet up with Whatsapp
-                      </a>
-                    </li>
-                    <li>
-                      <button
-                        type="submit"
-                        className="bg-black text-white px-4 py-2 text-sm rounded"
-                      >
-                        PLACE ORDER
-                      </button>
-                    </li>
-                  </ol>
-                )}
-              </div>
-              <div
-                onClick={() => handlePaymentMethodChange("payme")}
-                className="flex flex-col items-start border p-2 px-3 cursor-pointer"
-              >
-                <p
-                  className={`min-w-3.5 h-3.5 border rounded-full ${
-                    method === "payme" ? "bg-green-400" : ""
-                  }`}
-                ></p>
-                <p className="text-gray-500 text-sm font-medium mx-4">PayMe</p>
-                {method === "payme" && (
-                  <ol className="list-decimal list-inside mt-2">
-                    <li>
-                      <a
-                        href="https://payme.hsbc/turbulentstore"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 hover:underline"
-                      >
-                        Click me to PayMe
-                      </a>
-                      <br />
-                      (If you using PC) scan QR code to Payme
-                      <img
-                        className="h-40 w-40 mx-4"
-                        src={assets.paymeCode}
-                        alt="PayMe Code"
-                      />
-                    </li>
-                    <li>
-                      <a
-                        href="https://wa.me/85293442688"
-                        className="mt-3 text-blue-500 hover:underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Send payment completed capture
-                      </a>
-                    </li>
-                    <li>
-                      <button
-                        type="submit"
-                        className="bg-black text-white px-4 py-2 text-sm rounded"
-                      >
-                        PLACE ORDER
-                      </button>
-                    </li>
-                  </ol>
-                )}
-              </div>
-              <div
-                onClick={() => handlePaymentMethodChange("fps")}
-                className="flex flex-col items-start border p-2 px-3 cursor-pointer"
-              >
-                <p
-                  className={`min-w-3.5 h-3.5 border rounded-full ${
-                    method === "fps" ? "bg-green-400" : ""
-                  }`}
-                ></p>
-                <p className="text-gray-500 text-sm font-medium mx-4">FPS</p>
-                {method === "fps" && (
-                  <ol className="list-decimal list-inside mt-2">
-                    <li>FPS識別碼: 117417618</li>
 
-                    <li>
-                      <a
-                        href="https://wa.me/85293442688"
-                        className="mt-3 text-blue-500 hover:underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Send payment completed capture
-                      </a>
-                    </li>
-                    <li>
-                      <button
-                        type="submit"
-                        className="bg-black text-white px-4 py-2 text-sm rounded"
-                      >
-                        PLACE ORDER
-                      </button>
-                    </li>
-                  </ol>
-                )}
-              </div>
+            {/* Grouped Button for Free Delivery by 順豐速運 */}
+            <div className="border border-gray-300 rounded-lg p-4 mb-4">
+              <h3
+                className="text-lg font-semibold mb-2 cursor-pointer"
+                onClick={() => setIsFreeDeliveryOpen(!isFreeDeliveryOpen)}
+              >
+                Delivery by 順豐速運
+              </h3>
+              <h5>(free delivery within Hong Kong area)</h5>
+              <br />
+              {isFreeDeliveryOpen && (
+                <div className="flex flex-col gap-3">
+                  <div
+                    onClick={() => handlePaymentMethodChange("payme")}
+                    className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full"
+                  >
+                    <p
+                      className={`min-w-3.5 h-3.5 border rounded-full ${
+                        method === "payme" ? "bg-green-400" : ""
+                      }`}
+                    ></p>
+                    <p className="text-gray-500 text-sm font-medium mx-4">
+                      Delivery (By PayMe)
+                    </p>
+                    {method === "payme" && (
+                      <ol className="list-decimal list-inside mt-2">
+                        <li>
+                          <a
+                            href="https://payme.hsbc/69b506a1e1ac40f0a3ef436a57b245af"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:underline"
+                          >
+                            Click me to PayMe
+                          </a>
+                          <br />
+                          (If you using PC) scan QR code to PayMe
+                          <img
+                            className="h-40 w-40 mx-4"
+                            src={assets.paymeCode}
+                            alt="PayMe Code"
+                          />
+                        </li>
+                        <li>
+                          <a
+                            href="https://wa.me/85293442688"
+                            className="mt-3 text-blue-500 hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Send payment completed capture to us
+                          </a>
+                        </li>
+                        <li>
+                          <button
+                            type="submit"
+                            className="bg-black text-white px-4 py-2 text-sm rounded w-full mt-2"
+                          >
+                            PLACE ORDER
+                          </button>
+                        </li>
+                      </ol>
+                    )}
+                  </div>
+                  <div
+                    onClick={() => handlePaymentMethodChange("fps")}
+                    className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full"
+                  >
+                    <p
+                      className={`min-w-3.5 h-3.5 border rounded-full ${
+                        method === "fps" ? "bg-green-400" : ""
+                      }`}
+                    ></p>
+                    <p className="text-gray-500 text-sm font-medium mx-4">
+                      Delivery (By FPS)
+                    </p>
+                    {method === "fps" && (
+                      <ol className="list-decimal list-inside mt-2">
+                        <li>FPS識別碼: 117417618</li>
+                        <li>
+                          <a
+                            href="https://wa.me/85293442688"
+                            className="mt-3 text-blue-500 hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Send payment completed capture
+                          </a>
+                        </li>
+                        <li>
+                          <button
+                            type="submit"
+                            className="bg-black text-white px-4 py-2 text-sm rounded w-full mt-2"
+                          >
+                            PLACE ORDER
+                          </button>
+                        </li>
+                      </ol>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Grouped Button for Trade in Person */}
+            <div className="border border-gray-300 rounded-lg p-4 mb-4">
+              <h3
+                className="text-lg font-semibold mb-2 cursor-pointer"
+                onClick={() => setIsTradeInOpen(!isTradeInOpen)}
+              >
+                Trade in person
+              </h3>
+              {isTradeInOpen && (
+                <div>
+                  <div
+                    onClick={() => handlePaymentMethodChange("cod")}
+                    className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full mb-3"
+                  >
+                    <p
+                      className={`min-w-3.5 h-3.5 border rounded-full ${
+                        method === "cod" ? "bg-green-400" : ""
+                      }`}
+                    ></p>
+                    <p className="text-gray-500 text-sm font-medium mx-4">
+                      Trade in person (By cash)
+                    </p>
+                    {method === "cod" && (
+                      <ol className="list-decimal list-inside mt-2">
+                        <li>
+                          <a
+                            href="https://wa.me/85293442688"
+                            className="mt-3 text-blue-500 hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Arrange meet up with Whatsapp
+                          </a>
+                        </li>
+                        <li>
+                          <button
+                            type="submit"
+                            className="bg-black text-white px-4 py-2 text-sm rounded w-full mt-2"
+                          >
+                            PLACE ORDER
+                          </button>
+                        </li>
+                      </ol>
+                    )}
+                  </div>
+
+                  <div
+                    onClick={() => handlePaymentMethodChange("paymeTradeIn")}
+                    className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full mb-3"
+                  >
+                    <p
+                      className={`min-w-3.5 h-3.5 border rounded-full ${
+                        method === "paymeTradeIn" ? "bg-green-400" : ""
+                      }`}
+                    ></p>
+                    <p className="text-gray-500 text-sm font-medium mx-4">
+                      Trade in person (By PayMe)
+                    </p>
+                    {method === "paymeTradeIn" && (
+                      <ol className="list-decimal list-inside mt-2">
+                        <li>
+                          <a
+                            href="https://payme.hsbc/turbulentstore"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:underline"
+                          >
+                            Click me to PayMe
+                          </a>
+                          <br />
+                          (If you using PC) scan QR code to PayMe
+                          <img
+                            className="h-40 w-40 mx-4"
+                            src={assets.paymeCode}
+                            alt="PayMe Code"
+                          />
+                        </li>
+                        <li>
+                          <a
+                            href="https://wa.me/85293442688"
+                            className="mt-3 text-blue-500 hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Send payment completed capture
+                          </a>
+                        </li>
+                        <li>
+                          <button
+                            type="submit"
+                            className="bg-black text-white px-4 py-2 text-sm rounded w-full mt-2"
+                          >
+                            PLACE ORDER
+                          </button>
+                        </li>
+                      </ol>
+                    )}
+                  </div>
+
+                  <div
+                    onClick={() => handlePaymentMethodChange("fpsTradeIn")}
+                    className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full"
+                  >
+                    <p
+                      className={`min-w-3.5 h-3.5 border rounded-full ${
+                        method === "fpsTradeIn" ? "bg-green-400" : ""
+                      }`}
+                    ></p>
+                    <p className="text-gray-500 text-sm font-medium mx-4">
+                      Trade in person (By FPS)
+                    </p>
+                    {method === "fpsTradeIn" && (
+                      <ol className="list-decimal list-inside mt-2">
+                        <li>FPS識別碼: 117417618</li>
+                        <li>
+                          <a
+                            href="https://wa.me/85293442688"
+                            className="mt-3 text-blue-500 hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Send payment completed capture
+                          </a>
+                        </li>
+                        <li>
+                          <button
+                            type="submit"
+                            className="bg-black text-white px-4 py-2 text-sm rounded w-full mt-2"
+                          >
+                            PLACE ORDER
+                          </button>
+                        </li>
+                      </ol>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Move CartTotal section here */}
+          {/* CartTotal section */}
           <div className="mt-7 min-w-80">
             <CartTotal step="3" />
           </div>

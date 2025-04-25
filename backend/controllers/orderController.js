@@ -5,7 +5,7 @@ import axios from "axios";
 
 // Function to send Telegram notifications
 const sendTelegramNotification = async (chatId, message) => {
-  const token = "7804211306:AAHkJwg-ejrIB4evQ-EHQpCV8UJJB8eQaoY"; // Replace with your bot token
+  const token = "YOUR_TELEGRAM_BOT_TOKEN"; // Replace with your bot token
   const url = `https://api.telegram.org/bot${token}/sendMessage`;
 
   try {
@@ -54,13 +54,13 @@ const reduceProductSizeCount = async (items, session) => {
         // Check if the new count is zero and send a notification
         if (updatedSize.count === 0) {
           const message = `Product out of stock:\nProduct Name: ${name}\nSize: ${size}`;
-          await sendTelegramNotification("-1002324020435", message); // Send Telegram notification
+          await sendTelegramNotification("-1002324020435", message);
         }
 
         // Check if the new count is less than 5 and send a notification
         if (updatedSize.count <= 10 && updatedSize.count > 0) {
           const message = `Product running low:\nProduct: ${name}\nSize: ${size} \nStock: ${updatedSize.count}`;
-          await sendTelegramNotification("-1002324020435", message); // Send Telegram notification
+          await sendTelegramNotification("-1002324020435", message);
         }
       }
     } catch (error) {
@@ -130,6 +130,7 @@ const placeOrderPayme = async (req, res) => {
   session.startTransaction();
 
   try {
+    console.log("Placing PayMe order:", req.body);
     const { userId, items, amount, address } = req.body; // Ensure items contain productId
     const orderNumber = await generateOrderNumber();
 
@@ -182,6 +183,7 @@ const placeOrderFps = async (req, res) => {
   session.startTransaction();
 
   try {
+    console.log("Placing FPS order:", req.body);
     const { userId, items, amount, address } = req.body; // Ensure items contain productId
     const orderNumber = await generateOrderNumber();
 
@@ -215,6 +217,110 @@ const placeOrderFps = async (req, res) => {
 
     // Send Telegram notification
     const message = `收到新訂單:\n訂單號碼 : ${orderNumber}\n金額: $${amount}\n付款方式 : FPS`;
+    await sendTelegramNotification("-1002324020435", message);
+
+    await session.commitTransaction();
+    res.json({ success: true, message: "Order Placed", orderNumber });
+  } catch (error) {
+    await session.abortTransaction();
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  } finally {
+    session.endSession();
+  }
+};
+
+// Placing orders using Trade in person by PayMe Method
+const tradeInPersonPlaceOrderPayme = async (req, res) => {
+  const session = await orderModel.startSession();
+  session.startTransaction();
+
+  try {
+    const { userId, items, amount, address } = req.body; // Ensure items contain productId
+    const orderNumber = await generateOrderNumber();
+
+    const orderData = {
+      userId,
+      items,
+      address,
+      amount,
+      paymentMethod: "paymeTradeIn",
+      payment: false,
+      date: Date.now(),
+      orderNumber,
+    };
+
+    const newOrder = new orderModel(orderData);
+    await newOrder.save({ session });
+
+    // Reduce product size counts
+    await reduceProductSizeCount(items, session);
+
+    // Update user's name in userModel with firstName
+    await userModel.findByIdAndUpdate(
+      userId,
+      {
+        name: address.firstName, // Assuming firstName is in the address object
+      },
+      { session }
+    );
+
+    await userModel.findByIdAndUpdate(userId, { cartData: {} }, { session });
+
+    // Send Telegram notification
+    const message = `收到新訂單:\n訂單號碼 : ${orderNumber}\n金額: $${amount}\n付款方式 : Trade in person by PayMe`;
+    await sendTelegramNotification("-1002324020435", message);
+
+    await session.commitTransaction();
+    res.json({ success: true, message: "Order Placed", orderNumber });
+  } catch (error) {
+    await session.abortTransaction();
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  } finally {
+    session.endSession();
+  }
+};
+
+// Placing orders using Trade in person by FPS Method
+const tradeInPersonPlaceOrderFps = async (req, res) => {
+  const session = await orderModel.startSession();
+  session.startTransaction();
+
+  try {
+    const { userId, items, amount, address } = req.body; // Ensure items contain productId
+    const orderNumber = await generateOrderNumber();
+
+    const orderData = {
+      userId,
+      items,
+      address,
+      amount,
+      paymentMethod: "fpsTradeIn",
+      payment: false,
+      date: Date.now(),
+      orderNumber,
+    };
+
+    const newOrder = new orderModel(orderData);
+    await newOrder.save({ session });
+
+    // Reduce product size counts
+    await reduceProductSizeCount(items, session);
+
+    // Update user's name in userModel with firstName
+    await userModel.findByIdAndUpdate(
+      userId,
+      {
+        name: address.firstName, // Assuming firstName is in the address object
+      },
+      { session }
+    );
+
+    await userModel.findByIdAndUpdate(userId, { cartData: {} }, { session });
+
+    // Send Telegram notification
+    const message = `收到新訂單:\n訂單號碼 : ${orderNumber}\n金額: $${amount}\n付款方式 : Trade in person by FPS`;
     await sendTelegramNotification("-1002324020435", message);
 
     await session.commitTransaction();
@@ -264,10 +370,13 @@ const updateStatus = async (req, res) => {
   }
 };
 
+// Export functions
 export {
   placeOrder,
   placeOrderPayme,
   placeOrderFps,
+  tradeInPersonPlaceOrderPayme,
+  tradeInPersonPlaceOrderFps,
   allOrders,
   userOrders,
   updateStatus,

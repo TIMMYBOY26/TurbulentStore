@@ -3,6 +3,8 @@ import {
   placeOrder,
   placeOrderPayme,
   placeOrderFps,
+  tradeInPersonPlaceOrderPayme,
+  tradeInPersonPlaceOrderFps,
   allOrders,
   userOrders,
   updateStatus,
@@ -12,7 +14,7 @@ import authUser from "../middleware/auth.js";
 
 const orderRouter = express.Router();
 
-//Admin Features
+// Admin Features
 orderRouter.post("/list", adminAuth, allOrders);
 orderRouter.post("/status", adminAuth, updateStatus);
 
@@ -20,6 +22,18 @@ orderRouter.post("/status", adminAuth, updateStatus);
 orderRouter.post("/place", authUser, placeOrder);
 orderRouter.post("/payme", authUser, placeOrderPayme);
 orderRouter.post("/fps", authUser, placeOrderFps);
+
+// Trade in Person Payment Features
+orderRouter.post(
+  "/tradeInPersonPlaceOrderPayme",
+  authUser,
+  tradeInPersonPlaceOrderPayme
+);
+orderRouter.post(
+  "/tradeInPersonPlaceOrderFps",
+  authUser,
+  tradeInPersonPlaceOrderFps
+);
 
 // User Feature
 orderRouter.post("/userorders", authUser, userOrders);

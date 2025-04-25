@@ -85,16 +85,16 @@ const Cart = () => {
         <div className="w-full sm:w-[450px] text-end">
           <CartTotal step="2" />
 
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row justify-between mt-4">
             <button
               onClick={() => navigate("/collection")}
-              className="bg-black text-white text-sm my-8 px-8 py-3 rounded hover:bg-gray-800 transition"
+              className="bg-black text-white text-sm my-2 sm:my-0 px-8 py-3 rounded hover:bg-gray-800 transition"
             >
               BACK
             </button>
             <button
               onClick={() => navigate("/place-order")}
-              className="bg-black text-white text-sm my-8 px-8 py-3 rounded hover:bg-gray-800 transition"
+              className="bg-black text-white text-sm my-2 sm:my-0 px-8 py-3 rounded hover:bg-gray-800 transition"
             >
               NEXT STEP TO CHECKOUT
             </button>
