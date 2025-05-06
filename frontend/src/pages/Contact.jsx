@@ -26,7 +26,7 @@ const Contact = () => {
         </div>
         <div className="flex flex-col items-center border p-5 rounded-lg shadow-md w-full md:w-1/3">
           <h3 className="text-xl font-semibold mb-3">WhatsApp</h3>
-          <p className="text-lg">Turbulent Support</p>
+          <p className="text-lg">Show & General Enquiry</p>
           <a
             href="https://wa.me/85293442688"
             className="mt-3 text-blue-500 hover:underline"

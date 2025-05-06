@@ -65,9 +65,9 @@ const Order = () => {
 
       {/* Link for contacting support */}
       <p className="mt-4 text-gray-600">
-        If you have any problems with your order, please{" "}
+        If you have any problems with your order, please click{" "}
         <a href="/contact" className="text-blue-600 underline">
-          click here
+          here
         </a>{" "}
         to contact us.
       </p>

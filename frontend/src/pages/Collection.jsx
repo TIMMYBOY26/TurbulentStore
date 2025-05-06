@@ -93,7 +93,7 @@ const Collection = () => {
                 value={"TEES"}
                 onChange={toggleCategory}
               />
-              TEES
+              T-shirts
             </p>
             <p className="flex gap-2">
               <input
@@ -102,7 +102,7 @@ const Collection = () => {
                 value={"ACCESSORIES"}
                 onChange={toggleCategory}
               />
-              ACCESSORIES
+              Stickers
             </p>
           </div>
         </div>
@@ -118,8 +118,8 @@ const Collection = () => {
             className="border-2 border-gray-300 text-sm px-2"
           >
             <option value="relavent">Sort by: Relavent</option>
-            <option value="low-high">Sort by: low to high</option>
-            <option value="high-low">Sort by: high to low</option>
+            <option value="low-high">Sort by: Price low to high</option>
+            <option value="high-low">Sort by: Price high to low</option>
           </select>
         </div>
 
