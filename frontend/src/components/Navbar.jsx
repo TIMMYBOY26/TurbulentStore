@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { assets } from "../assets/assets";
 import { NavLink, Link, useLocation } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
@@ -13,6 +13,8 @@ const Navbar = () => {
     setCartItems,
   } = useContext(ShopContext);
   const location = useLocation(); // Get the current route
+  const [dropdownOpen, setDropdownOpen] = useState(false); // State for dropdown
+  const dropdownRef = useRef(null); // Reference for the dropdown
 
   const logout = () => {
     navigate("/login");
@@ -28,6 +30,24 @@ const Navbar = () => {
       setShowSearch(true); // Show search functionality for other pages
     }
   };
+
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev); // Toggle dropdown visibility
+  };
+
+  const closeDropdown = (e) => {
+    // Check if the click is outside the dropdown
+    if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+      setDropdownOpen(false); // Close dropdown if clicking outside
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", closeDropdown); // Add event listener
+    return () => {
+      document.removeEventListener("mousedown", closeDropdown); // Cleanup
+    };
+  }, []);
 
   return (
     <div className="flex items-center justify-between py-5 font-medium">
@@ -60,24 +80,36 @@ const Navbar = () => {
             alt="Search"
           />
         </Link>
-        <div className="group relative">
+        <div className="group relative" ref={dropdownRef}>
           <img
-            onClick={() => (token ? null : navigate("/login"))}
+            onClick={toggleDropdown} // Toggle dropdown on click
             className="w-5 cursor-pointer"
             src={assets.profile_icon}
             alt="Profile"
           />
           {/* Dropdown menu */}
-          {token && (
-            <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4">
+          {token && dropdownOpen && (
+            <div
+              className="absolute dropdown-menu right-0 pt-4 z-50" // Ensure z-index is high
+              onClick={(e) => e.stopPropagation()} // Prevent click propagation
+            >
               <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 rounded">
                 <p
-                  onClick={() => navigate("/orders")}
+                  onClick={() => {
+                    navigate("/orders");
+                    setDropdownOpen(false); // Close dropdown after navigating
+                  }}
                   className="cursor-pointer hover:text-black"
                 >
                   My Orders
                 </p>
-                <p onClick={logout} className="cursor-pointer hover:text-black">
+                <p
+                  onClick={() => {
+                    logout();
+                    setDropdownOpen(false); // Close dropdown after logout
+                  }}
+                  className="cursor-pointer hover:text-black"
+                >
                   Logout
                 </p>
               </div>
