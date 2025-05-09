@@ -31,19 +31,18 @@ const Order = () => {
               payment: order.payment,
               paymentMethod: order.paymentMethod,
               date: order.date,
-              amount: order.amount, // Add amount to grouped order
+              amount: order.amount,
               items: [],
             };
           }
           order.items.forEach((item) => {
             groupedOrders[orderNumber].items.push({
               ...item,
-              orderNumber, // Add orderNumber to item for reference
+              orderNumber,
             });
           });
         });
 
-        // Convert the grouped orders object back to an array
         const allOrdersItem = Object.values(groupedOrders);
         setOrderData(allOrdersItem.reverse());
       }
@@ -54,7 +53,7 @@ const Order = () => {
 
   useEffect(() => {
     loadOrderData();
-    window.scrollTo(0, 0); // Scroll to top when the component mounts
+    window.scrollTo(0, 0);
   }, [token]);
 
   return (
@@ -63,7 +62,6 @@ const Order = () => {
         <Title text2={"MY ORDER"} />
       </div>
 
-      {/* Link for contacting support */}
       <p className="mt-4 text-gray-600">
         If you have any problems with your order, please click{" "}
         <a href="/contact" className="text-blue-600 underline">
@@ -84,12 +82,10 @@ const Order = () => {
               </div>
 
               <div>
-                {/* Display order number from the first item */}
                 <p className="text-gray-500">
                   Order Number: {order.items[0].orderNumber}
                 </p>
                 <p className="sm:text-base font-medium">Items:</p>
-                {/* Display all product names */}
                 {order.items.map((item, itemIndex) => (
                   <p key={itemIndex} className="text-gray-600">
                     {item.name} - Size: {item.size} - Quantity: {item.quantity}
@@ -98,7 +94,7 @@ const Order = () => {
                 <div className="flex items-center gap-3 mt-1 text-base text-gray-700">
                   <p>
                     Total: {currency}
-                    {order.amount} {/* Display the amount */}
+                    {order.amount}
                   </p>
                   <p>
                     Quantity:{" "}
@@ -116,7 +112,19 @@ const Order = () => {
                 </p>
                 <p className="mt-1">
                   Payment:{" "}
-                  <span className="text-gray-600">{order.paymentMethod}</span>
+                  <span className="text-gray-600">
+                    {order.paymentMethod === "paymeTradeIn"
+                      ? "Payme, In-person delivery"
+                      : order.paymentMethod === "fpsTradeIn"
+                      ? "FPS, In-person delivery"
+                      : order.paymentMethod === "COD"
+                      ? "Cash, In-person delivery"
+                      : order.paymentMethod === "PayMe"
+                      ? "Payme, delivery by SF Express"
+                      : order.paymentMethod === "FPS"
+                      ? "FPS, delivery by SF Express"
+                      : order.paymentMethod}
+                  </span>
                 </p>
               </div>
             </div>

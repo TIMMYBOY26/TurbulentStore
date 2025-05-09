@@ -8,7 +8,7 @@ const CartTotal = ({ step }) => {
   return (
     <div className="w-full">
       <div className="text-xl sm:text-2xl my-3 text-left">
-        <Title text1={`STEP ${step}: `} text2={"CHECK CART TOTALS"} />
+        <Title text1={`STEP ${step}: `} text2={"CHECK TOTAL AMOUNT"} />
       </div>
 
       <div className="flex flex-col gap-2 mt-2 text-sm">

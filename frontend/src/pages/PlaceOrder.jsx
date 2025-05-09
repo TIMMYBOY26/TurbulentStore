@@ -14,7 +14,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-lg p-6 w-11/12 sm:w-96">
         <h2 className="text-xl font-bold mb-4">Confirm Your Order</h2>
-        <p>*Please ensure you have sent payment capture</p>
+        <p>*Please ensure you have sent payment record</p>
         <br />
         <p>Are you sure you want to place this order?</p>
         <div className="flex justify-end mt-6">
@@ -159,8 +159,8 @@ const PlaceOrder = () => {
       console.error(error);
       toast.error(
         error.response?.data?.message ||
-        error.message ||
-        "An unknown error occurred."
+          error.message ||
+          "An unknown error occurred."
       );
     }
   };
@@ -183,7 +183,7 @@ const PlaceOrder = () => {
         {/* Left Side */}
         <div className="flex flex-col gap-4 w-full sm:max-w-[480px]">
           <div className="text-xl sm:text-2xl my-3">
-            <Title text1={"STEP 1: "} text2={" FILL INFORMATION"} />
+            <Title text1={"STEP 1: "} text2={" FILL IN YOUR INFORMATION"} />
           </div>
           <div className="flex gap-3">
             <input
@@ -202,8 +202,10 @@ const PlaceOrder = () => {
             name="phone"
             value={formData.phone}
             className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
-            type="number"
-            placeholder="Phone"
+            type="tel"
+            placeholder="Phone Number"
+            maxLength={8}
+            pattern="[0-9]*"
           />
         </div>
         {/* Right Side */}
@@ -220,9 +222,12 @@ const PlaceOrder = () => {
                 className="text-lg font-semibold mb-2 w-full text-left cursor-pointer"
                 onClick={() => setIsFreeDeliveryOpen(!isFreeDeliveryOpen)}
               >
-                Delivery by 順豐速運
+                Delivery by SF Express
                 <h5>*Free delivery within Hong Kong area</h5>
-                <h5>WhatsApp確認地址後預計兩星期到貨</h5>
+                <h5>
+                  *Order is expected to arrive within 2 weeks after WhatsApp
+                  confirmation
+                </h5>
               </button>
               {isFreeDeliveryOpen && (
                 <div className="flex flex-col gap-3">
@@ -231,11 +236,12 @@ const PlaceOrder = () => {
                     className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full"
                   >
                     <p
-                      className={`min-w-3.5 h-3.5 border rounded-full ${method === "payme" ? "bg-green-400" : ""
-                        }`}
+                      className={`min-w-3.5 h-3.5 border rounded-full ${
+                        method === "payme" ? "bg-green-400" : ""
+                      }`}
                     ></p>
                     <p className="text-gray-500 text-sm font-medium mx-4">
-                      Delivery (By PayMe)
+                      By PayMe
                     </p>
                     {method === "payme" && (
                       <ol className="list-decimal list-inside mt-2">
@@ -246,10 +252,10 @@ const PlaceOrder = () => {
                             rel="noopener noreferrer"
                             className="text-blue-500 hover:underline"
                           >
-                            Click me to PayMe
+                            Click here to PayMe
                           </a>
                           <br />
-                          (If you using PC) scan QR code to PayMe
+                          Scan QR code to PayMe if you are using PC
                           <img
                             className="h-40 w-40 mx-4"
                             src={assets.paymeCode}
@@ -263,8 +269,7 @@ const PlaceOrder = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            Upload payment completed capture & delivery address
-                            to us
+                            Send us the payment record & delivery address
                           </a>
                         </li>
                         <li>
@@ -283,17 +288,19 @@ const PlaceOrder = () => {
                     className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full"
                   >
                     <p
-                      className={`min-w-3.5 h-3.5 border rounded-full ${method === "fps" ? "bg-green-400" : ""
-                        }`}
+                      className={`min-w-3.5 h-3.5 border rounded-full ${
+                        method === "fps" ? "bg-green-400" : ""
+                      }`}
                     ></p>
                     <p className="text-gray-500 text-sm font-medium mx-4">
-                      Delivery (By FPS)
+                      By FPS
                     </p>
                     {method === "fps" && (
                       <ol className="list-decimal list-inside mt-2">
-                        <li>FPS識別碼: 2394658
+                        <li>
+                          FPS identifier: 2394658
                           <br />
-                          (If you using PC) scan QR code to FPS
+                          Scan QR code to FPS if you are using PC
                           <img
                             className="h-40 w-40 mx-4"
                             src={assets.fpsCode}
@@ -307,10 +314,8 @@ const PlaceOrder = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            Send payment completed capture & delivery address
-                            to us
+                            Send us the payment record & delivery address
                           </a>
-
                         </li>
                         <li>
                           <button
@@ -334,7 +339,7 @@ const PlaceOrder = () => {
                 className="text-lg font-semibold mb-2 w-full text-left cursor-pointer"
                 onClick={() => setIsTradeInOpen(!isTradeInOpen)}
               >
-                Trade in person
+                In-person delivery
               </button>
               {isTradeInOpen && (
                 <div>
@@ -343,11 +348,12 @@ const PlaceOrder = () => {
                     className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full mb-3"
                   >
                     <p
-                      className={`min-w-3.5 h-3.5 border rounded-full ${method === "cod" ? "bg-green-400" : ""
-                        }`}
+                      className={`min-w-3.5 h-3.5 border rounded-full ${
+                        method === "cod" ? "bg-green-400" : ""
+                      }`}
                     ></p>
                     <p className="text-gray-500 text-sm font-medium mx-4">
-                      Trade in person (By cash)
+                      By cash
                     </p>
                     {method === "cod" && (
                       <ol className="list-decimal list-inside mt-2">
@@ -358,7 +364,7 @@ const PlaceOrder = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            Arrange meet up with Whatsapp
+                            Schedule meet up on Whatsapp
                           </a>
                         </li>
                         <li>
@@ -378,11 +384,12 @@ const PlaceOrder = () => {
                     className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full mb-3"
                   >
                     <p
-                      className={`min-w-3.5 h-3.5 border rounded-full ${method === "paymeTradeIn" ? "bg-green-400" : ""
-                        }`}
+                      className={`min-w-3.5 h-3.5 border rounded-full ${
+                        method === "paymeTradeIn" ? "bg-green-400" : ""
+                      }`}
                     ></p>
                     <p className="text-gray-500 text-sm font-medium mx-4">
-                      Trade in person (By PayMe)
+                      By PayMe
                     </p>
                     {method === "paymeTradeIn" && (
                       <ol className="list-decimal list-inside mt-2">
@@ -393,10 +400,10 @@ const PlaceOrder = () => {
                             rel="noopener noreferrer"
                             className="text-blue-500 hover:underline"
                           >
-                            Click me to PayMe
+                            Click here to PayMe
                           </a>
                           <br />
-                          (If you using PC) scan QR code to PayMe
+                          Scan QR code to PayMe if you are using PC
                           <img
                             className="h-40 w-40 mx-4"
                             src={assets.paymeCode}
@@ -410,7 +417,7 @@ const PlaceOrder = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            Send payment completed capture & Arrange meet up
+                            Send us the payment record & schedule meet up
                           </a>
                         </li>
                         <li>
@@ -430,16 +437,17 @@ const PlaceOrder = () => {
                     className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full"
                   >
                     <p
-                      className={`min-w-3.5 h-3.5 border rounded-full ${method === "fpsTradeIn" ? "bg-green-400" : ""
-                        }`}
+                      className={`min-w-3.5 h-3.5 border rounded-full ${
+                        method === "fpsTradeIn" ? "bg-green-400" : ""
+                      }`}
                     ></p>
                     <p className="text-gray-500 text-sm font-medium mx-4">
-                      Trade in person (By FPS)
+                      By FPS
                     </p>
                     {method === "fpsTradeIn" && (
                       <ol className="list-decimal list-inside mt-2">
-                        <li>FPS識別碼: 2394658</li>
-                        (If you using PC) scan QR code to FPS
+                        <li>FPS identifier: 2394658</li>
+                        scan QR code to FPS if you are using PC
                         <img
                           className="h-40 w-40 mx-4"
                           src={assets.fpsCode}
@@ -452,7 +460,7 @@ const PlaceOrder = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            Send payment completed capture & Arrange meet up
+                            Send us the payment record & schedule meet up
                           </a>
                         </li>
                         <li>

@@ -180,7 +180,7 @@ const Product = () => {
                   )}
                   {item.count >= 5 && item.count < 10 && (
                     <span className="text-sm text-orange-500">
-                      Limited Stock
+                      Limited Stock {item.count}
                     </span>
                   )}
                   {item.count >= 10 && (
@@ -200,8 +200,8 @@ const Product = () => {
             </button>
             <hr className="mt-8 sm:w-4/5" />
             <div className="text-sm text-gray-500 mt-5 flex flex-col gap-1">
-              <p>Original product.</p>
-              <p>Cash on delivery is available on this product.</p>
+              {/* <p>Original product.</p>
+              <p>Cash on delivery is available on this product.</p> */}
             </div>
           </div>
         </div>
