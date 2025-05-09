@@ -71,6 +71,17 @@ const Product = () => {
     }
   };
 
+  // Function to format the description
+  const formatDescription = (description) => {
+    return description.split("-").map((part, index) => (
+      <React.Fragment key={index}>
+        {part.trim()}
+        {index < description.split("-").length - 1 && <br />}{" "}
+        {/* Add line break */}
+      </React.Fragment>
+    ));
+  };
+
   return productData ? (
     <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100 relative">
       {/* Toast Container */}
@@ -151,9 +162,10 @@ const Product = () => {
             {currency}
             {productData.price}
           </p>
-          <p className="mt-5 text-gray-500 md:w-4/5">
-            {productData.description}
-          </p>
+          <div className="mt-5 text-gray-500 md:w-4/5">
+            {formatDescription(productData.description)}{" "}
+            {/* Use formatted description */}
+          </div>
           <div className="flex flex-col gap-4 my-8">
             <p>Select Size</p>
             <div className="flex gap-2">
