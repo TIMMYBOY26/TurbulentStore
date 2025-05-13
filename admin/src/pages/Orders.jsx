@@ -6,6 +6,8 @@ import { assets } from "../assets/assets";
 
 const Orders = ({ token }) => {
   const [orders, setOrders] = useState([]);
+  const [isIncomeVisible, setIsIncomeVisible] = useState(true);
+  const [isStatusVisible, setIsStatusVisible] = useState(true);
 
   const fetchAllOrders = async () => {
     if (!token) {
@@ -54,9 +56,96 @@ const Orders = ({ token }) => {
     (a, b) => new Date(b.date) - new Date(a.date)
   );
 
+  // Calculate total income by month
+  const incomeByMonth = sortedOrders.reduce((acc, order) => {
+    const month = new Date(order.date).toLocaleString("default", {
+      month: "long",
+      year: "numeric",
+    });
+    acc[month] = (acc[month] || 0) + order.amount;
+    return acc;
+  }, {});
+
+  // Calculate order status counts
+  const statusCounts = sortedOrders.reduce((acc, order) => {
+    acc[order.status] = (acc[order.status] || 0) + 1;
+    return acc;
+  }, {});
+
+  // List of all possible statuses
+  const allStatuses = [
+    "Payment Processing",
+    "Delivery in Progress",
+    "Goods Arrangement in Progress",
+    "Shipped",
+    "Order Completed",
+    "Cancelled", // Add any other statuses you want to track
+  ];
+
   return (
     <div>
-      <h3>Order Page</h3>
+      {/* Income Table Section */}
+      <div className="my-4">
+        <button
+          onClick={() => setIsIncomeVisible(!isIncomeVisible)}
+          className="text-lg font-semibold mb-2"
+        >
+          {isIncomeVisible ? "Hide" : "Show"} Total Income by Month
+        </button>
+        {isIncomeVisible && (
+          <table className="min-w-full max-w-lg mx-auto border border-gray-300 text-sm">
+            <thead>
+              <tr>
+                <th className="border border-gray-300 p-1">Month</th>
+                <th className="border border-gray-300 p-1">Total Income</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(incomeByMonth).map(([month, total], index) => (
+                <tr key={index}>
+                  <td className="border border-gray-300 p-1">{month}</td>
+                  <td className="border border-gray-300 p-1">
+                    {currency}
+                    {total.toFixed(2)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Status Count Table Section */}
+      <div className="my-4">
+        <button
+          onClick={() => setIsStatusVisible(!isStatusVisible)}
+          className="text-lg font-semibold mb-2"
+        >
+          {isStatusVisible ? "Hide" : "Show"} Order Status Counts
+        </button>
+        {isStatusVisible && (
+          <table className="min-w-full max-w-lg mx-auto border border-gray-300 text-sm">
+            <thead>
+              <tr>
+                <th className="border border-gray-300 p-1">Status</th>
+                <th className="border border-gray-300 p-1">Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              {allStatuses.map((status, index) => (
+                <tr key={index}>
+                  <td className="border border-gray-300 p-1">{status}</td>
+                  <td className="border border-gray-300 p-1">
+                    {statusCounts[status] || 0}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+      <h3>Orders</h3>
+
       <div>
         {sortedOrders.map((order, index) => (
           <div
@@ -133,6 +222,8 @@ const Orders = ({ token }) => {
               </option>
               <option value="Shipped">Shipped</option>
               <option value="Order Completed">Order Completed</option>
+              <option value="Cancelled">Cancelled</option>{" "}
+              {/* Add options for all statuses */}
             </select>
           </div>
         ))}
