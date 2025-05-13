@@ -44,22 +44,23 @@ const Cart = () => {
           return (
             <div
               key={item._id} // Use item._id as the key
-              className="py-4 border-t border-b text-gray-700 grid grid-cols-[4fr_0.5fr_0.5fr] sm:grid-cols-[4fr_2fr_0.5fr] items-center gap-4"
+              className="py-4 border-t border-b text-gray-700 grid grid-cols-1 sm:grid-cols-[4fr_1fr] items-center gap-4"
             >
-              <div className="flex items-start gap-6">
+              <div className="flex items-start gap-4 sm:gap-6">
                 <img
                   src={productData.image[0]}
                   alt={productData.name}
-                  className="w-16 h-16"
+                  className="w-12 h-12 sm:w-16 sm:h-16" // Smaller size for mobile
                 />
-                <div>
+                <div className="flex flex-col">
                   <h3 className="text-lg">{productData.name}</h3>
                   <p className="text-sm">Size: {item.size}</p>
-                  {/* Display price per item */}
                   <p className="text-sm">
-                    Price per item: {currency} {productData.price}
+                    Price: {currency} {productData.price}
                   </p>
                 </div>
+              </div>
+              <div className="flex items-center justify-end sm:justify-end">
                 <input
                   onChange={(e) =>
                     e.target.value === "" || e.target.value === "0"
@@ -70,16 +71,16 @@ const Cart = () => {
                           Number(e.target.value)
                         )
                   }
-                  className="border max-w-10 sm:max-w-20 px-1 sm:px-2 py-1"
+                  className="border max-w-[60px] sm:max-w-[80px] px-1 sm:px-2 py-1 text-center"
                   type="number"
                   min={1}
                   defaultValue={item.quantity}
                 />
                 <img
                   onClick={() => updateQuantity(item._id, item.size, 0)}
-                  className="w-4 mr-4 sm:w-5 cursor-pointer"
+                  className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer ml-2"
                   src={assets.bin_icon}
-                  alt=""
+                  alt="Remove item"
                 />
               </div>
             </div>
