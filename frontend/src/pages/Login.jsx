@@ -116,7 +116,6 @@ const Login = () => {
             {isPasscodeSent ? "Verify Passcode" : "Login"}
           </p>
         </div>
-
         <input
           onChange={(e) => setEmail(e.target.value)}
           value={email}
@@ -125,7 +124,6 @@ const Login = () => {
           placeholder="Email"
           required
         />
-
         {isPasscodeSent && (
           <input
             onChange={(e) => setPasscode(e.target.value)}
@@ -136,9 +134,11 @@ const Login = () => {
             required
           />
         )}
-
         {isPasscodeSent && ( // Only show this when verifying passcode
-          <div className="w-full flex justify-between text-sm mt-[-8px]">
+          <div className="w-full flex flex-col items-start text-sm mt-[-8px]">
+            <p className="text-red-600 mb-2">
+              *Please also check your spam or junk folder
+            </p>
             <p
               className={`cursor-pointer ${
                 cooldown ? "text-gray-800" : "text-blue-600"
@@ -152,7 +152,6 @@ const Login = () => {
             </p>
           </div>
         )}
-
         <button className="bg-black text-white font-light px-8 py-2 mt-4 hover:bg-gray-800 hover:text-blue-300 transition duration-300 ease-in-out">
           {isPasscodeSent ? "Verify Passcode" : "Send Passcode"}
         </button>

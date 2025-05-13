@@ -37,14 +37,14 @@ const Cart = () => {
       </div>
 
       <div>
-        {cartData.map((item, index) => {
+        {cartData.map((item) => {
           const productData = products.find(
             (product) => product._id === item._id
           );
           return (
             <div
-              key={index}
-              className="py-4 border-t border-b text-gray-700 grid grid-cols-[4fr_0.5fr] sm:grid-cols-[4fr_2fr_0.5fr] items-center gap-4"
+              key={item._id} // Use item._id as the key
+              className="py-4 border-t border-b text-gray-700 grid grid-cols-[4fr_0.5fr_0.5fr] sm:grid-cols-[4fr_2fr_0.5fr] items-center gap-4"
             >
               <div className="flex items-start gap-6">
                 <img
@@ -55,6 +55,10 @@ const Cart = () => {
                 <div>
                   <h3 className="text-lg">{productData.name}</h3>
                   <p className="text-sm">Size: {item.size}</p>
+                  {/* Display price per item */}
+                  <p className="text-sm">
+                    Price per item: {currency} {productData.price}
+                  </p>
                 </div>
                 <input
                   onChange={(e) =>

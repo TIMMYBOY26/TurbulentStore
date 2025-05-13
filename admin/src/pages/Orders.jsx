@@ -108,9 +108,9 @@ const Orders = ({ token }) => {
                     : order.paymentMethod === "COD"
                     ? "Cash, In-person delivery"
                     : order.paymentMethod === "PayMe"
-                    ? "Payme, delivery by SF Express"
+                    ? "Payme, Delivery by SF Express"
                     : order.paymentMethod === "FPS"
-                    ? "FPS, delivery by SF Express"
+                    ? "FPS, Delivery by SF Express"
                     : order.paymentMethod}
                 </span>
               </p>
@@ -126,7 +126,7 @@ const Orders = ({ token }) => {
               value={order.status}
               className="p-2 font-semibold"
             >
-              <option value="Payment processing">Payment processing</option>
+              <option value="Payment Processing">Payment Processing</option>
               <option value="Delivery in Progress">Delivery in Progress</option>
               <option value="Goods Arrangement in Progress">
                 Goods Arrangement in Progress

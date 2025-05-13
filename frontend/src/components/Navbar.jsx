@@ -82,7 +82,13 @@ const Navbar = () => {
         </Link>
         <div className="group relative" ref={dropdownRef}>
           <img
-            onClick={toggleDropdown} // Toggle dropdown on click
+            onClick={() => {
+              if (token) {
+                toggleDropdown(); // Toggle dropdown if logged in
+              } else {
+                navigate("/login"); // Redirect to login if not logged in
+              }
+            }} // Handle click based on authentication status
             className="w-5 cursor-pointer"
             src={assets.profile_icon}
             alt="Profile"
@@ -101,7 +107,7 @@ const Navbar = () => {
                   }}
                   className="cursor-pointer hover:text-black"
                 >
-                  My Orders
+                  My Order
                 </p>
                 <p
                   onClick={() => {

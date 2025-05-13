@@ -120,9 +120,9 @@ const Order = () => {
                       : order.paymentMethod === "COD"
                       ? "Cash, In-person delivery"
                       : order.paymentMethod === "PayMe"
-                      ? "Payme, delivery by SF Express"
+                      ? "Payme, Delivery by SF Express"
                       : order.paymentMethod === "FPS"
-                      ? "FPS, delivery by SF Express"
+                      ? "FPS, Delivery by SF Express"
                       : order.paymentMethod}
                   </span>
                 </p>

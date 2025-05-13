@@ -11,11 +11,11 @@ const Hero = () => {
 
   return (
     <div
-      className="flex flex-col sm:flex-row cursor-pointer transition-transform duration-300 hover:scale-105" // Added hover effect for the entire hero section
+      className="flex flex-col sm:flex-row cursor-pointer transition-transform duration-300" // Removed hover effect
       style={{
         backgroundImage: `url(${assets.hero_bg})`, // Background image path
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
       }}
       onClick={handleHeroClick} // Add onClick event
     >
@@ -29,11 +29,15 @@ const Hero = () => {
             </h1>
             <br />
             <div className="flex items-center gap-2">
-              <p className="font-semibold text-sm md:text-lg">\\FROM TURBULENT</p>
+              <p className="font-semibold text-sm md:text-lg">
+                \\FROM TURBULENT
+              </p>
             </div>
             <hr />
             <div className="flex items-center gap-2">
-              <p className="font-semibold text-sm md:text-base">// Feel The Dynamic...</p>
+              <p className="font-semibold text-sm md:text-base">
+                // Feel The Dynamic...
+              </p>
             </div>
           </div>
         </div>
@@ -44,7 +48,6 @@ const Hero = () => {
           src={assets.hero_img}
           alt="Hero"
         />
-
       </div>
     </div>
   );

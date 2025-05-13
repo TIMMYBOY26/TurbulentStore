@@ -447,7 +447,7 @@ const PlaceOrder = () => {
                     {method === "fpsTradeIn" && (
                       <ol className="list-decimal list-inside mt-2">
                         <li>FPS identifier: 2394658</li>
-                        scan QR code to FPS if you are using PC
+                        Scan QR code to FPS if you are using PC
                         <img
                           className="h-40 w-40 mx-4"
                           src={assets.fpsCode}

@@ -39,7 +39,7 @@ const Footer = () => {
                   onClick={scrollToTop}
                   className="hover:underline"
                 >
-                  My Orders
+                  My Order
                 </Link>
               </li>
             )}
