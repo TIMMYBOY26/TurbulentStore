@@ -56,13 +56,22 @@ const Orders = ({ token }) => {
     (a, b) => new Date(b.date) - new Date(a.date)
   );
 
-  // Calculate total income by month
+  // Calculate total income and order count by month
   const incomeByMonth = sortedOrders.reduce((acc, order) => {
     const month = new Date(order.date).toLocaleString("default", {
       month: "long",
       year: "numeric",
     });
-    acc[month] = (acc[month] || 0) + order.amount;
+
+    // Initialize the month entry if it doesn't exist
+    if (!acc[month]) {
+      acc[month] = { totalIncome: 0, orderCount: 0 };
+    }
+
+    // Update total income and order count
+    acc[month].totalIncome += order.amount;
+    acc[month].orderCount += 1;
+
     return acc;
   }, {});
 
@@ -98,18 +107,22 @@ const Orders = ({ token }) => {
               <tr>
                 <th className="border border-gray-300 p-1">Month</th>
                 <th className="border border-gray-300 p-1">Total Income</th>
+                <th className="border border-gray-300 p-1">Total Orders</th>
               </tr>
             </thead>
             <tbody>
-              {Object.entries(incomeByMonth).map(([month, total], index) => (
-                <tr key={index}>
-                  <td className="border border-gray-300 p-1">{month}</td>
-                  <td className="border border-gray-300 p-1">
-                    {currency}
-                    {total.toFixed(2)}
-                  </td>
-                </tr>
-              ))}
+              {Object.entries(incomeByMonth).map(
+                ([month, { totalIncome, orderCount }], index) => (
+                  <tr key={index}>
+                    <td className="border border-gray-300 p-1">{month}</td>
+                    <td className="border border-gray-300 p-1">
+                      {currency}
+                      {totalIncome.toFixed(2)}
+                    </td>
+                    <td className="border border-gray-300 p-1">{orderCount}</td>
+                  </tr>
+                )
+              )}
             </tbody>
           </table>
         )}
