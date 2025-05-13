@@ -56,7 +56,7 @@ const Cart = () => {
                   <h3 className="text-lg">{productData.name}</h3>
                   <p className="text-sm">Size: {item.size}</p>
                   <p className="text-sm">
-                    Price: {currency} {productData.price}
+                    Price per item: {currency} {productData.price}
                   </p>
                 </div>
               </div>
