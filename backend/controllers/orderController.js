@@ -370,6 +370,34 @@ const updateStatus = async (req, res) => {
   }
 };
 
+// Update order amount
+const updateOrderAmount = async (req, res) => {
+  try {
+    const { orderId, amount } = req.body;
+
+    // Validate input
+    if (!orderId || amount == null) {
+      return res.json({ success: false, message: "Invalid input" });
+    }
+
+    // Update the order amount
+    const updatedOrder = await orderModel.findByIdAndUpdate(
+      orderId,
+      { amount },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedOrder) {
+      return res.json({ success: false, message: "Order not found" });
+    }
+
+    res.json({ success: true, message: "Order amount updated", order: updatedOrder });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
 // Export functions
 export {
   placeOrder,
@@ -380,4 +408,5 @@ export {
   allOrders,
   userOrders,
   updateStatus,
+  updateOrderAmount, // Add this line to export the new function
 };

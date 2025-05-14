@@ -8,6 +8,7 @@ import {
   allOrders,
   userOrders,
   updateStatus,
+  updateOrderAmount, // Import the new function
 } from "../controllers/orderController.js";
 import adminAuth from "../middleware/adminAuth.js";
 import authUser from "../middleware/auth.js";
@@ -37,5 +38,8 @@ orderRouter.post(
 
 // User Feature
 orderRouter.post("/userorders", authUser, userOrders);
+
+// New route for updating order amount
+orderRouter.post("/update-amount", adminAuth, updateOrderAmount); // Add this line
 
 export default orderRouter;

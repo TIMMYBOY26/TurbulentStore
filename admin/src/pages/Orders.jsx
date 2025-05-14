@@ -9,6 +9,10 @@ const Orders = ({ token }) => {
   const [isIncomeVisible, setIsIncomeVisible] = useState(true);
   const [isStatusVisible, setIsStatusVisible] = useState(true);
 
+  // State to manage the new amount for each order
+  const [newAmounts, setNewAmounts] = useState({});
+  const [editingOrderId, setEditingOrderId] = useState(null);
+
   const fetchAllOrders = async () => {
     if (!token) {
       return null;
@@ -44,6 +48,51 @@ const Orders = ({ token }) => {
     } catch (error) {
       console.log(error);
       toast.error(error.message);
+    }
+  };
+
+  // Function to handle updating the order amount
+  const updateOrderAmount = async (orderId) => {
+    const amount = newAmounts[orderId];
+    if (amount == null || amount <= 0) {
+      toast.error("Please enter a valid amount.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        backendUrl + "/api/order/update-amount",
+        { orderId, amount },
+        { headers: { token } }
+      );
+
+      if (response.data.success) {
+        toast.success("Order amount updated successfully.");
+        await fetchAllOrders(); // Refresh the order list
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
+
+  const handleAmountChange = (orderId, value) => {
+    setNewAmounts({
+      ...newAmounts,
+      [orderId]: value,
+    });
+  };
+
+  const handleAmountBlur = (orderId) => {
+    setEditingOrderId(null);
+    updateOrderAmount(orderId);
+  };
+
+  const handleKeyPress = (event, orderId) => {
+    if (event.key === "Enter") {
+      handleAmountBlur(orderId);
     }
   };
 
@@ -219,10 +268,30 @@ const Orders = ({ token }) => {
               <p>Payment : {order.payment ? "Done" : "Pending"}</p>
               <p>Date: {new Date(order.date).toLocaleDateString()}</p>
             </div>
-            <p className="text-sm sm:text-[20px]">
-              {currency}
-              {order.amount}
-            </p>
+
+            {/* Editable Amount Field */}
+            {editingOrderId === order._id ? (
+              <input
+                type="number"
+                value={newAmounts[order._id] || order.amount}
+                onChange={(e) => handleAmountChange(order._id, e.target.value)}
+                onBlur={() => handleAmountBlur(order._id)}
+                onKeyPress={(e) => handleKeyPress(e, order._id)}
+                className="text-sm sm:text-[20px] border p-1 rounded"
+              />
+            ) : (
+              <p
+                className="text-sm sm:text-[20px] cursor-pointer"
+                onClick={() => {
+                  setEditingOrderId(order._id);
+                  setNewAmounts({ ...newAmounts, [order._id]: order.amount });
+                }}
+              >
+                {currency}
+                {order.amount}
+              </p>
+            )}
+
             <select
               onChange={(event) => statusHandler(event, order._id)}
               value={order.status}
