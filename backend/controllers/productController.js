@@ -5,16 +5,13 @@ import productModel from "../models/productModel.js";
 const addProduct = async (req, res) => {
     try {
         const { name, description, price, category, sizes, bestseller } = req.body;
-        const image1 = req.files.image1 && req.files.image1[0];
-        const image2 = req.files.image2 && req.files.image2[0];
-        const image3 = req.files.image3 && req.files.image3[0];
-        const image4 = req.files.image4 && req.files.image4[0];
-        const image5 = req.files.image5 && req.files.image5[0];
-        const image6 = req.files.image6 && req.files.image6[0];
-        const image7 = req.files.image7 && req.files.image7[0];
-        const image8 = req.files.image8 && req.files.image8[0];
-
-        const images = [image1, image2, image3, image4, image5, image6, image7, image8].filter((item) => item !== undefined);
+        const images = [];
+        for (let i = 1; i <= 8; i++) {
+            const image = req.files[`image${i}`] && req.files[`image${i}`][0];
+            if (image) {
+                images.push(image);
+            }
+        }
 
         let imagesUrl = await Promise.all(
             images.map(async (item) => {
@@ -63,11 +60,16 @@ const listProduct = async (req, res) => {
     }
 };
 
-// Function for updating product price
+// Function for updating product price and sizes
 const updateProduct = async (req, res) => {
     const { id, price, sizes } = req.body;
     try {
-        const updateData = { price };
+        const updateData = {};
+
+        // Update price if provided
+        if (price) {
+            updateData.price = Number(price);
+        }
 
         // Update sizes if provided
         if (sizes) {
@@ -75,12 +77,36 @@ const updateProduct = async (req, res) => {
                 size: size.size,
                 count: Number(size.count)
             }));
-            updateData.sizes = sizesParsed;
+
+            // Find the product and update sizes
+            const product = await productModel.findById(id);
+            if (!product) {
+                return res.status(404).json({ success: false, message: 'Product not found.' });
+            }
+
+            // Update the sizes in the product
+            sizesParsed.forEach(newSize => {
+                const existingSize = product.sizes.find(size => size.size === newSize.size);
+                if (existingSize) {
+                    // If the size exists, update its count
+                    existingSize.count = newSize.count;
+                } else {
+                    // If the size doesn't exist, add it
+                    product.sizes.push(newSize);
+                }
+            });
+
+            // Save the updated product
+            await product.save();
+            return res.json({ success: true, message: 'Product updated!' });
         }
 
+        // If only price is updated
         await productModel.findByIdAndUpdate(id, updateData);
-        res.json({ success: true, message: 'Product updated!' });
+        res.json({ success: true, message: 'Product price updated!' });
+
     } catch (error) {
+        console.log(error);
         res.json({ success: false, message: error.message });
     }
 };
