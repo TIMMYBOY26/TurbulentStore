@@ -8,6 +8,8 @@ const Cart = () => {
   const { products, currency, cartItems, updateQuantity, navigate } =
     useContext(ShopContext);
   const [cartData, setCartData] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
 
   useEffect(() => {
     if (products.length > 0) {
@@ -29,6 +31,32 @@ const Cart = () => {
     // Scroll to top when the component mounts
     window.scrollTo(0, 0);
   }, [cartItems, products]);
+
+  const handleCheckout = () => {
+    for (const item of cartData) {
+      const productData = products.find((product) => product._id === item._id);
+      const selectedSize = productData.sizes.find(
+        (sizeItem) => sizeItem.size === item.size
+      );
+
+      // Check if the quantity in cart exceeds available stock
+      if (selectedSize && item.quantity > selectedSize.count) {
+        setModalMessage(
+          `You cannot checkout with ${item.quantity} of size ${item.size}. Only ${selectedSize.count} available in stock!`
+        );
+        setShowModal(true); // Show the modal
+        return; // Stop the checkout process
+      }
+    }
+
+    // If all checks pass, navigate to the checkout page
+    navigate("/place-order");
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setModalMessage(""); // Clear the message when closing
+  };
 
   return (
     <div className="border-t pt-14">
@@ -101,7 +129,7 @@ const Cart = () => {
               BACK
             </button>
             <button
-              onClick={() => navigate("/place-order")}
+              onClick={handleCheckout} // Updated to use handleCheckout
               className="bg-black text-white text-sm my-2 sm:my-0 px-8 py-3 rounded hover:bg-gray-800 transition"
             >
               NEXT STEP TO CHECKOUT
@@ -109,6 +137,24 @@ const Cart = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal for Stock Warning */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-5 rounded shadow-lg">
+            <h2 className="text-lg font-bold">Warning</h2>
+            <p>{modalMessage}</p>
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={closeModal}
+                className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
