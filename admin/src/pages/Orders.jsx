@@ -141,14 +141,13 @@ const Orders = ({ token }) => {
     ).toFixed(2);
   }
 
-  // Calculate order status counts
-  const statusCounts = finalFilteredOrders.reduce((acc, order) => {
+  // Calculate order status counts based on original orders
+  const statusCounts = orders.reduce((acc, order) => {
     acc[order.status] = (acc[order.status] || 0) + 1;
     return acc;
   }, {});
 
   const allStatuses = [
-    "All",
     "Payment Processing",
     "Delivery in Progress",
     "Goods Arrangement in Progress",
@@ -156,6 +155,26 @@ const Orders = ({ token }) => {
     "Order Completed",
     "Cancelled",
   ];
+
+  // Function to determine the color based on status
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Order Completed":
+        return "bg-green-500"; // Green
+      case "Delivery in Progress":
+        return "bg-yellow-500"; // Yellow
+      case "Shipped":
+        return "bg-blue-500"; // Blue
+      case "Payment Processing":
+        return "bg-orange-500"; // Orange
+      case "Cancelled":
+        return "bg-red-500"; // Red
+      case "Goods Arrangement in Progress":
+        return "bg-gray-500"; // Light Gray
+      default:
+        return "bg-gray-500"; // Default color
+    }
+  };
 
   return (
     <div>
@@ -228,7 +247,14 @@ const Orders = ({ token }) => {
             <tbody>
               {allStatuses.map((status, index) => (
                 <tr key={index}>
-                  <td className="border border-gray-300 p-1">{status}</td>
+                  <td className="border border-gray-300 p-1 flex items-center">
+                    <span
+                      className={`inline-block w-3 h-3 rounded-full mr-2 ${getStatusColor(
+                        status
+                      )}`}
+                    ></span>
+                    {status}
+                  </td>
                   <td className="border border-gray-300 p-1">
                     {statusCounts[status] || 0}
                   </td>
@@ -255,6 +281,7 @@ const Orders = ({ token }) => {
           onChange={(e) => setSelectedStatus(e.target.value)}
           className="border border-gray-300 p-2 rounded w-full sm:w-1/2"
         >
+          <option value="All">All</option>
           {allStatuses.map((status, index) => (
             <option key={index} value={status}>
               {status}
@@ -347,20 +374,29 @@ const Orders = ({ token }) => {
               </p>
             )}
 
-            <select
-              onChange={(event) => statusHandler(event, order._id)}
-              value={order.status}
-              className="p-2 font-semibold"
-            >
-              <option value="Payment Processing">Payment Processing</option>
-              <option value="Delivery in Progress">Delivery in Progress</option>
-              <option value="Goods Arrangement in Progress">
-                Goods Arrangement in Progress
-              </option>
-              <option value="Shipped">Shipped</option>
-              <option value="Order Completed">Order Completed</option>
-              <option value="Cancelled">Cancelled</option>
-            </select>
+            <div className="flex items-center">
+              <span
+                className={`inline-block w-3 h-3 rounded-full mr-2 ${getStatusColor(
+                  order.status
+                )}`}
+              ></span>
+              <select
+                onChange={(event) => statusHandler(event, order._id)}
+                value={order.status}
+                className={`p-2 font-semibold border border-gray-300 rounded`}
+              >
+                <option value="Payment Processing">Payment Processing</option>
+                <option value="Delivery in Progress">
+                  Delivery in Progress
+                </option>
+                <option value="Goods Arrangement in Progress">
+                  Goods Arrangement in Progress
+                </option>
+                <option value="Shipped">Shipped</option>
+                <option value="Order Completed">Order Completed</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
           </div>
         ))}
       </div>
