@@ -9,9 +9,10 @@ const Orders = ({ token }) => {
   const [isIncomeVisible, setIsIncomeVisible] = useState(true);
   const [isStatusVisible, setIsStatusVisible] = useState(true);
 
-  // State to manage the new amount for each order
   const [newAmounts, setNewAmounts] = useState({});
   const [editingOrderId, setEditingOrderId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("All");
 
   const fetchAllOrders = async () => {
     if (!token) {
@@ -51,7 +52,6 @@ const Orders = ({ token }) => {
     }
   };
 
-  // Function to handle updating the order amount
   const updateOrderAmount = async (orderId) => {
     const amount = newAmounts[orderId];
     if (amount == null || amount <= 0) {
@@ -100,44 +100,61 @@ const Orders = ({ token }) => {
     fetchAllOrders();
   }, [token]);
 
-  // Sort orders in descending order based on the order date
   const sortedOrders = [...orders].sort(
     (a, b) => new Date(b.date) - new Date(a.date)
   );
 
-  // Calculate total income and order count by month
-  const incomeByMonth = sortedOrders.reduce((acc, order) => {
+  const filteredOrders = sortedOrders.filter((order) =>
+    String(order.orderNumber).toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const finalFilteredOrders =
+    selectedStatus === "All"
+      ? filteredOrders
+      : filteredOrders.filter((order) => order.status === selectedStatus);
+
+  // Calculate total income, order count, and items sold by month
+  const incomeByMonth = finalFilteredOrders.reduce((acc, order) => {
     const month = new Date(order.date).toLocaleString("default", {
       month: "long",
       year: "numeric",
     });
 
-    // Initialize the month entry if it doesn't exist
     if (!acc[month]) {
-      acc[month] = { totalIncome: 0, orderCount: 0 };
+      acc[month] = { totalIncome: 0, orderCount: 0, totalItems: 0 };
     }
 
-    // Update total income and order count
     acc[month].totalIncome += order.amount;
     acc[month].orderCount += 1;
+    acc[month].totalItems += order.items.reduce(
+      (sum, item) => sum + item.quantity,
+      0
+    );
 
     return acc;
   }, {});
 
+  // Calculate average order value by month
+  for (const month in incomeByMonth) {
+    incomeByMonth[month].averageOrderValue = (
+      incomeByMonth[month].totalIncome / incomeByMonth[month].orderCount
+    ).toFixed(2);
+  }
+
   // Calculate order status counts
-  const statusCounts = sortedOrders.reduce((acc, order) => {
+  const statusCounts = finalFilteredOrders.reduce((acc, order) => {
     acc[order.status] = (acc[order.status] || 0) + 1;
     return acc;
   }, {});
 
-  // List of all possible statuses
   const allStatuses = [
+    "All",
     "Payment Processing",
     "Delivery in Progress",
     "Goods Arrangement in Progress",
     "Shipped",
     "Order Completed",
-    "Cancelled", // Add any other statuses you want to track
+    "Cancelled",
   ];
 
   return (
@@ -157,11 +174,21 @@ const Orders = ({ token }) => {
                 <th className="border border-gray-300 p-1">Month</th>
                 <th className="border border-gray-300 p-1">Total Income</th>
                 <th className="border border-gray-300 p-1">Total Orders</th>
+                <th className="border border-gray-300 p-1">Total Items Sold</th>
+                <th className="border border-gray-300 p-1">
+                  Average Order Value
+                </th>
               </tr>
             </thead>
             <tbody>
               {Object.entries(incomeByMonth).map(
-                ([month, { totalIncome, orderCount }], index) => (
+                (
+                  [
+                    month,
+                    { totalIncome, orderCount, totalItems, averageOrderValue },
+                  ],
+                  index
+                ) => (
                   <tr key={index}>
                     <td className="border border-gray-300 p-1">{month}</td>
                     <td className="border border-gray-300 p-1">
@@ -169,6 +196,11 @@ const Orders = ({ token }) => {
                       {totalIncome.toFixed(2)}
                     </td>
                     <td className="border border-gray-300 p-1">{orderCount}</td>
+                    <td className="border border-gray-300 p-1">{totalItems}</td>
+                    <td className="border border-gray-300 p-1">
+                      {currency}
+                      {averageOrderValue}
+                    </td>
                   </tr>
                 )
               )}
@@ -206,10 +238,33 @@ const Orders = ({ token }) => {
           </table>
         )}
       </div>
+
       <h3>Orders</h3>
 
+      {/* Search Input and Status Filter Section */}
+      <div className="flex flex-col sm:flex-row my-4 gap-4">
+        <input
+          type="text"
+          placeholder="Search by Order Number"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border border-gray-300 p-2 rounded w-full sm:w-1/2"
+        />
+        <select
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value)}
+          className="border border-gray-300 p-2 rounded w-full sm:w-1/2"
+        >
+          {allStatuses.map((status, index) => (
+            <option key={index} value={status}>
+              {status}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div>
-        {sortedOrders.map((order, index) => (
+        {finalFilteredOrders.map((order, index) => (
           <div
             className="grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-x-gray-200 p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-gray-700"
             key={index}
@@ -304,8 +359,7 @@ const Orders = ({ token }) => {
               </option>
               <option value="Shipped">Shipped</option>
               <option value="Order Completed">Order Completed</option>
-              <option value="Cancelled">Cancelled</option>{" "}
-              {/* Add options for all statuses */}
+              <option value="Cancelled">Cancelled</option>
             </select>
           </div>
         ))}
