@@ -149,8 +149,8 @@ const Orders = ({ token }) => {
 
   const allStatuses = [
     "Payment Processing",
-    "Delivery in Progress",
     "Goods Arrangement in Progress",
+    "Delivery in Progress",
     "Shipped",
     "Order Completed",
     "Cancelled",
