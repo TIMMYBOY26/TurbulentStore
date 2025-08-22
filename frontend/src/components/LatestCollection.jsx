@@ -8,7 +8,10 @@ const LatestCollection = () => {
   const [latestProducts, setLatestProduct] = useState([]);
 
   useEffect(() => {
-    setLatestProduct(products.slice(1, 5));
+    // Set the latest products to the last 4 items in the products array
+    if (products.length > 0) {
+      setLatestProduct(products.slice(-4).reverse());
+    }
   }, [products]);
 
   return (
@@ -20,7 +23,7 @@ const LatestCollection = () => {
         </p>
       </div>
 
-      {/*Rendering products */}
+      {/* Rendering products */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6">
         {latestProducts.map((item, index) => (
           <ProductItem

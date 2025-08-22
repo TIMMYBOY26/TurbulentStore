@@ -9,7 +9,7 @@ const Collection = () => {
   const [showFilter, setShowFilter] = useState(false);
   const [filterProducts, setFilterProducts] = useState([]);
   const [category, setCategory] = useState([]);
-  const [sortType, setsortType] = useState("relavent");
+  const [sortType, setsortType] = useState("relevant");
 
   const toggleCategory = (e) => {
     if (category.includes(e.target.value)) {
@@ -34,7 +34,8 @@ const Collection = () => {
       );
     }
 
-    setFilterProducts(productsCopy);
+    // Reverse the filtered products
+    setFilterProducts(productsCopy.reverse());
   };
 
   const sortProduct = () => {
@@ -42,11 +43,11 @@ const Collection = () => {
 
     switch (sortType) {
       case "low-high":
-        setFilterProducts(fpCopy.sort((a, b) => a.price - b.price));
+        setFilterProducts(fpCopy.sort((a, b) => a.price - b.price).reverse());
         break;
 
       case "high-low":
-        setFilterProducts(fpCopy.sort((a, b) => b.price - a.price));
+        setFilterProducts(fpCopy.sort((a, b) => b.price - a.price).reverse());
         break;
 
       default:
@@ -80,9 +81,8 @@ const Collection = () => {
         </p>
         {/* Category Filter */}
         <div
-          className={`border border-gray-300 pl-5 py-3 mt-6 ${
-            showFilter ? "" : "hidden"
-          } sm:block`}
+          className={`border border-gray-300 pl-5 py-3 mt-6 ${showFilter ? "" : "hidden"
+            } sm:block`}
         >
           <p className="mb-3 text-sm font-medium">CATEGORIES</p>
           <div className="flex flex-col gap-2 text-sm font-light text-gray-700">
@@ -117,9 +117,9 @@ const Collection = () => {
             onChange={(e) => setsortType(e.target.value)}
             className="border-2 border-gray-300 text-sm px-2"
           >
-            <option value="relavent">Sort by: Relavent</option>
-            <option value="low-high">Sort by: Price low to high</option>
-            <option value="high-low">Sort by: Price high to low</option>
+            <option value="relevant">Sort by: Relevant</option>
+            <option value="high-low">Sort by: Price low to high</option>
+            <option value="low-high">Sort by: Price high to low</option>
           </select>
         </div>
 
