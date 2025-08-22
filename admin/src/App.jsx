@@ -3,6 +3,8 @@ import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import { Routes, Route } from 'react-router-dom';
 import Add from './pages/Add';
+import AddSong from './pages/Addsong';
+import ListSong from './pages/Listsong';
 import List from './pages/List';
 import Orders from './pages/Orders';
 import Login from './components/Login';
@@ -39,6 +41,8 @@ const App = () => {
                 <Route path='/add' element={<Add token={token} />} />
                 <Route path='/list' element={<List token={token} />} />
                 <Route path='/orders' element={<Orders token={token} />} />
+                <Route path='/addsongs' element={<AddSong token={token} />} />
+                <Route path='/listsongs' element={<ListSong token={token} />} />
               </Routes>
             </div>
           </div>
