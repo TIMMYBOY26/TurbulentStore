@@ -47,7 +47,9 @@ const ShopContextProvider = (props) => {
 
   const getCartCount = () => {
     return Object.values(cartItems).reduce((totalCount, sizes) => {
-      return totalCount + Object.values(sizes).reduce((sum, count) => sum + count, 0);
+      return (
+        totalCount + Object.values(sizes).reduce((sum, count) => sum + count, 0)
+      );
     }, 0);
   };
 
@@ -73,9 +75,12 @@ const ShopContextProvider = (props) => {
   const getCartAmount = () => {
     return Object.entries(cartItems).reduce((totalAmount, [itemId, sizes]) => {
       const itemInfo = products.find((product) => product._id === itemId);
-      return totalAmount + Object.entries(sizes).reduce((sum, [size, count]) => {
-        return sum + (itemInfo.price * count);
-      }, 0);
+      return (
+        totalAmount +
+        Object.entries(sizes).reduce((sum, [size, count]) => {
+          return sum + itemInfo.price * count;
+        }, 0)
+      );
     }, 0);
   };
 

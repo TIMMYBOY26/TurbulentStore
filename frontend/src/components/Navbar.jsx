@@ -60,7 +60,7 @@ const Navbar = () => {
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden"></hr>
         </NavLink>
         {/* New Button renamed to RELEASE */}
-        <NavLink to="/release" className={"flex flex-col items-center gap-1"}>
+        <NavLink to="/songs" className={"flex flex-col items-center gap-1"}>
           <p>RELEASE</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden"></hr>
         </NavLink>
@@ -77,20 +77,20 @@ const Navbar = () => {
         </NavLink>
       </ul>
       <div className="flex items-center gap-6">
+        {/* RELEASE Button for small screens */}
+        <Link to="/songs" className="sm:hidden">
+          <img
+            src={assets.music_icon} // Using the specified icon for the RELEASE button
+            className="w-5 cursor-pointer"
+            alt="RELEASE"
+          />
+        </Link>
         <Link to="/collection">
           <img
             onClick={handleSearchClick}
             src={assets.search_icon}
             className="w-5 cursor-pointer"
             alt="Search"
-          />
-        </Link>
-        {/* RELEASE Button for small screens */}
-        <Link to="/release" className="sm:hidden">
-          <img
-            src={assets.music2_icon} // Using the specified icon for the RELEASE button
-            className="w-5 cursor-pointer"
-            alt="RELEASE"
           />
         </Link>
         <div className="group relative" ref={dropdownRef}>
