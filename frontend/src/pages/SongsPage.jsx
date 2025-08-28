@@ -13,20 +13,23 @@ const SongsPage = () => {
   useEffect(() => {
     const fetchSongs = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/song/list`); // Ensure the correct endpoint
-        setSongs(response.data.songs); // Set the list of songs
+        const response = await axios.get(`${API_URL}/api/song/list`);
+        setSongs(response.data.songs);
       } catch (err) {
-        setError(err.message); // Handle errors
+        setError(err.message);
       } finally {
-        setLoading(false); // Set loading to false after the request
+        setLoading(false);
       }
     };
 
-    fetchSongs(); // Fetch the list of songs
+    fetchSongs();
   }, [API_URL]);
 
-  if (loading) return <p className="text-center text-xl">Loading...</p>; // Loading state
-  if (error) return <p className="text-center text-red-500">Error: {error}</p>; // Error state
+  if (loading) return <p className="text-center text-xl">Loading...</p>;
+  if (error) return <p className="text-center text-red-500">Error: {error}</p>;
+
+  // Reverse the songs array before rendering
+  const reversedSongs = [...songs].reverse();
 
   return (
     <div className="songs-page container mx-auto p-3">
@@ -34,9 +37,9 @@ const SongsPage = () => {
       <hr className="border-t-2 border-gray-300 mb-4 block sm:hidden" />
       {/* Title */}
       <h1 className="text-3xl font mb-1 text-center">MUSIC</h1>
-      <ul className="grid grid-cols-1 sm:grid-cols-3 gap-7">
-        {songs.length > 0 ? (
-          songs.map((song) => (
+      <ul className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {reversedSongs.length > 0 ? (
+          reversedSongs.map((song) => (
             <Song key={song._id} song={song} />
           ))
         ) : (
