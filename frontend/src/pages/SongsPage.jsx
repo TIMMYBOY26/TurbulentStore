@@ -30,19 +30,13 @@ const SongsPage = () => {
 
   return (
     <div className="songs-page">
-      {/* <h2>All Songs</h2> */}
-      {/* Notice for users */}
-      <div className="notice bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 rounded">
-        <strong>Notice:</strong> This page is still under construction and will
-        be available soon!
-      </div>
       <ul>
         {songs.length > 0 ? (
           songs.map((song) => (
             <Song key={song._id} song={song} /> // Use the Song component to render each song
           ))
         ) : (
-          <p></p> // Message if no songs are available
+          <p>No songs available</p> // Message if no songs are available
         )}
       </ul>
     </div>

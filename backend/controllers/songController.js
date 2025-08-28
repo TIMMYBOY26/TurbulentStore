@@ -4,20 +4,21 @@ import songModel from "../models/songModel.js";
 // function for add song
 const addSong = async (req, res) => {
     try {
-        const { name, description, date, lyrics, youtubelink } = req.body
+        const { name, description, date, lyrics, youtubelink } = req.body;
 
-        const image1 = req.files.image1 && req.files.image1[0]
-        const image2 = req.files.image2 && req.files.image2[0]
-        const image3 = req.files.image3 && req.files.image3[0]
+        const image1 = req.files.image1 && req.files.image1[0];
+        const image2 = req.files.image2 && req.files.image2[0];
+        const image3 = req.files.image3 && req.files.image3[0];
 
-        const images = [image1, image2, image3].filter((item) => item !== undefined)
+        const images = [image1, image2, image3].filter((item) => item !== undefined);
 
         let imagesUrl = await Promise.all(
             images.map(async (item) => {
                 let result = await cloudinary.uploader.upload(item.path, { resource_type: 'image' });
-                return result.secure_url
+                return result.secure_url;
             })
-        )
+        );
+
         const songData = {
             name,
             description,
@@ -26,16 +27,15 @@ const addSong = async (req, res) => {
             youtubelink,
             image: imagesUrl,
         };
-        console.log(songData)
+        console.log(songData);
         const song = new songModel(songData);
-        await song.save()
+        await song.save();
 
-        res.json({ success: true, message: "song Added" })
+        res.json({ success: true, message: "Song Added" });
 
     } catch (error) {
-        res.json({ success: false, message: error.message })
+        res.json({ success: false, message: error.message });
     }
-
 }
 
 // function for list song
@@ -53,8 +53,11 @@ const listSong = async (req, res) => {
 // function for single song info
 const singleSong = async (req, res) => {
     try {
-        const { songId } = req.body;
-        const song = await songModel.findById(songId);
+        const { id } = req.params; // Get song ID from URL parameters
+        const song = await songModel.findById(id); // Use the ID to find the song
+        if (!song) {
+            return res.status(404).json({ success: false, message: "Song not found" });
+        }
         res.json({ success: true, song });
 
     } catch (error) {
@@ -63,4 +66,4 @@ const singleSong = async (req, res) => {
     }
 };
 
-export { listSong, addSong, singleSong }
+export { listSong, addSong, singleSong };

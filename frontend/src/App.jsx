@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import PlaceOrder from "./pages/PlaceOrder";
 import Orders from "./pages/Order";
 import SongsPage from "./pages/SongsPage.jsx";
+import SongDetailPage from "./pages/SongDetailPage"; // Import the SongDetailPage
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import SearchBar from "./components/SearchBar";
@@ -29,8 +30,8 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/place-order" element={<PlaceOrder />} />
         <Route path="/orders" element={<Orders />} />
-        <Route path="/songs/:id?" element={<SongsPage />} />{" "}
-        {/* Updated route for songs */}
+        <Route path="/songs" element={<SongsPage />} /> {/* Route for songs list */}
+        <Route path="/songs/:id" element={<SongDetailPage />} /> {/* Route for song details */}
       </Routes>
       <Footer />
     </div>

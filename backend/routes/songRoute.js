@@ -1,12 +1,24 @@
-import express from 'express'
-import { listSong, addSong, singleSong } from '../controllers/songController.js'
+import express from 'express';
+import { listSong, addSong, singleSong } from '../controllers/songController.js';
 import upload from '../middleware/multer.js';
 import adminAuth from '../middleware/adminAuth.js';
 
 const songRouter = express.Router();
 
-songRouter.post('/add', adminAuth, upload.fields([{ name: 'image1', adminAuth, maxCount: 1 }, { name: 'image2', adminAuth, maxCount: 1 }, { name: 'image3', adminAuth, maxCount: 1 }]), addSong);
-songRouter.get('/list', listSong);
-songRouter.post('/single', singleSong);
+// Route to add a song
+songRouter.post('/add', adminAuth, upload.fields([
+    { name: 'image1', maxCount: 1 },
+    { name: 'image2', maxCount: 1 },
+    { name: 'image3', maxCount: 1 }
+]), addSong);
 
-export default songRouter
+// Route to list all songs
+songRouter.get('/list', listSong);
+
+// Route to get a single song by ID (GET method)
+songRouter.get('/:id', singleSong); // Using GET to retrieve a song by ID
+
+// Route to get a single song by ID (POST method)
+songRouter.post('/single', singleSong); // Using POST to retrieve a song by ID
+
+export default songRouter;
