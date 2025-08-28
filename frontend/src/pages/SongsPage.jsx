@@ -25,18 +25,19 @@ const SongsPage = () => {
     fetchSongs(); // Fetch the list of songs
   }, [API_URL]);
 
-  if (loading) return <p>Loading...</p>; // Loading state
-  if (error) return <p>Error: {error}</p>; // Error state
+  if (loading) return <p className="text-center text-xl">Loading...</p>; // Loading state
+  if (error) return <p className="text-center text-red-500">Error: {error}</p>; // Error state
 
   return (
-    <div className="songs-page">
-      <ul>
+    <div className="songs-page container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-6 text-center">MUSIC</h1>
+      <ul className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {songs.length > 0 ? (
           songs.map((song) => (
-            <Song key={song._id} song={song} /> // Use the Song component to render each song
+            <Song key={song._id} song={song} />
           ))
         ) : (
-          <p>No songs available</p> // Message if no songs are available
+          <p className="col-span-full text-center">No songs available</p>
         )}
       </ul>
     </div>
