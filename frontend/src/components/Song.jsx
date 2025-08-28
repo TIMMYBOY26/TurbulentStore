@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const Song = ({ song }) => {
   return (
-    <li className="song-item relative flex flex-col items-center p-4">
+    <li className="song-item relative flex flex-col items-center p-2 sm:p-4">
       {/* Container for image and title */}
       <Link to={`/songs/${song._id}`} className="relative group">
         {/* Display the first image if it exists */}

@@ -29,9 +29,12 @@ const SongsPage = () => {
   if (error) return <p className="text-center text-red-500">Error: {error}</p>; // Error state
 
   return (
-    <div className="songs-page container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">MUSIC</h1>
-      <ul className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+    <div className="songs-page container mx-auto p-3">
+      {/* Grey horizontal line */}
+      <hr className="border-t-2 border-gray-300 mb-4 block sm:hidden" />
+      {/* Title */}
+      <h1 className="text-3xl font mb-1 text-center">MUSIC</h1>
+      <ul className="grid grid-cols-1 sm:grid-cols-3 gap-7">
         {songs.length > 0 ? (
           songs.map((song) => (
             <Song key={song._id} song={song} />

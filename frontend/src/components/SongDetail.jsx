@@ -2,9 +2,9 @@ import React from "react";
 
 const SongDetail = ({ song }) => {
     return (
-        <div className="song-detail flex">
+        <div className="song-detail flex flex-col md:flex-row">
             {/* Left side for YouTube player and images */}
-            <div className="left-side w-1/2 pr-4">
+            <div className="left-side w-full md:w-1/2 pr-4 mb-4 md:mb-0">
                 <h3>VIDEO</h3>
                 {/* Embed the YouTube video player */}
                 {song.youtubelink && (
@@ -23,19 +23,25 @@ const SongDetail = ({ song }) => {
 
                 <div className="image-gallery grid grid-cols-2 gap-2">
                     {song.image.map((imgUrl, index) => (
-                        <img key={index} src={imgUrl} alt={`Song image ${index + 1}`} className="w-full h-auto rounded shadow" />
+                        <img
+                            key={index}
+                            src={imgUrl}
+                            alt={`Song image ${index + 1}`}
+                            className="w-full h-auto rounded shadow"
+                        />
                     ))}
-                </div> {/* Display images */}
+                </div>
             </div>
 
             {/* Right side for song details */}
-            <div className="right-side w-1/2 pl-4">
-                <h2 className="text-2xl font mb-2">{song.name}</h2>                {/* Apply splitting logic to description */}
+            <div className="right-side w-full md:w-1/2 pl-4">
+                <h2 className="text-2xl font mb-2">{song.name}</h2>
+                {/* Apply splitting logic to description */}
                 <p>
                     {song.description.split('|').map((line, index) => (
                         <span key={index}>
                             {line.trim()}
-                            {index < song.description.split('|').length - 1 && <br />} {/* Add line break except after the last line */}
+                            {index < song.description.split('|').length - 1 && <br />}
                         </span>
                     ))}
                 </p>
@@ -46,7 +52,7 @@ const SongDetail = ({ song }) => {
                     {song.lyrics.split('|').map((line, index) => (
                         <span key={index}>
                             {line.trim()}
-                            {index < song.lyrics.split('|').length - 1 && <br />} {/* Add line break except after the last line */}
+                            {index < song.lyrics.split('|').length - 1 && <br />}
                         </span>
                     ))}
                 </p>
