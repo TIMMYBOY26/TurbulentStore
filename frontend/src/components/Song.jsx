@@ -16,7 +16,9 @@ const Song = ({ song }) => {
         )}
 
         {/* Song name positioned at the bottom left of the image */}
-
+        <span className="absolute bottom-2 left-2 text-black text-lg bg-transparent px-2 py-1 rounded transition-opacity duration-300 group-hover:opacity-80">
+          {song.name}
+        </span>
       </Link>
     </li>
   );
