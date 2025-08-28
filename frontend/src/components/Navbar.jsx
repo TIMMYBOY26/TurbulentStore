@@ -61,7 +61,7 @@ const Navbar = () => {
         </NavLink>
         {/* New Button renamed to RELEASE */}
         <NavLink to="/songs" className={"flex flex-col items-center gap-1"}>
-          <p>RELEASE</p>
+          <p>MUSIC</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden"></hr>
         </NavLink>
         <NavLink
