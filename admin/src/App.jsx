@@ -8,10 +8,12 @@ import ListSong from './pages/Listsong';
 import List from './pages/List';
 import Orders from './pages/Orders';
 import Login from './components/Login';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
+import AddShows from './pages/AddShows'; // 新增演出頁面
+import ListShows from './pages/ListShows'; // 列出演出頁面
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
-export const currency = '$'
+export const currency = '$';
 
 const App = () => {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -43,6 +45,10 @@ const App = () => {
                 <Route path='/orders' element={<Orders token={token} />} />
                 <Route path='/addsongs' element={<AddSong token={token} />} />
                 <Route path='/listsongs' element={<ListSong token={token} />} />
+
+                {/* 新增的演出管理路由 */}
+                <Route path='/addshows' element={<AddShows token={token} />} />
+                <Route path='/listshows' element={<ListShows token={token} />} />
               </Routes>
             </div>
           </div>
