@@ -44,10 +44,10 @@ const ShowDetail = () => {
                 ))}
             </div>
             <h1 className="text-3xl sm:text-2xl font-bold mb-2">{show.name}</h1> {/* Adjusted font size for small screens */}
-
+            <p><span className="font-medium">{new Date(show.date).toLocaleDateString()}</span></p>
             <p className="text-lg mb-4 whitespace-pre-wrap break-words">{show.description}</p>
             <div className="text-gray-600 mb-4">
-                <p>Date: <span className="font-medium">{new Date(show.date).toLocaleDateString()}</span></p>
+
                 <p>Location: <span className="font-medium">{show.location}</span></p>
                 <p>Status: <span className="font-medium">{show.status}</span></p>
             </div>
