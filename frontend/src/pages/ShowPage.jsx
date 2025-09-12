@@ -25,23 +25,26 @@ const ShowPage = () => {
         fetchShows();
     }, [API_URL]);
 
-    if (loading) return <p className="text-center text-xl">Loading...</p>;
-    if (error) return <p className="text-center text-red-500">Error: {error}</p>;
+    if (loading)
+        return <p className="text-center text-xl">Loading...</p>;
+    if (error)
+        return <p className="text-center text-red-500">Error: {error}</p>;
 
     // Reverse the shows array before rendering
     const reversedShows = [...shows].reverse();
 
     return (
-        <div className="shows-page container mx-auto p-3">
-            <hr className="border-t-2 border-gray-300 mb-4 block sm:hidden" />
-            <h1 className="text-3xl font mb-1 text-center">SHOWS</h1>
-            <ul className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="shows-page container mx-auto p-4">
+            <h1 className="text-4xl font-bold mb-6 text-center">SHOWS</h1>
+            <ul className="space-y-4">
                 {reversedShows.length > 0 ? (
                     reversedShows.map((show) => (
-                        <Show key={show._id} show={show} />
+                        <li key={show._id} className="bg-white shadow-md rounded-lg border border-gray-200 transition-transform transform hover:scale-105 cursor-pointer">
+                            <Show show={show} />
+                        </li>
                     ))
                 ) : (
-                    <p className="col-span-full text-center">No shows available</p>
+                    <p className="text-center text-lg">No shows available</p>
                 )}
             </ul>
         </div>
