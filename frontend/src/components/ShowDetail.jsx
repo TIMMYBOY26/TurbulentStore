@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate
 
 const ShowDetail = () => {
     const { id } = useParams();
     const [show, setShow] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate(); // Initialize useNavigate
 
     // Use the environment variable for the backend URL
     const API_URL = import.meta.env.VITE_BACKEND_URL; // Access the backend URL from .env
@@ -28,21 +29,44 @@ const ShowDetail = () => {
 
     if (loading) return <p className="text-center text-xl">Loading...</p>;
     if (error) return <p className="text-center text-red-500">Error: {error}</p>;
-
     if (!show) return <p className="text-center">Show not found</p>;
 
     return (
-        <div className="show-detail container mx-auto p-3">
-            <h1 className="text-3xl font-bold">{show.name}</h1>
-            <img src={show.image[0]} alt={show.name} className="w-full h-auto rounded-lg mb-4" />
-            <p className="text-lg">{show.description}</p>
-            <p className="text-gray-500">Date: {new Date(show.date).toLocaleDateString()}</p>
-            <p className="text-gray-500">Location: {show.location}</p>
-            <p className="text-gray-500">Status: {show.status}</p>
-            <a href={show.ticketLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                Buy Tickets
+        <div className="show-detail container mx-auto p-4 md:p-8">
+            <div className="flex justify-center flex-wrap mb-4">
+                {show.image.map((img, index) => (
+                    <img
+                        key={index}
+                        src={img}
+                        alt={`${show.name} image ${index + 1}`}
+                        className="w-1/3 h-auto object-cover p-1"
+                    />
+                ))}
+            </div>
+            <h1 className="text-3xl font-bold mb-2">{show.name}</h1>
+
+            <p className="text-lg mb-4 whitespace-pre-wrap break-words">{show.description}</p>
+            <div className="text-gray-600 mb-4">
+                <p>Date: <span className="font-medium">{new Date(show.date).toLocaleDateString()}</span></p>
+                <p>Location: <span className="font-medium">{show.location}</span></p>
+                <p>Status: <span className="font-medium">{show.status}</span></p>
+            </div>
+            <a
+                href={show.ticketLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-black text-white px-4 py-2 transition duration-200 mb-2"
+            >
+                Buy Tickets / Reservation
             </a>
+            <div> <button
+                onClick={() => navigate(-1)} // Navigate back to the previous page
+                className="inline-block bg-gray-300 text-black px-4 py-2 transition duration-200"
+            >
+                Back
+            </button></div>
         </div>
+
     );
 };
 

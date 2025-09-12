@@ -27,12 +27,12 @@ const ShowDetailPage = () => {
         fetchShow(); // Fetch the show details
     }, [API_URL, id]);
 
-    if (loading) return <p>Loading...</p>; // Loading state
-    if (error) return <p>Error: {error}</p>; // Error state
-    if (!show) return <p>No show found</p>; // Check if show exists
+    if (loading) return <p className="text-center text-xl">Loading...</p>; // Loading state
+    if (error) return <p className="text-center text-red-500">Error: {error}</p>; // Error state
+    if (!show) return <p className="text-center">No show found</p>; // Check if show exists
 
     return (
-        <div className="show-detail-page">
+        <div className="show-detail-page flex flex-col items-center p-4 md:p-8">
             <ShowDetail show={show} /> {/* Render the ShowDetail component */}
         </div>
     );
