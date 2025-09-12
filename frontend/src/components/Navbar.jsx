@@ -104,6 +104,16 @@ const Navbar = () => {
             alt="Search"
           />
         </Link>
+
+        {/* Contact Us button logo for small screens */}
+        <Link to="/contact" className="sm:hidden">
+          <img
+            src={assets.menu_icon} // Replace with the actual contact icon path
+            className="w-5 cursor-pointer"
+            alt=""
+          />
+        </Link>
+
         <div className="group relative" ref={dropdownRef}>
           <img
             onClick={() => {
@@ -155,14 +165,6 @@ const Navbar = () => {
             </p>
           </Link>
         )}
-        {/* Contact Us button logo for small screens */}
-        <Link to="/contact" className="sm:hidden">
-          <img
-            src={assets.menu_icon} // Replace with the actual contact icon path
-            className="w-5 cursor-pointer"
-            alt=""
-          />
-        </Link>
 
       </div>
     </div>
