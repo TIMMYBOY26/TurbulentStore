@@ -88,6 +88,14 @@ const Navbar = () => {
             alt="RELEASE"
           />
         </Link>
+        {/* New Shows button for small screens */}
+        <Link to="/shows" className="sm:hidden">
+          <img
+            src={assets.calender_icon} // Using the specified icon for the SHOWS button
+            className="w-5 cursor-pointer"
+            alt="Shows"
+          />
+        </Link>
         <Link to="/collection">
           <img
             onClick={handleSearchClick}
@@ -155,14 +163,7 @@ const Navbar = () => {
             alt=""
           />
         </Link>
-        {/* New Shows button for small screens */}
-        <Link to="/shows" className="sm:hidden">
-          <img
-            src={assets.music_icon} // Using the specified icon for the SHOWS button
-            className="w-5 cursor-pointer"
-            alt="Shows"
-          />
-        </Link>
+
       </div>
     </div>
   );
