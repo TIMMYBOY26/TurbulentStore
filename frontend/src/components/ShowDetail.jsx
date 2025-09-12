@@ -39,11 +39,11 @@ const ShowDetail = () => {
                         key={index}
                         src={img}
                         alt={`${show.name} image ${index + 1}`}
-                        className="w-1/3 h-auto object-cover p-1"
+                        className="w-full sm:w-1/2 md:w-1/3 h-auto object-cover p-1" // Responsive width classes
                     />
                 ))}
             </div>
-            <h1 className="text-3xl font-bold mb-2">{show.name}</h1>
+            <h1 className="text-3xl sm:text-2xl font-bold mb-2">{show.name}</h1> {/* Adjusted font size for small screens */}
 
             <p className="text-lg mb-4 whitespace-pre-wrap break-words">{show.description}</p>
             <div className="text-gray-600 mb-4">
@@ -59,14 +59,15 @@ const ShowDetail = () => {
             >
                 Buy Tickets / Reservation
             </a>
-            <div> <button
-                onClick={() => navigate(-1)} // Navigate back to the previous page
-                className="inline-block bg-gray-300 text-black px-4 py-2 transition duration-200"
-            >
-                Back
-            </button></div>
+            <div>
+                <button
+                    onClick={() => navigate(-1)} // Navigate back to the previous page
+                    className="inline-block bg-gray-300 text-black px-4 py-2 transition duration-200"
+                >
+                    Back
+                </button>
+            </div>
         </div>
-
     );
 };
 
