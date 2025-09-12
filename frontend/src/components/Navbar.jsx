@@ -59,7 +59,6 @@ const Navbar = () => {
           <p>HOME</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden"></hr>
         </NavLink>
-        {/* New Button renamed to RELEASE */}
         <NavLink to="/songs" className={"flex flex-col items-center gap-1"}>
           <p>MUSIC</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden"></hr>
@@ -69,6 +68,10 @@ const Navbar = () => {
           className={"flex flex-col items-center gap-1"}
         >
           <p>COLLECTION</p>
+          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden"></hr>
+        </NavLink>
+        <NavLink to="/shows" className={"flex flex-col items-center gap-1"}>
+          <p>SHOWS</p> {/* New link for Shows */}
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden"></hr>
         </NavLink>
         <NavLink to="/contact" className={"flex flex-col items-center gap-1"}>
@@ -150,6 +153,14 @@ const Navbar = () => {
             src={assets.menu_icon} // Replace with the actual contact icon path
             className="w-5 cursor-pointer"
             alt=""
+          />
+        </Link>
+        {/* New Shows button for small screens */}
+        <Link to="/shows" className="sm:hidden">
+          <img
+            src={assets.music_icon} // Using the specified icon for the SHOWS button
+            className="w-5 cursor-pointer"
+            alt="Shows"
           />
         </Link>
       </div>
