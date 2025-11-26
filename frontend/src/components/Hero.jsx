@@ -15,7 +15,12 @@ const Hero = () => {
       onClick={handleHeroClick}
     >
       {/* Video Background */}
-      <video autoPlay loop muted className="w-full h-[60vh] object-cover">
+      <video
+        autoPlay
+        loop
+        muted
+        className="w-full h-auto max-h-[60vh] object-contain"
+      >
         <source src={assets.sampleWebVideo} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
