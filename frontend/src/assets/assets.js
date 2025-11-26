@@ -10,6 +10,7 @@ import fpsCode from "./fpscode.jpg";
 import hero_img from "./hero_img.png";
 import hero_bg from "./HeroBg.jpg";
 import loginBg from "./loginBg.jpg";
+import sampleWebVideo from "./sample web video.mp4";
 
 import cart_icon from "./cart_icon.png";
 import bin_icon from "./bin_icon.png";
@@ -54,11 +55,11 @@ export const assets = {
   fpsCode,
   paymeLogo,
   paymeCode,
-  hero_img,
   hero_bg,
   loginBg,
   parcel_icon,
   support_icon,
+  sampleWebVideo,
 };
 
 // export const products = [
