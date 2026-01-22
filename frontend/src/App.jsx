@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import Collection from "./pages/Collection";
 import Contact from "./pages/Contact";
@@ -16,28 +16,43 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import SearchBar from "./components/SearchBar";
 import { ToastContainer } from "react-toastify";
+import Hero from "./components/Hero"; // Import the Hero component
 
 const App = () => {
+  const location = useLocation(); // Get the current location
+
   return (
-    <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
+    <div>
       <ToastContainer />
-      <Navbar />
-      <SearchBar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/collection" element={<Collection />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/product/:productId" element={<Product />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/place-order" element={<PlaceOrder />} />
-        <Route path="/orders" element={<Orders />} />
-        <Route path="/songs" element={<SongsPage />} /> {/* Route for songs list */}
-        <Route path="/songs/:id" element={<SongDetailPage />} /> {/* Route for song details */}
-        <Route path="/shows" element={<ShowPage />} /> {/* Route for shows list */}
-        <Route path="/shows/:id" element={<ShowDetailPage />} /> {/* Route for show details */}
-      </Routes>
-      <Footer />
+      <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
+        <Navbar />
+        <SearchBar />
+      </div>
+
+      {/* Conditionally render the Hero component only on the home page */}
+      {location.pathname === "/" && <Hero />}
+
+      <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/collection" element={<Collection />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/product/:productId" element={<Product />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/place-order" element={<PlaceOrder />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/songs" element={<SongsPage />} />{" "}
+          {/* Route for songs list */}
+          <Route path="/songs/:id" element={<SongDetailPage />} />{" "}
+          {/* Route for song details */}
+          <Route path="/shows" element={<ShowPage />} />{" "}
+          {/* Route for shows list */}
+          <Route path="/shows/:id" element={<ShowDetailPage />} />{" "}
+          {/* Route for show details */}
+        </Routes>
+        <Footer />
+      </div>
     </div>
   );
 };
