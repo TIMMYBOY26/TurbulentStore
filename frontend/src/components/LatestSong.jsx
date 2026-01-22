@@ -85,7 +85,8 @@ const LatestSong = () => {
             onClick={() => navigate("/songs")}
             className="inline-block cursor-pointer text-gray-500 text-sm font-light hover:text-black transition-colors"
           >
-            Click to see full MV <span className="text-xs ml-1">→</span>
+            Click to see full MV / Lyrics{" "}
+            <span className="text-xs ml-1">→</span>
           </p>
         </div>
       </div>
