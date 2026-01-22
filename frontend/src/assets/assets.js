@@ -31,11 +31,13 @@ import cross_icon from "./cross_icon.png";
 import parcel_icon from "./parcel_icon.svg";
 
 import Monologue_hero from "./TURBULENT MONOLOGUE COVER.png";
+import lightwall from "./lightwall.jpeg";
 
 export const assets = {
   logo,
   hero_img,
   Monologue_hero,
+  lightwall,
   TurbulentShirt,
   TurbulentShirtBack,
   TurbulentShirtChart,
