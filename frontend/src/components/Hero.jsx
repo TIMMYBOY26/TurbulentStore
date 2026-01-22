@@ -28,35 +28,35 @@ const Hero = () => {
 
         {/* --- BUTTONS & TITLE CONTAINER --- */}
         <div className="absolute bottom-[11%] sm:bottom-[20%] left-0 w-full flex flex-col items-center px-4">
-          {/* TEXT GROUP: Updated to sm:text-black for 2026 large screen display */}
-          <div className="flex flex-col items-center mb-2 sm:mb-3 leading-tight">
-            <h2 className="text-white sm:text-black text-[10px] sm:text-lg font-bold uppercase tracking-[0.2em] drop-shadow-md sm:drop-shadow-none">
+          {/* TEXT GROUP: Increased slightly for mobile and desktop */}
+          <div className="flex flex-col items-center mb-2 sm:mb-4 leading-tight">
+            <h2 className="text-white sm:text-black text-[11px] sm:text-xl font-bold uppercase tracking-[0.2em] drop-shadow-md sm:drop-shadow-none">
               The New Album
             </h2>
-            <h2 className="text-white sm:text-black text-[10px] sm:text-lg font-bold uppercase tracking-[0.2em] drop-shadow-md sm:drop-shadow-none">
+            <h2 className="text-white sm:text-black text-[11px] sm:text-xl font-bold uppercase tracking-[0.2em] drop-shadow-md sm:drop-shadow-none">
               Out January 28TH
             </h2>
           </div>
 
           <div className="flex justify-center gap-3 sm:gap-6">
-            {/* ORDER BUTTON */}
+            {/* ORDER BUTTON: Increased padding and font slightly */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 navigate("/collection");
               }}
-              className="px-4 py-1 sm:px-8 sm:py-2 border-[1px] sm:border-2 border-white sm:border-black text-white sm:text-black bg-transparent sm:bg-white rounded-sm font-medium uppercase tracking-wider text-[10px] sm:text-sm transition-all duration-300 hover:bg-white sm:hover:bg-black hover:text-black sm:hover:text-white"
+              className="px-5 py-1.5 sm:px-10 sm:py-2.5 border-[1px] sm:border-2 border-white sm:border-black text-white sm:text-black bg-transparent sm:bg-white rounded-sm font-medium uppercase tracking-wider text-[11px] sm:text-base transition-all duration-300 hover:bg-white sm:hover:bg-black hover:text-black sm:hover:text-white"
             >
               ORDER
             </button>
 
-            {/* STREAM BUTTON */}
+            {/* STREAM BUTTON: Increased padding and font slightly */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 window.open(streamUrl, "_blank", "noopener,noreferrer");
               }}
-              className="px-4 py-1 sm:px-8 sm:py-2 border-[1px] sm:border-2 border-white sm:border-black text-white sm:text-black bg-transparent sm:bg-white rounded-sm font-medium uppercase tracking-wider text-[10px] sm:text-sm transition-all duration-300 hover:bg-white sm:hover:bg-black hover:text-black sm:hover:text-white"
+              className="px-5 py-1.5 sm:px-10 sm:py-2.5 border-[1px] sm:border-2 border-white sm:border-black text-white sm:text-black bg-transparent sm:bg-white rounded-sm font-medium uppercase tracking-wider text-[11px] sm:text-base transition-all duration-300 hover:bg-white sm:hover:bg-black hover:text-black sm:hover:text-white"
             >
               STREAM
             </button>
