@@ -51,9 +51,12 @@ const Navbar = () => {
 
   return (
     <div className="flex items-center justify-between py-5 font-medium">
-      <Link to="/">
-        <img src={assets.logo} className="w-36" alt="Logo" />
+      {/* Logo Link: Added translate-y-[3px] to lower it */}
+      <Link to="/" className="translate-y-[3px]">
+        {/* Logo Image: Added lg:w-44 to make it larger on large screens */}
+        <img src={assets.logo} className="w-36 lg:w-44" alt="Logo" />
       </Link>
+
       <ul className="hidden sm:flex gap-5 text-sm text-gray-700">
         <NavLink to="/" className={"flex flex-col items-center gap-1"}>
           <p>HOME</p>
@@ -71,7 +74,7 @@ const Navbar = () => {
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden"></hr>
         </NavLink>
         <NavLink to="/shows" className={"flex flex-col items-center gap-1"}>
-          <p>SHOWS</p> {/* New link for Shows */}
+          <p>SHOWS</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden"></hr>
         </NavLink>
         <NavLink to="/contact" className={"flex flex-col items-center gap-1"}>
@@ -79,19 +82,18 @@ const Navbar = () => {
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden"></hr>
         </NavLink>
       </ul>
+
       <div className="flex items-center gap-6">
-        {/* RELEASE Button for small screens */}
         <Link to="/songs" className="sm:hidden">
           <img
-            src={assets.music_icon} // Using the specified icon for the RELEASE button
+            src={assets.music_icon}
             className="w-5 cursor-pointer"
             alt="RELEASE"
           />
         </Link>
-        {/* New Shows button for small screens */}
         <Link to="/shows" className="sm:hidden">
           <img
-            src={assets.calender_icon} // Using the specified icon for the SHOWS button
+            src={assets.calender_icon}
             className="w-5 cursor-pointer"
             alt="Shows"
           />
@@ -105,39 +107,33 @@ const Navbar = () => {
           />
         </Link>
 
-        {/* Contact Us button logo for small screens */}
         <Link to="/contact" className="sm:hidden">
-          <img
-            src={assets.menu_icon} // Replace with the actual contact icon path
-            className="w-5 cursor-pointer"
-            alt=""
-          />
+          <img src={assets.menu_icon} className="w-5 cursor-pointer" alt="" />
         </Link>
 
         <div className="group relative" ref={dropdownRef}>
           <img
             onClick={() => {
               if (token) {
-                toggleDropdown(); // Toggle dropdown if logged in
+                toggleDropdown();
               } else {
-                navigate("/login"); // Redirect to login if not logged in
+                navigate("/login");
               }
-            }} // Handle click based on authentication status
+            }}
             className="w-5 cursor-pointer"
             src={assets.profile_icon}
             alt="Profile"
           />
-          {/* Dropdown menu */}
           {token && dropdownOpen && (
             <div
-              className="absolute dropdown-menu right-0 pt-4 z-50" // Ensure z-index is high
-              onClick={(e) => e.stopPropagation()} // Prevent click propagation
+              className="absolute dropdown-menu right-0 pt-4 z-50"
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 rounded">
                 <p
                   onClick={() => {
                     navigate("/orders");
-                    setDropdownOpen(false); // Close dropdown after navigating
+                    setDropdownOpen(false);
                   }}
                   className="cursor-pointer hover:text-black"
                 >
@@ -146,7 +142,7 @@ const Navbar = () => {
                 <p
                   onClick={() => {
                     logout();
-                    setDropdownOpen(false); // Close dropdown after logout
+                    setDropdownOpen(false);
                   }}
                   className="cursor-pointer hover:text-black"
                 >
@@ -156,7 +152,7 @@ const Navbar = () => {
             </div>
           )}
         </div>
-        {/* Conditionally render the cart icon */}
+
         {token && (
           <Link to="/cart" className="relative">
             <img src={assets.cart_icon} className="w-5 min-w-5" alt="Cart" />
@@ -165,7 +161,6 @@ const Navbar = () => {
             </p>
           </Link>
         )}
-
       </div>
     </div>
   );
