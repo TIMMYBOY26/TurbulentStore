@@ -32,12 +32,14 @@ import parcel_icon from "./parcel_icon.svg";
 
 import Monologue_hero from "./TURBULENT MONOLOGUE COVER.png";
 import lightwall from "./lightwall.jpeg";
+import lightwallvideo from "./lightwallvideo.mp4";
 
 export const assets = {
   logo,
   hero_img,
   Monologue_hero,
   lightwall,
+  lightwallvideo,
   TurbulentShirt,
   TurbulentShirtBack,
   TurbulentShirtChart,
