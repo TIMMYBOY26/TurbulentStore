@@ -9,33 +9,61 @@ const Hero = () => {
     navigate("/collection");
   };
 
+  const streamUrl = "https://linktr.ee";
+
   return (
     <div
-      className="flex flex-col sm:flex-row cursor-pointer transition-transform duration-300 h-auto sm:h-[80vh] w-full"
+      className="flex flex-col sm:flex-row cursor-pointer transition-transform duration-300 h-auto sm:h-[80vh] w-full relative"
       onClick={handleHeroClick}
       style={{
         backgroundImage: `url(${assets.Monologue_hero})`,
-        // 'contain' on mobile to show full square, 'cover' on desktop for full bleed
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
       }}
     >
-      {/* 
-          On mobile, we use an invisible aspect-square div to force the 
-          container to be a perfect square so the background image fills it 
-      */}
-      <div className="w-full aspect-square sm:aspect-auto sm:h-full flex flex-col sm:flex-row">
-        {/* Hero left */}
-        <div className="w-full sm:w-1/2 flex items-center justify-center py-10 sm:py-0">
-          {/* Content goes here */}
-        </div>
-
-        {/* Hero right */}
+      <div className="w-full aspect-square sm:aspect-auto sm:h-full flex flex-col sm:flex-row relative">
+        <div className="w-full sm:w-1/2 flex items-center justify-center py-10 sm:py-0"></div>
         <div className="w-full sm:w-1/2"></div>
+
+        {/* --- BUTTONS & TITLE CONTAINER --- */}
+        <div className="absolute bottom-[11%] sm:bottom-[20%] left-0 w-full flex flex-col items-center px-4">
+          {/* TEXT GROUP: Updated to sm:text-black for 2026 large screen display */}
+          <div className="flex flex-col items-center mb-2 sm:mb-3 leading-tight">
+            <h2 className="text-white sm:text-black text-[10px] sm:text-lg font-bold uppercase tracking-[0.2em] drop-shadow-md sm:drop-shadow-none">
+              The New Album
+            </h2>
+            <h2 className="text-white sm:text-black text-[10px] sm:text-lg font-bold uppercase tracking-[0.2em] drop-shadow-md sm:drop-shadow-none">
+              Out January 28TH
+            </h2>
+          </div>
+
+          <div className="flex justify-center gap-3 sm:gap-6">
+            {/* ORDER BUTTON */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate("/collection");
+              }}
+              className="px-4 py-1 sm:px-8 sm:py-2 border-[1px] sm:border-2 border-white sm:border-black text-white sm:text-black bg-transparent sm:bg-white rounded-sm font-medium uppercase tracking-wider text-[10px] sm:text-sm transition-all duration-300 hover:bg-white sm:hover:bg-black hover:text-black sm:hover:text-white"
+            >
+              ORDER
+            </button>
+
+            {/* STREAM BUTTON */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(streamUrl, "_blank", "noopener,noreferrer");
+              }}
+              className="px-4 py-1 sm:px-8 sm:py-2 border-[1px] sm:border-2 border-white sm:border-black text-white sm:text-black bg-transparent sm:bg-white rounded-sm font-medium uppercase tracking-wider text-[10px] sm:text-sm transition-all duration-300 hover:bg-white sm:hover:bg-black hover:text-black sm:hover:text-white"
+            >
+              STREAM
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Inline Style Override for Desktop */}
       <style jsx>{`
         @media (min-width: 640px) {
           div {
