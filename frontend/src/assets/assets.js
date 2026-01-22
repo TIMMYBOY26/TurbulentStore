@@ -30,9 +30,12 @@ import contact_img from "./contact_img.png";
 import cross_icon from "./cross_icon.png";
 import parcel_icon from "./parcel_icon.svg";
 
+import Monologue_hero from "./TURBULENT MONOLOGUE COVER.png";
+
 export const assets = {
   logo,
   hero_img,
+  Monologue_hero,
   TurbulentShirt,
   TurbulentShirtBack,
   TurbulentShirtChart,
