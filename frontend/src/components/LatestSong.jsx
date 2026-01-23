@@ -8,7 +8,7 @@ const LatestSong = () => {
   const videoRef = useRef(null);
   const [isMuted, setIsMuted] = useState(true);
 
-  // Set volume to 70% (30% less than max) on mount
+  // Set volume to 70% on mount
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.volume = 0.7;
@@ -23,6 +23,10 @@ const LatestSong = () => {
     }
   };
 
+  const handleVideoClick = () => {
+    navigate("/songs/69719365c59ead5f6d4c8f40");
+  };
+
   return (
     <div className="mt-0 mb-10">
       <div className="flex flex-col items-center pt-6 pb-3 text-3xl">
@@ -35,12 +39,21 @@ const LatestSong = () => {
         </p>
       </div>
 
-      <div className="relative w-full overflow-hidden">
+      {/* 
+          CONTAINER: 
+          - 'group' allows children to react to hover
+          - 'overflow-hidden' clips the zoom effect
+          - 'active:scale-[0.98]' provides mobile press feedback
+      */}
+      <div
+        onClick={handleVideoClick}
+        className="group relative w-full overflow-hidden cursor-pointer transition-transform duration-300 active:scale-[0.98] sm:active:scale-100"
+      >
         <video
           ref={videoRef}
           src={assets.lightwallvideo}
-          onClick={() => navigate("/songs/69719365c59ead5f6d4c8f40")}
-          className="w-full h-auto mt-0 cursor-pointer"
+          // VIDEO: Zoom effect on desktop hover via group-hover
+          className="w-full h-auto mt-0 transition-transform duration-700 ease-in-out sm:group-hover:scale-105"
           autoPlay
           loop
           muted
@@ -49,7 +62,7 @@ const LatestSong = () => {
 
         <button
           onClick={toggleMute}
-          className="absolute bottom-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-black/20 backdrop-blur-sm border border-white/20 text-white transition-all hover:bg-black/40 z-10"
+          className="absolute bottom-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-black/20 backdrop-blur-sm border border-white/20 text-white transition-all hover:bg-black/40 z-10 active:scale-90"
         >
           {isMuted ? (
             <svg xmlns="http://www.w3.org" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
