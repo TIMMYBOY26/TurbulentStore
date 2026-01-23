@@ -74,7 +74,7 @@ const Navbar = () => {
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden"></hr>
         </NavLink>
         <NavLink to="/shows" className={"flex flex-col items-center gap-1"}>
-          <p>SHOWS</p>
+          <p>NEWS</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden"></hr>
         </NavLink>
         <NavLink to="/contact" className={"flex flex-col items-center gap-1"}>

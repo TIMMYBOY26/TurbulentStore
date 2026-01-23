@@ -33,10 +33,9 @@ const SongsPage = () => {
 
   return (
     <div className="songs-page container mx-auto p-3">
-      {/* Grey horizontal line */}
-      <hr className="border-t-2 border-gray-300 mb-4 block sm:hidden" />
       {/* Title */}
       <h1 className="text-3xl font mb-1 text-center">MUSIC</h1>
+
       <ul className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {reversedSongs.length > 0 ? (
           reversedSongs.map((song) => (

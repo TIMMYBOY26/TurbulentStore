@@ -53,7 +53,7 @@ const ShowPage = () => {
 
     return (
         <div className="shows-page container mx-auto p-4">
-            <h1 className="text-4xl font-bold mb-6 text-center">SHOWS</h1>
+            <h1 className="text-4xl font-bold mb-6 text-center">NEWS</h1>
             <div className="mb-5 flex flex-col items-center space-y-2">
                 <div className="flex items-center space-x-4"> {/* Flex container for side-by-side layout */}
                     <span
