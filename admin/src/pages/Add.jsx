@@ -216,6 +216,7 @@ const Add = ({ token }) => {
             >
               <option value="TEES">TEES</option>
               <option value="ACCESSORIES">ACCESSORIES</option>
+              <option value="MUSIC">MUSIC</option>
             </select>
           </div>
 
@@ -235,7 +236,7 @@ const Add = ({ token }) => {
         <div>
           <p className="mb-2">Product Sizes</p>
           <div className="flex gap-3">
-            {["S", "M", "L", "XL", "XXL", "STICKER"].map((size) => (
+            {["S", "M", "L", "XL", "XXL", "STICKER", "MUSIC"].map((size) => (
               <div key={size} className="flex flex-col items-center">
                 <p
                   onClick={() =>

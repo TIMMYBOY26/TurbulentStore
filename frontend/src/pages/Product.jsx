@@ -140,13 +140,12 @@ const Product = () => {
             {productData.image.map((src, index) => (
               <img
                 key={index}
-                className={`absolute w-full h-full object-contain transition-transform duration-500 ease-in-out transform ${
-                  currentImageIndex === index
+                className={`absolute w-full h-full object-contain transition-transform duration-500 ease-in-out transform ${currentImageIndex === index
                     ? "translate-x-0"
                     : currentImageIndex > index
-                    ? "-translate-x-full"
-                    : "translate-x-full"
-                }`}
+                      ? "-translate-x-full"
+                      : "translate-x-full"
+                  }`}
                 src={src}
                 alt=""
                 style={{ zIndex: -1 }} // Ensure images are behind other elements
@@ -167,17 +166,16 @@ const Product = () => {
             {/* Use formatted description */}
           </div>
           <div className="flex flex-col gap-4 my-8">
-            <p>Select Size</p>
+            <p>Select</p>
             <div className="flex gap-2">
               {productData.sizes.map((item) => (
                 <div key={item.size} className="flex flex-col items-center">
                   <button
                     onClick={() => item.count > 0 && setSize(item.size)}
-                    className={`border py-2 px-4 ${
-                      item.count === 0
+                    className={`border py-2 px-4 ${item.count === 0
                         ? "bg-gray-300 cursor-not-allowed"
                         : "bg-gray-100"
-                    } ${item.size === size ? "border-blue-500" : ""}`}
+                      } ${item.size === size ? "border-blue-500" : ""}`}
                     disabled={item.count === 0}
                   >
                     {item.size}
@@ -203,9 +201,8 @@ const Product = () => {
             </div>
             <button
               onClick={handleAddToCart}
-              className={`bg-black text-white px-8 py-3 text-sm active:bg-gray-700 ${
-                size === "" ? "cursor-not-allowed opacity-50" : ""
-              }`}
+              className={`bg-black text-white px-8 py-3 text-sm active:bg-gray-700 ${size === "" ? "cursor-not-allowed opacity-50" : ""
+                }`}
               disabled={size === ""}
             >
               {token ? "ADD TO CART" : "LOGIN TO ADD TO CART"}
