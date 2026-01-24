@@ -9,8 +9,9 @@ import List from './pages/List';
 import Orders from './pages/Orders';
 import Login from './components/Login';
 import { ToastContainer } from 'react-toastify';
-import AddShows from './pages/AddShows'; // 新增演出頁面
-import ListShows from './pages/ListShows'; // 列出演出頁面
+import AddShows from './pages/AddShows';
+import ListShows from './pages/ListShows';
+import ListUser from './pages/ListUser'; // Import the new User List page
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 export const currency = '$';
@@ -18,7 +19,6 @@ export const currency = '$';
 const App = () => {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
 
-  // Store token in localStorage whenever it changes
   useEffect(() => {
     if (token) {
       localStorage.setItem('token', token);
@@ -46,9 +46,12 @@ const App = () => {
                 <Route path='/addsongs' element={<AddSong token={token} />} />
                 <Route path='/listsongs' element={<ListSong token={token} />} />
 
-                {/* 新增的演出管理路由 */}
+                {/* Performance Management Routes */}
                 <Route path='/addshows' element={<AddShows token={token} />} />
                 <Route path='/listshows' element={<ListShows token={token} />} />
+
+                {/* NEW: User Management Route */}
+                <Route path='/users' element={<ListUser token={token} />} />
               </Routes>
             </div>
           </div>

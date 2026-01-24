@@ -1,26 +1,25 @@
 import express from "express";
 import {
-  sendLoginPasscode, // Import the function to send the passcode
-  verifyPasscode, // Import the function for verifying the passcode
-  resendLoginPasscode, // Import the function to resend the passcode
+  sendLoginPasscode,
+  verifyPasscode,
+  resendLoginPasscode,
   adminLogin,
+  allUsers, // 1. Import the new controller function
 } from "../controllers/userController.js";
+import adminAuth from "../middleware/adminAuth.js"; // 2. Import admin authentication middleware
 
 const userRouter = express.Router();
 
-// Remove the registration route since it's no longer needed
-// userRouter.post('/register', registerUser); // Comment or remove this line
-
-// New route to send the passcode
-userRouter.post("/send-passcode", sendLoginPasscode); // This handles sending the passcode via email
-
-// New route to verify the passcode
-userRouter.post("/verify-passcode", verifyPasscode); // This handles verifying the passcode
-
-// New route to resend the passcode
-userRouter.post("/resend-passcode", resendLoginPasscode); // This handles resending the passcode
+// Existing User Auth Routes
+userRouter.post("/send-passcode", sendLoginPasscode);
+userRouter.post("/verify-passcode", verifyPasscode);
+userRouter.post("/resend-passcode", resendLoginPasscode);
 
 // Route for admin login
 userRouter.post("/admin", adminLogin);
+
+// 3. NEW: Route to get all users (Admin only)
+// This matches the call made in your ListUser.jsx (backendUrl + "/api/user/list")
+userRouter.get("/list", adminAuth, allUsers);
 
 export default userRouter;
