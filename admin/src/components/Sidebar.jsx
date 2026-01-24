@@ -1,9 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { assets } from '../assets/assets';
-// Modern 2026 Dashboard Icons from Lucide
 import {
-    LayoutDashboard,
     Music,
     Mic2,
     Package,
@@ -13,63 +11,73 @@ import {
 } from 'lucide-react';
 
 const Sidebar = () => {
-    // Shared styling for active and inactive links to maintain 2026 visual hierarchy
-    const linkStyle = "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ";
-    const activeStyle = "bg-blue-50 text-blue-600 border-r-4 border-blue-600 font-medium";
-    const inactiveStyle = "text-gray-500 hover:bg-gray-100 hover:text-gray-900";
+    // 2026 refined styling: Using flex-shrink-0 to prevent sidebar from squashing
+    const linkStyle = "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group mx-2 ";
+    const activeStyle = "bg-blue-600 text-white shadow-lg shadow-blue-200 font-medium";
+    const inactiveStyle = "text-gray-500 hover:bg-gray-50 hover:text-blue-600";
 
     return (
-        <div className='w-[20%] min-h-screen border-r bg-white flex flex-col'>
-            {/* Sidebar Branding / Logo Area */}
-            <div className='p-6 border-b mb-4'>
-                <p className='text-xs font-bold text-gray-400 uppercase tracking-widest'>Admin Console</p>
+        /* 
+           - Mobile: w-[70px] (Icon rail)
+           - Desktop: md:w-[250px] (Full sidebar)
+        */
+        <div className='w-[70px] md:w-[20%] min-w-[70px] md:min-w-[240px] min-h-screen border-r bg-white flex flex-col transition-all duration-300 sticky top-0'>
+
+            {/* Sidebar Branding */}
+            <div className='p-4 md:p-6 border-b mb-4 flex justify-center md:justify-start'>
+                <p className='text-[10px] font-bold text-blue-600 md:text-gray-400 uppercase tracking-widest'>
+                    <span className='md:hidden'>AD</span>
+                    <span className='hidden md:block'>Admin Console</span>
+                </p>
             </div>
 
-            <div className='flex flex-col gap-2 px-3 overflow-y-auto'>
+            <div className='flex flex-col gap-1 overflow-y-auto flex-1'>
 
-                {/* SECTION: E-COMMERCE */}
-                <p className='px-4 mt-4 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider'>Store Management</p>
+                {/* SECTION: STORE */}
+                <p className='hidden md:block px-6 mt-4 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider'>Store</p>
 
                 <NavLink to='/add' className={({ isActive }) => linkStyle + (isActive ? activeStyle : inactiveStyle)}>
-                    <PlusCircle size={20} />
-                    <span className='hidden md:block'>Add Item</span>
+                    <PlusCircle size={22} className="shrink-0" />
+                    <span className='hidden md:block whitespace-nowrap'>Add Product</span>
                 </NavLink>
 
                 <NavLink to='/list' className={({ isActive }) => linkStyle + (isActive ? activeStyle : inactiveStyle)}>
-                    <Package size={20} />
-                    <span className='hidden md:block'>Inventory List</span>
+                    <Package size={22} className="shrink-0" />
+                    <span className='hidden md:block whitespace-nowrap'>Inventory List</span>
                 </NavLink>
 
                 <NavLink to='/orders' className={({ isActive }) => linkStyle + (isActive ? activeStyle : inactiveStyle)}>
-                    <ShoppingCart size={20} />
-                    <span className='hidden md:block'>Customer Orders</span>
+                    <ShoppingCart size={22} className="shrink-0" />
+                    <span className='hidden md:block whitespace-nowrap'>Orders</span>
                 </NavLink>
 
-                {/* SECTION: SHOWS & TOURS */}
-                <p className='px-4 mt-6 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider'>Events & Music</p>
+                {/* SECTION: MEDIA */}
+                <div className='my-2 border-t md:border-none mx-4 md:mx-0' />
+                <p className='hidden md:block px-6 mt-4 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider'>Media</p>
 
                 <NavLink to='/addshows' className={({ isActive }) => linkStyle + (isActive ? activeStyle : inactiveStyle)}>
-                    <Mic2 size={20} className="text-green-500 group-hover:text-green-600" />
-                    <span className='hidden md:block'>Add News</span>
+                    <Mic2 size={22} className="shrink-0" />
+                    <span className='hidden md:block whitespace-nowrap'>Add News</span>
                 </NavLink>
 
                 <NavLink to='/addsongs' className={({ isActive }) => linkStyle + (isActive ? activeStyle : inactiveStyle)}>
-                    <Music size={20} />
-                    <span className='hidden md:block'>Upload Song</span>
+                    <Music size={22} className="shrink-0" />
+                    <span className='hidden md:block whitespace-nowrap'>Upload Song</span>
                 </NavLink>
 
                 {/* SECTION: SYSTEM */}
-                <p className='px-4 mt-6 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider'>System</p>
+                <div className='my-2 border-t md:border-none mx-4 md:mx-0' />
+                <p className='hidden md:block px-6 mt-4 mb-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wider'>System</p>
 
                 <NavLink to='/users' className={({ isActive }) => linkStyle + (isActive ? activeStyle : inactiveStyle)}>
-                    <Users size={20} />
-                    <span className='hidden md:block'>User Database</span>
+                    <Users size={22} className="shrink-0" />
+                    <span className='hidden md:block whitespace-nowrap'>Users</span>
                 </NavLink>
             </div>
 
-            {/* Bottom Section for Branding or Footer */}
-            <div className='mt-auto p-6 border-t'>
-                <p className='text-[10px] text-gray-400 text-center'>v2.4.0 Build 2026</p>
+            {/* Version Footer */}
+            <div className='mt-auto p-4 border-t'>
+                <p className='text-[8px] md:text-[10px] text-gray-400 text-center font-mono'>v2.4.0-26</p>
             </div>
         </div>
     );

@@ -11,6 +11,8 @@ const List = ({ token }) => {
   const [editSizeId, setEditSizeId] = useState(null);
   const [newSizeCount, setNewSizeCount] = useState("");
   const [sizeToEdit, setSizeToEdit] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState(null);
 
   const fetchList = async () => {
     try {
@@ -106,6 +108,18 @@ const List = ({ token }) => {
     }
   };
 
+  const openModal = (product) => {
+    setCurrentProduct(product);
+    setNewPrice(product.price);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setCurrentProduct(null);
+    setNewSizeCount("");
+  };
+
   useEffect(() => {
     fetchList();
   }, []);
@@ -114,7 +128,7 @@ const List = ({ token }) => {
     <div className="p-4 sm:p-8 bg-gray-50 min-h-screen">
       <ToastContainer position="bottom-right" />
 
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Product Inventory</h2>
         <p className="text-sm text-gray-500">Total Products: {list.length}</p>
       </div>
@@ -136,6 +150,7 @@ const List = ({ token }) => {
             <div
               className="grid grid-cols-[1fr_3fr_1fr] md:grid-cols-[1fr_3fr_1.5fr_1.5fr_1.2fr_0.8fr] items-center gap-4 py-4 px-6 hover:bg-gray-50 transition-colors text-sm text-gray-700"
               key={item._id}
+              onClick={() => openModal(item)} // Open modal on click
             >
               {/* Product Image */}
               <div className="w-16 h-16 rounded-lg overflow-hidden border bg-gray-200">
@@ -154,29 +169,8 @@ const List = ({ token }) => {
                   <div className="flex flex-col gap-1">
                     {item.sizes.map((size) => (
                       <div key={size.size}>
-                        {editSizeId === size.size && sizeToEdit === item._id ? (
-                          <input
-                            type="number"
-                            value={newSizeCount}
-                            onChange={(e) => setNewSizeCount(e.target.value)}
-                            onBlur={() => updateSizeCount(item._id, size)}
-                            onKeyDown={(e) => handleSizeKeyDown(e, item._id, size)}
-                            className="border border-blue-400 rounded px-1 w-16 outline-none focus:ring-1 focus:ring-blue-500"
-                            autoFocus
-                          />
-                        ) : (
-                          <p
-                            onClick={() => {
-                              setEditSizeId(size.size);
-                              setSizeToEdit(item._id);
-                              setNewSizeCount(size.count);
-                            }}
-                            className="cursor-pointer text-blue-600 hover:text-blue-800 flex justify-between w-24"
-                          >
-                            <span className="text-gray-400 font-bold">{size.size}:</span>
-                            <span className="font-medium">{size.count}</span>
-                          </p>
-                        )}
+                        <p className="text-gray-400 font-bold">{size.size}:</p>
+                        <span className="font-medium">{size.count}</span>
                       </div>
                     ))}
                   </div>
@@ -187,33 +181,18 @@ const List = ({ token }) => {
 
               {/* Price */}
               <div>
-                {editPriceId === item._id ? (
-                  <input
-                    type="number"
-                    value={newPrice}
-                    onChange={(e) => setNewPrice(e.target.value)}
-                    onBlur={() => updateProduct(item._id, newPrice)}
-                    onKeyDown={(e) => handleKeyDown(e, item._id)}
-                    className="border border-blue-400 rounded px-2 py-1 w-24 outline-none"
-                    autoFocus
-                  />
-                ) : (
-                  <p
-                    onClick={() => {
-                      setEditPriceId(item._id);
-                      setNewPrice(item.price);
-                    }}
-                    className="cursor-pointer text-lg font-semibold text-gray-800 hover:text-blue-600"
-                  >
-                    {currency}{item.price}
-                  </p>
-                )}
+                <p className="text-lg font-semibold text-gray-800">
+                  {currency}{item.price}
+                </p>
               </div>
 
               {/* Delete Action */}
               <div className="flex justify-end md:justify-center">
                 <button
-                  onClick={() => removeProduct(item._id)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent modal from opening
+                    removeProduct(item._id);
+                  }}
                   className="p-2 hover:bg-red-50 text-red-500 rounded-full transition-all group"
                   title="Remove Product"
                 >
@@ -226,6 +205,63 @@ const List = ({ token }) => {
           ))}
         </div>
       </div>
+
+      {/* Modal for Editing Product */}
+      {isModalOpen && currentProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg p-6 w-11/12 sm:w-1/3">
+            <h3 className="text-xl font-bold mb-4">{currentProduct.name}</h3> {/* Show full product name */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Price</label>
+              <input
+                type="number"
+                value={newPrice}
+                onChange={(e) => setNewPrice(e.target.value)}
+                className="border border-gray-300 rounded px-2 py-1 w-full outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Size Stock</label>
+              {currentProduct.sizes.map((size) => (
+                <div key={size.size} className="flex items-center mb-2">
+                  <span className="text-gray-500">{size.size}:</span>
+                  <input
+                    type="number"
+                    value={sizeToEdit === size.size ? newSizeCount : size.count}
+                    onChange={(e) => {
+                      setSizeToEdit(size.size);
+                      setNewSizeCount(e.target.value);
+                    }}
+                    className="border border-gray-300 rounded px-2 py-1 w-16 ml-2 outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-end">
+              <button
+                onClick={() => {
+                  updateProduct(currentProduct._id, newPrice);
+                  currentProduct.sizes.forEach((size) => {
+                    if (size.size === sizeToEdit) {
+                      updateSizeCount(currentProduct._id, size);
+                    }
+                  });
+                  closeModal();
+                }}
+                className="bg-blue-600 text-white rounded px-4 py-2"
+              >
+                Save
+              </button>
+              <button
+                onClick={closeModal}
+                className="ml-2 bg-gray-300 text-gray-700 rounded px-4 py-2"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

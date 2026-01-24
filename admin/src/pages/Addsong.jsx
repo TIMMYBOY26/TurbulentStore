@@ -50,6 +50,8 @@ const AddSong = ({ token }) => {
     return (
         <>
             <ToastContainer />
+            {/* Page Title */}
+            <h1 className="text-2xl font-semibold mb-6 pb-2 ">Add Song</h1>
             <form onSubmit={onSubmitHandler} className="flex flex-col w-full items-start gap-3">
                 <div>
                     <p className="mb-2">Upload Image</p>

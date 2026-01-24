@@ -3,139 +3,150 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import validator from "validator";
 import nodemailer from "nodemailer";
+import { OAuth2Client } from "google-auth-library";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-/** 
- * 1. PERSISTENT POOLED TRANSPORTER
- * Creating the transporter outside functions reuses the SMTP connection pool.
- * 'pool: true' is essential for high-performance 2026 applications.
- */
+// 1. Google OAuth Client
+const googleClient = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  process.env.GOOGLE_REDIRECT_URI
+);
+
+// 2. Persistent Pooled Transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
   host: "smtp.gmail.com",
   port: 465,
   secure: true,
-  pool: true, // Reuses connections instead of creating new ones
+  pool: true,
   maxConnections: 5,
-  maxMessages: Infinity,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // Use a Google App Password
+    pass: process.env.EMAIL_PASS,
   },
 });
 
 // Helper: Token Generator
 const createToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET);
 
-/**
- * 2. FIRE-AND-FORGET EMAIL HELPER
- * By not 'awaiting' the mail delivery in the controller, your API 
- * responds to the user instantly while the email sends in the background.
- */
+// Helper: Background Email
 const sendMailBackground = (options) => {
-  transporter.sendMail(options).catch((err) => {
-    console.error("Background Email Error:", err);
-  });
+  transporter.sendMail(options).catch((err) => console.error("Email Error:", err));
 };
 
-// Function to send login passcode via email
-export const sendLoginPasscode = async (req, res) => {
+// --- GOOGLE OAUTH CONTROLLERS ---
+
+export const googleAuth = async (req, res) => {
+  const url = googleClient.generateAuthUrl({
+    access_type: "offline",
+    scope: ["profile", "email"],
+    prompt: "select_account",
+  });
+  res.redirect(url);
+};
+
+export const googleCallback = async (req, res) => {
   try {
-    const { email, name } = req.body;
+    const { code } = req.query;
+    const { tokens } = await googleClient.getToken(code);
+    const ticket = await googleClient.verifyIdToken({
+      idToken: tokens.id_token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
 
-    if (!validator.isEmail(email)) {
-      return res.json({ success: false, message: "Invalid email format." });
-    }
+    const { email, name } = ticket.getPayload();
 
-    const passcode = Math.floor(100000 + Math.random() * 900000).toString();
-    const hashedPasscode = await bcrypt.hash(passcode, 10);
-    const expiry = Date.now() + 10 * 60 * 1000;
-
-    /** 
-     * 3. ATOMIC DATABASE OPERATION
-     * findOneAndUpdate reduces two DB calls (find + save) into one.
-     */
-    await userModel.findOneAndUpdate(
+    const user = await userModel.findOneAndUpdate(
       { email },
-      {
-        $set: {
-          passcode: hashedPasscode,
-          passcodeExpires: expiry,
-          name: name || "Guest"
-        }
-      },
+      { $set: { name } },
       { upsert: true, new: true }
     );
 
-    // Send email without 'await' for instant API response
+    const token = createToken(user._id);
+    // Redirect to frontend (Frontend must handle the ?token param)
+    res.redirect(`${process.env.FRONTEND_URL}/login?token=${token}`);
+  } catch (error) {
+    console.error("Google Auth Error:", error);
+    res.redirect(`${process.env.FRONTEND_URL}/login?error=auth_failed`);
+  }
+};
+
+// --- EMAIL PASSCODE CONTROLLERS ---
+
+export const sendLoginPasscode = async (req, res) => {
+  try {
+    const { email, name } = req.body;
+    if (!validator.isEmail(email)) return res.json({ success: false, message: "Invalid email" });
+
+    const passcode = Math.floor(100000 + Math.random() * 900000).toString();
+    const hashedPasscode = await bcrypt.hash(passcode, 10);
+
+    await userModel.findOneAndUpdate(
+      { email },
+      { $set: { passcode: hashedPasscode, passcodeExpires: Date.now() + 10 * 60 * 1000, name: name || "Guest" } },
+      { upsert: true }
+    );
+
     sendMailBackground({
       from: process.env.EMAIL_USER,
       to: email,
       subject: "Your Login Passcode",
-      text: `Your login passcode is: ${passcode}`,
+      text: `Your passcode is: ${passcode}`,
     });
 
-    res.json({ success: true, message: "Passcode sent to email." });
+    res.json({ success: true, message: "Passcode sent." });
   } catch (error) {
-    console.error("Controller Error:", error);
     res.json({ success: false, message: "Error processing request." });
   }
 };
 
-// Function to resend login passcode
-export const resendLoginPasscode = async (req, res) => {
-  try {
-    const { email } = req.body;
-    if (!validator.isEmail(email)) {
-      return res.json({ success: false, message: "Invalid email format." });
-    }
-
-    const passcode = Math.floor(100000 + Math.random() * 900000).toString();
-    const hashedPasscode = await bcrypt.hash(passcode, 10);
-
-    const user = await userModel.findOneAndUpdate(
-      { email },
-      { $set: { passcode: hashedPasscode, passcodeExpires: Date.now() + 10 * 60 * 1000 } }
-    );
-
-    if (!user) return res.json({ success: false, message: "User not found." });
-
-    sendMailBackground({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Your New Login Passcode",
-      text: `Your new login passcode is: ${passcode}`,
-    });
-
-    res.json({ success: true, message: "New passcode sent." });
-  } catch (error) {
-    res.json({ success: false, message: "Error resending passcode." });
-  }
-};
-
-// Function to verify the login passcode
 export const verifyPasscode = async (req, res) => {
   try {
     const { email, passcode } = req.body;
     const user = await userModel.findOne({ email });
+    if (!user) return res.json({ success: false, message: "User not found" });
 
-    if (!user) return res.json({ success: false, message: "User not found." });
-
-    const isPasscodeValid = await bcrypt.compare(passcode, user.passcode);
-    if (isPasscodeValid && user.passcodeExpires > Date.now()) {
+    const isValid = await bcrypt.compare(passcode, user.passcode);
+    if (isValid && user.passcodeExpires > Date.now()) {
       const token = createToken(user._id);
-      res.json({ success: true, message: "Verified successfully.", token });
+      res.json({ success: true, token });
     } else {
-      res.json({ success: false, message: "Invalid or expired passcode." });
+      res.json({ success: false, message: "Invalid or expired passcode" });
     }
   } catch (error) {
-    res.json({ success: false, message: "Verification error." });
+    res.json({ success: false, message: "Verification error" });
   }
 };
 
-// Route for admin login
+export const resendLoginPasscode = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const passcode = Math.floor(100000 + Math.random() * 900000).toString();
+    const hashedPasscode = await bcrypt.hash(passcode, 10);
+
+    await userModel.findOneAndUpdate(
+      { email },
+      { $set: { passcode: hashedPasscode, passcodeExpires: Date.now() + 10 * 60 * 1000 } }
+    );
+
+    sendMailBackground({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "New Passcode",
+      text: `Your new passcode is: ${passcode}`,
+    });
+
+    res.json({ success: true, message: "New passcode sent." });
+  } catch (error) {
+    res.json({ success: false, message: "Error resending." });
+  }
+};
+
+// --- ADMIN CONTROLLERS ---
+
 export const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -150,7 +161,6 @@ export const adminLogin = async (req, res) => {
   }
 };
 
-// Function to get all users (Admin only)
 export const allUsers = async (req, res) => {
   try {
     const users = await userModel.find({}).select("-passcode -passcodeExpires");
@@ -160,11 +170,10 @@ export const allUsers = async (req, res) => {
   }
 };
 
-// Function to remove a user (Admin only)
 export const removeUser = async (req, res) => {
   try {
     await userModel.findByIdAndDelete(req.body.id);
-    res.json({ success: true, message: "User removed successfully" });
+    res.json({ success: true, message: "User removed" });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
