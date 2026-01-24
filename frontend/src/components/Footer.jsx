@@ -32,7 +32,9 @@ const Footer = () => {
                 Contact Us
               </Link>
             </li>
-            {token && ( // Conditionally render Orders link
+
+            {/* Conditionally render Orders link */}
+            {token && (
               <li>
                 <Link
                   to="/orders"
@@ -43,20 +45,24 @@ const Footer = () => {
                 </Link>
               </li>
             )}
-            <li>
-              <Link
-                to="/cart"
-                onClick={scrollToTop}
-                className="hover:underline"
-              >
-                My Cart
-              </Link>
-            </li>
+
+            {/* Conditionally render Cart link only if token exists */}
+            {token && (
+              <li>
+                <Link
+                  to="/cart"
+                  onClick={scrollToTop}
+                  className="hover:underline"
+                >
+                  My Cart
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
         <hr />
         <p className="py-0 text-sm text-center">
-          Copyright 2025 @TurbulentStore.com - All Rights Reserved.
+          Copyright 2026 @TurbulentStore.com - All Rights Reserved.
         </p>
       </div>
     </div>

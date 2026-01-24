@@ -5,7 +5,8 @@ import { assets } from "../assets/assets";
 import CartTotal from "../components/CartTotal";
 
 const Cart = () => {
-  const { products, currency, cartItems, updateQuantity, navigate } =
+  // Destructure getCartAmount from ShopContext
+  const { products, currency, cartItems, updateQuantity, navigate, getCartAmount } =
     useContext(ShopContext);
   const [cartData, setCartData] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -71,14 +72,14 @@ const Cart = () => {
           );
           return (
             <div
-              key={item._id} // Use item._id as the key
+              key={`${item._id}-${item.size}`} // Use combined ID and size for a unique key
               className="py-4 border-t border-b text-gray-700 grid grid-cols-1 sm:grid-cols-[4fr_1fr] items-center gap-4"
             >
               <div className="flex items-start gap-4 sm:gap-6">
                 <img
                   src={productData.image[0]}
                   alt={productData.name}
-                  className="w-12 h-12 sm:w-16 sm:h-16" // Smaller size for mobile
+                  className="w-12 h-12 sm:w-16 sm:h-16"
                 />
                 <div className="flex flex-col">
                   <h3 className="text-lg">{productData.name}</h3>
@@ -94,10 +95,10 @@ const Cart = () => {
                     e.target.value === "" || e.target.value === "0"
                       ? null
                       : updateQuantity(
-                          item._id,
-                          item.size,
-                          Number(e.target.value)
-                        )
+                        item._id,
+                        item.size,
+                        Number(e.target.value)
+                      )
                   }
                   className="border max-w-[60px] sm:max-w-[80px] px-1 sm:px-2 py-1 text-center"
                   type="number"
@@ -116,7 +117,6 @@ const Cart = () => {
         })}
       </div>
 
-      {/* Display CartTotal and buttons */}
       <div className="flex justify-end my-10">
         <div className="w-full sm:w-[450px] text-end">
           <CartTotal step="2" />
@@ -128,17 +128,20 @@ const Cart = () => {
             >
               BACK
             </button>
-            <button
-              onClick={handleCheckout} // Updated to use handleCheckout
-              className="bg-black text-white text-sm my-2 sm:my-0 px-8 py-3 rounded hover:bg-gray-800 transition"
-            >
-              NEXT STEP TO CHECKOUT
-            </button>
+
+            {/* Conditionally render button only if total amount > 0 */}
+            {getCartAmount() > 0 && (
+              <button
+                onClick={handleCheckout}
+                className="bg-black text-white text-sm my-2 sm:my-0 px-8 py-3 rounded hover:bg-gray-800 transition"
+              >
+                NEXT STEP TO CHECKOUT
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Modal for Stock Warning */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-5 rounded shadow-lg">
