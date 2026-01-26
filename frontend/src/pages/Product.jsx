@@ -170,10 +170,10 @@ const Product = () => {
                     <img
                       key={index}
                       className={`absolute w-full h-full object-contain p-2 transition-transform duration-500 ease-out transform ${currentImageIndex === index
-                          ? "translate-x-0"
-                          : currentImageIndex > index
-                            ? "-translate-x-full"
-                            : "translate-x-full"
+                        ? "translate-x-0"
+                        : currentImageIndex > index
+                          ? "-translate-x-full"
+                          : "translate-x-full"
                         }`}
                       src={src}
                       alt=""
@@ -208,7 +208,7 @@ const Product = () => {
               </div>
 
               <div className="flex flex-col gap-4 my-8">
-                <p className="text-black font-medium">Select product / size</p>
+                <p className="text-black font-medium">* Select product / size</p>
                 <div className="flex gap-2">
                   {productData.sizes.map((item) => (
                     <div key={item.size} className="flex flex-col items-center">

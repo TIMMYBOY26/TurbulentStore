@@ -19,7 +19,6 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
             </svg>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Confirm Order</h2>
-          <p className="text-sm text-amber-600 font-medium mb-4 italic">*Please ensure payment record is ready (if applicable)</p>
           <p className="text-gray-500">Are you sure you want to place this order?</p>
         </div>
         <div className="flex gap-3 mt-8">
@@ -131,11 +130,11 @@ const PlaceOrder = () => {
             <Title text1={"STEP 1:"} text2={"YOUR INFORMATION"} />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-400 uppercase ml-1">First Name</label>
+                <label className="text-xs font-bold text-gray-400 uppercase ml-1">* First Name</label>
                 <input required name="firstName" onChange={onChangeHandler} value={formData.firstName} className="w-full border-gray-200 border rounded-xl py-3 px-4 focus:ring-2 focus:ring-black outline-none bg-gray-50 transition-all" placeholder="John" />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-400 uppercase ml-1">Phone Number</label>
+                <label className="text-xs font-bold text-gray-400 uppercase ml-1">* Phone Number</label>
                 <input required name="phone" onChange={onChangeHandler} value={formData.phone} className="w-full border-gray-200 border rounded-xl py-3 px-4 focus:ring-2 focus:ring-black outline-none bg-gray-50 transition-all" placeholder="9123 4567" maxLength={8} pattern="[0-9]*" />
               </div>
             </div>
@@ -206,7 +205,7 @@ const PlaceOrder = () => {
                 onClick={() => navigate("/cart")}
                 className="w-full text-gray-400 font-medium py-2 hover:text-black transition-colors text-sm flex items-center justify-center gap-2"
               >
-                ← Back to Shopping Bag
+                ← Back to Cart
               </button>
             </div>
           </div>

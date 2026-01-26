@@ -44,7 +44,7 @@ const CartTotal = ({ step, selectedMethod }) => {
 
         {/* Total Display - Minimalist Style */}
         <div className="flex justify-between items-center py-2">
-          <b className="text-gray-900 text-lg font-medium tracking-tight">Total Amount</b>
+          <b className="text-gray-900 text-lg font-medium tracking-tight">Total</b>
           <div className="text-right">
             <b className="text-3xl font-black text-gray-900 tracking-tighter">
               <span className="text-sm font-medium text-gray-400 mr-1">{currency}</span>
