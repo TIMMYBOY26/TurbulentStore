@@ -12,7 +12,7 @@ dotenv.config();
 const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
+  process.env.GOOGLE_REDIRECT_URI,
 );
 
 // 2. Persistent Pooled Transporter
@@ -34,7 +34,9 @@ const createToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET);
 
 // Helper: Background Email
 const sendMailBackground = (options) => {
-  transporter.sendMail(options).catch((err) => console.error("Email Error:", err));
+  transporter
+    .sendMail(options)
+    .catch((err) => console.error("Email Error:", err));
 };
 
 // --- GOOGLE OAUTH CONTROLLERS ---
@@ -62,7 +64,7 @@ export const googleCallback = async (req, res) => {
     const user = await userModel.findOneAndUpdate(
       { email },
       { $set: { name } },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     );
 
     const token = createToken(user._id);
@@ -79,15 +81,22 @@ export const googleCallback = async (req, res) => {
 export const sendLoginPasscode = async (req, res) => {
   try {
     const { email, name } = req.body;
-    if (!validator.isEmail(email)) return res.json({ success: false, message: "Invalid email" });
+    if (!validator.isEmail(email))
+      return res.json({ success: false, message: "Invalid email" });
 
     const passcode = Math.floor(100000 + Math.random() * 900000).toString();
     const hashedPasscode = await bcrypt.hash(passcode, 10);
 
     await userModel.findOneAndUpdate(
       { email },
-      { $set: { passcode: hashedPasscode, passcodeExpires: Date.now() + 10 * 60 * 1000, name: name || "Guest" } },
-      { upsert: true }
+      {
+        $set: {
+          passcode: hashedPasscode,
+          passcodeExpires: Date.now() + 10 * 60 * 1000,
+          name: name || "Guest",
+        },
+      },
+      { upsert: true },
     );
 
     sendMailBackground({
@@ -129,7 +138,12 @@ export const resendLoginPasscode = async (req, res) => {
 
     await userModel.findOneAndUpdate(
       { email },
-      { $set: { passcode: hashedPasscode, passcodeExpires: Date.now() + 10 * 60 * 1000 } }
+      {
+        $set: {
+          passcode: hashedPasscode,
+          passcodeExpires: Date.now() + 10 * 60 * 1000,
+        },
+      },
     );
 
     sendMailBackground({
@@ -150,7 +164,10 @@ export const resendLoginPasscode = async (req, res) => {
 export const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+    if (
+      email === process.env.ADMIN_EMAIL &&
+      password === process.env.ADMIN_PASSWORD
+    ) {
       const token = jwt.sign(email + password, process.env.JWT_SECRET);
       res.json({ success: true, token });
     } else {
@@ -174,6 +191,22 @@ export const removeUser = async (req, res) => {
   try {
     await userModel.findByIdAndDelete(req.body.id);
     res.json({ success: true, message: "User removed" });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
+export const getUserProfile = async (req, res) => {
+  try {
+    const { userId } = req.body; // Injected by your authUser middleware
+    const user = await userModel.findById(userId).select("email name");
+
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    // Success response
+    res.json({ success: true, email: user.email });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }

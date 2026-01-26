@@ -11,10 +11,12 @@ const Navbar = () => {
     token,
     setToken,
     setCartItems,
+    userEmail, // 1. Using userEmail from context
   } = useContext(ShopContext);
-  const location = useLocation(); // Get the current route
-  const [dropdownOpen, setDropdownOpen] = useState(false); // State for dropdown
-  const dropdownRef = useRef(null); // Reference for the dropdown
+
+  const location = useLocation();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const logout = () => {
     navigate("/login");
@@ -25,65 +27,61 @@ const Navbar = () => {
 
   const handleSearchClick = () => {
     if (location.pathname === "/") {
-      navigate("/collection"); // Redirect to collection page if on home page
+      navigate("/collection");
     } else {
-      setShowSearch(true); // Show search functionality for other pages
+      setShowSearch(true);
     }
   };
 
   const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev); // Toggle dropdown visibility
+    setDropdownOpen((prev) => !prev);
   };
 
   const closeDropdown = (e) => {
-    // Check if the click is outside the dropdown
     if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-      setDropdownOpen(false); // Close dropdown if clicking outside
+      setDropdownOpen(false);
     }
   };
 
   useEffect(() => {
-    document.addEventListener("mousedown", closeDropdown); // Add event listener
+    document.addEventListener("mousedown", closeDropdown);
     return () => {
-      document.removeEventListener("mousedown", closeDropdown); // Cleanup
+      document.removeEventListener("mousedown", closeDropdown);
     };
   }, []);
 
   return (
     <div className="flex items-center justify-between py-5 font-medium">
-      {/* Logo Link: Added translate-y-[3px] to lower it */}
+      {/* Logo Link */}
       <Link to="/" className="translate-y-[3px]">
-        {/* Logo Image: Added lg:w-44 to make it larger on large screens */}
         <img src={assets.logo} className="w-36 lg:w-44" alt="Logo" />
       </Link>
 
       <ul className="hidden sm:flex gap-5 text-sm text-gray-700">
-        <NavLink to="/" className={"flex flex-col items-center gap-1"}>
+        <NavLink to="/" className="flex flex-col items-center gap-1">
           <p>HOME</p>
-          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden"></hr>
+          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
-        <NavLink to="/songs" className={"flex flex-col items-center gap-1"}>
+        <NavLink to="/songs" className="flex flex-col items-center gap-1">
           <p>MUSIC</p>
-          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden"></hr>
+          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
-        <NavLink
-          to="/collection"
-          className={"flex flex-col items-center gap-1"}
-        >
+        <NavLink to="/collection" className="flex flex-col items-center gap-1">
           <p>COLLECTION</p>
-          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden"></hr>
+          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
-        <NavLink to="/shows" className={"flex flex-col items-center gap-1"}>
+        <NavLink to="/shows" className="flex flex-col items-center gap-1">
           <p>NEWS</p>
-          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden"></hr>
+          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
-        <NavLink to="/contact" className={"flex flex-col items-center gap-1"}>
+        <NavLink to="/contact" className="flex flex-col items-center gap-1">
           <p>CONTACT</p>
-          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden"></hr>
+          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
       </ul>
 
       <div className="flex items-center gap-6">
+        {/* Mobile Icons */}
         <Link to="/songs" className="sm:hidden">
           <img
             src={assets.music_icon}
@@ -98,28 +96,22 @@ const Navbar = () => {
             alt="Shows"
           />
         </Link>
-        <Link to="/collection">
-          <img
-            onClick={handleSearchClick}
-            src={assets.search_icon}
-            className="w-5 cursor-pointer"
-            alt="Search"
-          />
-        </Link>
+
+        <img
+          onClick={handleSearchClick}
+          src={assets.search_icon}
+          className="w-5 cursor-pointer"
+          alt="Search"
+        />
 
         <Link to="/contact" className="sm:hidden">
           <img src={assets.menu_icon} className="w-5 cursor-pointer" alt="" />
         </Link>
 
+        {/* Profile Dropdown */}
         <div className="group relative" ref={dropdownRef}>
           <img
-            onClick={() => {
-              if (token) {
-                toggleDropdown();
-              } else {
-                navigate("/login");
-              }
-            }}
+            onClick={() => (token ? toggleDropdown() : navigate("/login"))}
             className="w-5 cursor-pointer"
             src={assets.profile_icon}
             alt="Profile"
@@ -129,13 +121,20 @@ const Navbar = () => {
               className="absolute dropdown-menu right-0 pt-4 z-50"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 rounded">
+              <div className="flex flex-col gap-2 w-48 py-3 px-5 bg-slate-100 text-gray-500 rounded shadow-md border border-gray-200">
+                {/* 2. Display Email here */}
+                <div className="border-b border-gray-300 pb-2 mb-1">
+                  <p className="text-black font-semibold text-xs truncate italic">
+                    {userEmail || "Guest"}
+                  </p>
+                </div>
+
                 <p
                   onClick={() => {
                     navigate("/orders");
                     setDropdownOpen(false);
                   }}
-                  className="cursor-pointer hover:text-black"
+                  className="cursor-pointer hover:text-black text-sm"
                 >
                   My Order
                 </p>
@@ -144,7 +143,7 @@ const Navbar = () => {
                     logout();
                     setDropdownOpen(false);
                   }}
-                  className="cursor-pointer hover:text-black"
+                  className="cursor-pointer hover:text-black text-sm"
                 >
                   Logout
                 </p>

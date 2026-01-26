@@ -5,23 +5,26 @@ import {
   resendLoginPasscode,
   adminLogin,
   allUsers,
-  googleAuth,     // 1. Import Google Auth functions
-  googleCallback  // from your controller
+  googleAuth,
+  googleCallback,
+  getUserProfile,
 } from "../controllers/userController.js";
 import adminAuth from "../middleware/adminAuth.js";
+import authUser from "../middleware/auth.js";
 
+// 1. INITIALIZE ROUTER FIRST
 const userRouter = express.Router();
 
-// --- Existing User Auth Routes ---
+// 2. Profile Route (Uses user authentication middleware)
+userRouter.post("/profile", authUser, getUserProfile);
+
+// --- User Auth Routes ---
 userRouter.post("/send-passcode", sendLoginPasscode);
 userRouter.post("/verify-passcode", verifyPasscode);
 userRouter.post("/resend-passcode", resendLoginPasscode);
 
-// --- NEW: Google OAuth Routes ---
-// This initiates the redirect to Google
+// --- Google OAuth Routes ---
 userRouter.get("/google", googleAuth);
-
-// This is the URL Google will call back to (must match your .env and Google Console)
 userRouter.get("/google-callback", googleCallback);
 
 // --- Admin Routes ---
