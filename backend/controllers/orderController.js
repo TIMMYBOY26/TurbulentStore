@@ -337,10 +337,10 @@ const tradeInPersonPlaceOrderFps = async (req, res) => {
 // All Orders data for admin Panel
 const allOrders = async (req, res) => {
   try {
-    const orders = await orderModel.find({});
+    // This replaces the userId string with the actual user object (email only)
+    const orders = await orderModel.find({}).populate('userId', 'email');
     res.json({ success: true, orders });
   } catch (error) {
-    console.log(error);
     res.json({ success: false, message: error.message });
   }
 };

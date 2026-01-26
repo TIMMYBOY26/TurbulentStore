@@ -104,9 +104,19 @@ const Orders = ({ token }) => {
     (a, b) => new Date(b.date) - new Date(a.date)
   );
 
-  const filteredOrders = sortedOrders.filter((order) =>
-    String(order.orderNumber).toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Inside your Orders component, update the filteredOrders constant:
+  const filteredOrders = sortedOrders.filter((order) => {
+    const searchTermLower = searchTerm.toLowerCase();
+    const orderNumberMatch = String(order.orderNumber).toLowerCase().includes(searchTermLower);
+
+    // If you used .populate('userId'), the email is at order.userId.email
+    // If you used the manual join, it might be at order.userEmail
+    const emailMatch = (order.userId?.email || order.userEmail || "")
+      .toLowerCase()
+      .includes(searchTermLower);
+
+    return orderNumberMatch || emailMatch;
+  });
 
   const finalFilteredOrders =
     selectedStatus === "All"
@@ -309,23 +319,34 @@ const Orders = ({ token }) => {
                     {itemIndex < order.items.length - 1 && ","}
                   </p>
                 ))}
+
               </div>
               <p className="text-sm sm:text-[17px] mt-3 mb-2 font-medium">
-                {order.address.firstName + " " + order.address.lastName}
+                {order.address.firstName || ""} {order.address.lastName || ""}
               </p>
               <div>
-                <p>{order.address.street + ""}</p>
+                <p>{order.address.street || ""}</p>
                 <p>
-                  {order.address.city +
-                    "" +
-                    order.address.state +
-                    "" +
-                    order.address.country +
-                    "" +
-                    order.address.zipcode}
+                  {[
+                    order.address.city,
+                    order.address.state,
+                    order.address.country,
+                    order.address.zipcode,
+                  ]
+                    .filter(Boolean) // Filters out any undefined or empty values
+                    .join(" ")}
+                </p>
+
+              </div>
+
+              <p>{order.address.phone || ""}</p>
+              {/* Display User Login Email Here */}
+              <div className="mt-2 mb-2 p-2 bg-gray-50 rounded border border-dashed border-gray-300">
+                <p className="text-[11px] text-gray-400 uppercase font-bold tracking-widest">Login Account</p>
+                <p className="text-sm text-blue-600 font-semibold italic">
+                  {order.userId?.email || order.userEmail || "Email Not Found"}
                 </p>
               </div>
-              <p>{order.address.phone}</p>
             </div>
             <div>
               <p className="text-sm sm:text-[15px]">
@@ -337,14 +358,14 @@ const Orders = ({ token }) => {
                   {order.paymentMethod === "paymeTradeIn"
                     ? "Payme, In-person delivery"
                     : order.paymentMethod === "fpsTradeIn"
-                    ? "FPS, In-person delivery"
-                    : order.paymentMethod === "COD"
-                    ? "Cash, In-person delivery"
-                    : order.paymentMethod === "PayMe"
-                    ? "Payme, Delivery by SF Express"
-                    : order.paymentMethod === "FPS"
-                    ? "FPS, Delivery by SF Express"
-                    : order.paymentMethod}
+                      ? "FPS, In-person delivery"
+                      : order.paymentMethod === "COD"
+                        ? "Cash, In-person delivery"
+                        : order.paymentMethod === "PayMe"
+                          ? "Payme, Delivery by SF Express"
+                          : order.paymentMethod === "FPS"
+                            ? "FPS, Delivery by SF Express"
+                            : order.paymentMethod}
                 </span>
               </p>
               <p>Payment : {order.payment ? "Done" : "Pending"}</p>
