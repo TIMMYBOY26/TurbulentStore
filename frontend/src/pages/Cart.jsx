@@ -5,9 +5,7 @@ import { assets } from "../assets/assets";
 import CartTotal from "../components/CartTotal";
 
 const Cart = () => {
-  // Destructure getCartAmount from ShopContext
-  const { products, currency, cartItems, updateQuantity, navigate, getCartAmount } =
-    useContext(ShopContext);
+  const { products, currency, cartItems, updateQuantity, navigate, getCartAmount } = useContext(ShopContext);
   const [cartData, setCartData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -28,86 +26,71 @@ const Cart = () => {
       }
       setCartData(tempData);
     }
-
-    // Scroll to top when the component mounts
     window.scrollTo(0, 0);
   }, [cartItems, products]);
 
   const handleCheckout = () => {
     for (const item of cartData) {
       const productData = products.find((product) => product._id === item._id);
-      const selectedSize = productData.sizes.find(
-        (sizeItem) => sizeItem.size === item.size
-      );
+      const selectedSize = productData.sizes.find((sizeItem) => sizeItem.size === item.size);
 
-      // Check if the quantity in cart exceeds available stock
       if (selectedSize && item.quantity > selectedSize.count) {
-        setModalMessage(
-          `You cannot checkout with ${item.quantity} of size ${item.size}. Only ${selectedSize.count} available in stock!`
-        );
-        setShowModal(true); // Show the modal
-        return; // Stop the checkout process
+        setModalMessage(`Insufficient stock for size ${item.size}. Only ${selectedSize.count} left!`);
+        setShowModal(true);
+        return;
       }
     }
-
-    // If all checks pass, navigate to the checkout page
     navigate("/place-order");
   };
 
   const closeModal = () => {
     setShowModal(false);
-    setModalMessage(""); // Clear the message when closing
+    setModalMessage("");
   };
 
   return (
-    <div className="border-t pt-14">
-      <div className="text-2xl mb-3">
+    <div className="border-t pt-14 px-4 sm:px-0">
+      <div className="text-2xl mb-6">
         <Title text1={"STEP 1: "} text2={"CHECK YOUR CART"} />
       </div>
 
-      <div>
+      <div className="space-y-4">
         {cartData.map((item) => {
-          const productData = products.find(
-            (product) => product._id === item._id
-          );
+          const productData = products.find((product) => product._id === item._id);
           return (
             <div
-              key={`${item._id}-${item.size}`} // Use combined ID and size for a unique key
+              key={`${item._id}-${item.size}`}
               className="py-4 border-t border-b text-gray-700 grid grid-cols-1 sm:grid-cols-[4fr_1fr] items-center gap-4"
             >
               <div className="flex items-start gap-4 sm:gap-6">
                 <img
                   src={productData.image[0]}
                   alt={productData.name}
-                  className="w-12 h-12 sm:w-16 sm:h-16"
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover"
                 />
                 <div className="flex flex-col">
-                  <h3 className="text-lg">{productData.name}</h3>
-                  <p className="text-sm">Size: {item.size}</p>
-                  <p className="text-sm">
-                    Price per item: {currency} {productData.price}
-                  </p>
+                  <h3 className="text-lg font-medium">{productData.name}</h3>
+                  <div className="flex items-center gap-5 mt-2">
+                    <p className="px-2 sm:px-3 py-1 border bg-slate-50 text-xs sm:text-sm">Size: {item.size}</p>
+                    <p className="text-sm font-semibold">{currency} {productData.price}</p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center justify-end sm:justify-end">
+              <div className="flex items-center justify-between sm:justify-end gap-4">
                 <input
                   onChange={(e) =>
                     e.target.value === "" || e.target.value === "0"
                       ? null
-                      : updateQuantity(
-                        item._id,
-                        item.size,
-                        Number(e.target.value)
-                      )
+                      : updateQuantity(item._id, item.size, Number(e.target.value))
                   }
-                  className="border max-w-[60px] sm:max-w-[80px] px-1 sm:px-2 py-1 text-center"
+                  className="border max-w-[60px] sm:max-w-[80px] px-2 py-1 text-center rounded focus:ring-1 focus:ring-black outline-none"
                   type="number"
                   min={1}
                   defaultValue={item.quantity}
                 />
                 <img
                   onClick={() => updateQuantity(item._id, item.size, 0)}
-                  className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer ml-2"
+                  className="w-5 h-5 cursor-pointer opacity-60 hover:opacity-100 transition-opacity"
                   src={assets.bin_icon}
                   alt="Remove item"
                 />
@@ -118,43 +101,44 @@ const Cart = () => {
       </div>
 
       <div className="flex justify-end my-10">
-        <div className="w-full sm:w-[450px] text-end">
+        <div className="w-full sm:w-[450px]">
           <CartTotal step="2" />
 
-          <div className="flex flex-col sm:flex-row justify-between mt-4">
-            <button
-              onClick={() => navigate("/collection")}
-              className="bg-black text-white text-sm my-2 sm:my-0 px-8 py-3 rounded hover:bg-gray-800 transition"
-            >
-              BACK
-            </button>
-
-            {/* Conditionally render button only if total amount > 0 */}
+          {/* Button Container */}
+          <div className="flex flex-col gap-3 mt-8">
+            {/* Primary Action: Checkout */}
             {getCartAmount() > 0 && (
               <button
                 onClick={handleCheckout}
-                className="bg-black text-white text-sm my-2 sm:my-0 px-8 py-3 rounded hover:bg-gray-800 transition"
+                className="w-full bg-black text-white text-sm py-4 rounded-xl font-bold hover:bg-gray-800 transition-all active:scale-[0.98] shadow-lg shadow-black/10"
               >
                 NEXT STEP TO CHECKOUT
               </button>
             )}
+
+            {/* Secondary Action: Back (Different Color & Moved Below) */}
+            <button
+              onClick={() => navigate("/collection")}
+              className="w-full bg-gray-100 text-gray-600 text-sm py-3 rounded-xl font-semibold hover:bg-gray-200 hover:text-black transition-all"
+            >
+              ← BACK TO SHOPPING
+            </button>
           </div>
         </div>
       </div>
 
+      {/* Modern Modal Design */}
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-5 rounded shadow-lg">
-            <h2 className="text-lg font-bold">Warning</h2>
-            <p>{modalMessage}</p>
-            <div className="flex justify-end mt-4">
-              <button
-                onClick={closeModal}
-                className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
-              >
-                OK
-              </button>
-            </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center animate-in fade-in zoom-in duration-200">
+            <h2 className="text-xl font-bold text-red-600 mb-3">Stock Warning</h2>
+            <p className="text-gray-600 mb-6 leading-relaxed">{modalMessage}</p>
+            <button
+              onClick={closeModal}
+              className="w-full bg-black text-white py-3 rounded-xl font-bold hover:bg-gray-800 transition-all"
+            >
+              OK
+            </button>
           </div>
         </div>
       )}

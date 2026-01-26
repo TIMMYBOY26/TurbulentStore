@@ -6,30 +6,25 @@ import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-// Modal Component
+// Modern Modal with Backdrop Blur for 2026 aesthetics
 const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg p-6 w-11/12 sm:w-96">
-        <h2 className="text-xl font-bold mb-4">Confirm Your Order</h2>
-        <p>*Please ensure you have sent payment record</p>
-        <br />
-        <p>Are you sure you want to place this order?</p>
-        <div className="flex justify-end mt-6">
-          <button
-            className="bg-gray-300 text-black px-3 py-1 rounded mr-2"
-            onClick={onClose}
-          >
-            Cancel
-          </button>
-          <button
-            className="bg-black text-white px-3 py-1 rounded"
-            onClick={onConfirm}
-          >
-            Confirm
-          </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl scale-100 animate-in zoom-in-95 duration-300">
+        <div className="text-center">
+          <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-blue-50 mb-4">
+            <svg className="h-7 w-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Confirm Order</h2>
+          <p className="text-sm text-amber-600 font-medium mb-4 italic">*Please ensure payment record is ready (if applicable)</p>
+          <p className="text-gray-500">Are you sure you want to place this order?</p>
+        </div>
+        <div className="flex gap-3 mt-8">
+          <button className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-all" onClick={onClose}>Cancel</button>
+          <button className="flex-1 px-4 py-3 bg-black text-white font-bold rounded-xl hover:bg-gray-800 transition-all shadow-lg" onClick={onConfirm}>Confirm</button>
         </div>
       </div>
     </div>
@@ -37,466 +32,189 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
 };
 
 const PlaceOrder = () => {
-  const [method, setMethod] = useState("cod");
+  const [method, setMethod] = useState("payme");
+  const [deliveryType, setDeliveryType] = useState("sf");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isFreeDeliveryOpen, setIsFreeDeliveryOpen] = useState(false);
-  const [isTradeInOpen, setIsTradeInOpen] = useState(false);
 
-  const {
-    navigate,
-    backendUrl,
-    token,
-    cartItems,
-    setCartItems,
-    getCartAmount,
-    delivery_fee,
-    products,
-  } = useContext(ShopContext);
+  const { navigate, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
+  const [formData, setFormData] = useState({ firstName: "", phone: "" });
 
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    street: "",
-    city: "",
-    state: "",
-    zipcode: "",
-    country: "",
-    phone: "",
-  });
-
-  const onChangeHandler = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
-
-    setFormData((formData) => ({ ...formData, [name]: value }));
-  };
-
-  const onSubmitHandler = (event) => {
-    event.preventDefault();
-    setIsModalOpen(true); // Open the confirmation modal
-  };
+  const onChangeHandler = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const onSubmitHandler = (e) => { e.preventDefault(); setIsModalOpen(true); };
 
   const handleConfirmOrder = async () => {
-    setIsModalOpen(false); // Close the modal
-
+    setIsModalOpen(false);
     try {
       let orderItems = [];
-
-      // Iterate over cartItems to build orderItems
       for (const itemId in cartItems) {
         for (const size in cartItems[itemId]) {
           if (cartItems[itemId][size] > 0) {
-            const itemInfo = structuredClone(
-              products.find((product) => product._id === itemId)
-            );
+            const itemInfo = structuredClone(products.find(p => p._id === itemId));
             if (itemInfo) {
-              orderItems.push({
-                name: itemInfo.name,
-                productId: itemInfo._id,
-                size: size,
-                quantity: cartItems[itemId][size],
-              });
+              orderItems.push({ name: itemInfo.name, productId: itemInfo._id, size, quantity: cartItems[itemId][size] });
             }
           }
         }
       }
-
-      let orderData = {
-        address: formData,
-        items: orderItems,
-        amount: getCartAmount() + delivery_fee,
+      let orderData = { address: formData, items: orderItems, amount: getCartAmount() + delivery_fee };
+      const methodMap = {
+        cod: "/api/order/place", payme: "/api/order/payme", fps: "/api/order/fps",
+        paymeTradeIn: "/api/order/tradeInPersonPlaceOrderPayme", fpsTradeIn: "/api/order/tradeInPersonPlaceOrderFps"
       };
-
-      let response;
-      switch (method) {
-        case "cod":
-          response = await axios.post(
-            backendUrl + "/api/order/place",
-            orderData,
-            { headers: { token } }
-          );
-          break;
-        case "payme":
-          response = await axios.post(
-            backendUrl + "/api/order/payme",
-            orderData,
-            { headers: { token } }
-          );
-          break;
-        case "fps":
-          response = await axios.post(
-            backendUrl + "/api/order/fps",
-            orderData,
-            { headers: { token } }
-          );
-          break;
-        case "paymeTradeIn":
-          response = await axios.post(
-            backendUrl + "/api/order/tradeInPersonPlaceOrderPayme",
-            orderData,
-            { headers: { token } }
-          );
-          break;
-        case "fpsTradeIn":
-          response = await axios.post(
-            backendUrl + "/api/order/tradeInPersonPlaceOrderFps",
-            orderData,
-            { headers: { token } }
-          );
-          break;
-        default:
-          throw new Error("Invalid payment method selected.");
-      }
-
+      const response = await axios.post(backendUrl + methodMap[method], orderData, { headers: { token } });
       if (response.data.success) {
-        setCartItems({});
-        navigate("/orders");
+        setCartItems({}); navigate("/orders");
       } else {
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.error(error);
-      toast.error(
-        error.response?.data?.message ||
-        error.message ||
-        "An unknown error occurred."
-      );
+      toast.error(error.message);
     }
   };
 
-  const handlePaymentMethodChange = (selectedMethod) => {
-    setMethod(selectedMethod);
-  };
+  useEffect(() => { window.scrollTo(0, 0); }, []);
 
-  useEffect(() => {
-    // Scroll to top when the component mounts
-    window.scrollTo(0, 0);
-  }, []);
+  /**
+   * Payment Option UI
+   * isTradeIn: Determines if we show "Schedule meetup" link
+   * isCash: Specifically for the COD option to show simplified instructions
+   */
+  const PaymentOption = ({ id, label, qr, instructions, isTradeIn, isCash }) => (
+    <div
+      onClick={() => setMethod(id)}
+      className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${method === id ? 'border-black bg-gray-50 shadow-sm' : 'border-gray-100 hover:border-gray-200'}`}
+    >
+      <div className="flex items-center gap-3">
+        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${method === id ? 'border-black' : 'border-gray-300'}`}>
+          {method === id && <div className="w-2.5 h-2.5 bg-black rounded-full" />}
+        </div>
+        <span className="font-semibold text-gray-700">{label}</span>
+      </div>
+      {method === id && (
+        <div className="mt-4 pt-4 border-t border-gray-200 animate-in slide-in-from-top-2 duration-300">
+          <div className="text-sm text-gray-600 space-y-2">
+            {qr && <img src={qr} className="w-32 h-32 mx-auto sm:mx-0 rounded-lg border shadow-sm" alt="QR" />}
+
+            {/* Specialized Link Logic */}
+            {isCash ? (
+              // For Cash on Meeting: Simplified Step 1
+              <a href="https://wa.me/85293442688" target="_blank" rel="noopener noreferrer" className="text-purple-600 font-bold block hover:underline">
+                Schedule meet up on Whatsapp
+              </a>
+            ) : (
+              // For PayMe/FPS (SF Express or In-Person)
+              <>
+                {instructions}
+                <a href="https://wa.me/85293442688" target="_blank" rel="noopener noreferrer" className={`font-bold block hover:underline ${isTradeIn ? 'text-purple-600' : 'text-green-600'}`}>
+                  2. Send us the payment record {isTradeIn ? '& schedule meet up' : '& delivery address'}
+                </a>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  const paymeGuide = <p className="font-medium">1. <a href="https://payme.hsbc/69b506a1e1ac40f0a3ef436a57b245af" target="_blank" className="text-blue-600 underline">Click here to PayMe</a> or scan QR code.</p>;
+  const fpsGuide = <p className="font-medium">1. Use FPS ID: <span className="font-mono bg-gray-100 p-1 rounded text-xs">2394658</span> and send payment.</p>;
 
   return (
-    <>
-      <form
-        onSubmit={onSubmitHandler}
-        className="flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] border-t"
-      >
-        {/* Left Side */}
-        <div className="flex flex-col gap-4 w-full sm:max-w-[480px]">
-          <div className="text-xl sm:text-2xl my-3">
-            <Title text1={"STEP 1: "} text2={" FILL IN YOUR INFORMATION"} />
-          </div>
-          <div className="flex gap-3">
-            <input
-              required
-              onChange={onChangeHandler}
-              name="firstName"
-              value={formData.firstName}
-              className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
-              type="text"
-              placeholder="First Name"
-            />
-          </div>
-          <input
-            required
-            onChange={onChangeHandler}
-            name="phone"
-            value={formData.phone}
-            className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
-            type="tel"
-            placeholder="Phone Number"
-            maxLength={8}
-            pattern="[0-9]*"
-          />
-        </div>
-        {/* Right Side */}
-        <div className="mt-8">
-          <div className="mt-12">
-            <div className="text-xl sm:text-2xl my-3">
-              <Title text1={"STEP 2: "} text2={" SELECT PAYMENT METHOD"} />
-            </div>
+    <div className="max-w-6xl mx-auto px-4 py-8 sm:py-20">
+      <ConfirmationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onConfirm={handleConfirmOrder} />
 
-            {/* Grouped Button for Free Delivery by 順豐速運 */}
-            <div className="border border-gray-300 rounded-lg p-4 mb-4">
+      <form onSubmit={onSubmitHandler} className="flex flex-col lg:flex-row gap-12">
+
+        {/* LEFT: Information & Delivery Methods */}
+        <div className="flex-1 space-y-10">
+          <section>
+            <Title text1={"STEP 1:"} text2={"YOUR INFORMATION"} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-400 uppercase ml-1">First Name</label>
+                <input required name="firstName" onChange={onChangeHandler} value={formData.firstName} className="w-full border-gray-200 border rounded-xl py-3 px-4 focus:ring-2 focus:ring-black outline-none bg-gray-50 transition-all" placeholder="John" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-400 uppercase ml-1">Phone Number</label>
+                <input required name="phone" onChange={onChangeHandler} value={formData.phone} className="w-full border-gray-200 border rounded-xl py-3 px-4 focus:ring-2 focus:ring-black outline-none bg-gray-50 transition-all" placeholder="9123 4567" maxLength={8} pattern="[0-9]*" />
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <Title text1={"STEP 2:"} text2={"DELIVERY & PAYMENT"} />
+            <div className="mt-6 space-y-4">
+
+              {/* Delivery Choice A: SF Express */}
+              <div className={`rounded-2xl border-2 transition-all overflow-hidden ${deliveryType === 'sf' ? 'border-blue-500 bg-blue-50/10 shadow-md' : 'border-gray-100 bg-white'}`}>
+                <button type="button" onClick={() => { setDeliveryType('sf'); setMethod('payme'); }} className="w-full p-5 text-left flex justify-between items-center">
+                  <div>
+                    <h3 className="font-bold text-lg"> Delivery by SF Express </h3>
+                    <p className="text-sm text-blue-600 font-medium italic">Free Delivery in HK Area</p>
+                  </div>
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${deliveryType === 'sf' ? 'border-blue-500 bg-blue-500' : 'border-gray-300'}`}>
+                    {deliveryType === 'sf' && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                  </div>
+                </button>
+                {deliveryType === 'sf' && (
+                  <div className="p-5 border-t border-blue-100 space-y-3 bg-white">
+                    <PaymentOption id="payme" label="By PayMe" qr={assets.paymeCode} instructions={paymeGuide} isTradeIn={false} />
+                    <PaymentOption id="fps" label="By FPS" qr={assets.fpsCode} instructions={fpsGuide} isTradeIn={false} />
+                  </div>
+                )}
+              </div>
+
+              {/* Delivery Choice B: In-Person */}
+              <div className={`rounded-2xl border-2 transition-all overflow-hidden ${deliveryType === 'inPerson' ? 'border-purple-500 bg-purple-50/10 shadow-md' : 'border-gray-100 bg-white'}`}>
+                <button type="button" onClick={() => { setDeliveryType('inPerson'); setMethod('cod'); }} className="w-full p-5 text-left flex justify-between items-center">
+                  <div>
+                    <h3 className="font-bold text-lg">In-Person Delivery</h3>
+                  </div>
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${deliveryType === 'inPerson' ? 'border-purple-500 bg-purple-500' : 'border-gray-300'}`}>
+                    {deliveryType === 'inPerson' && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                  </div>
+                </button>
+                {deliveryType === 'inPerson' && (
+                  <div className="p-5 border-t border-purple-100 space-y-3 bg-white">
+                    <PaymentOption id="cod" label="By Cash" instructions={<></>} isTradeIn={true} isCash={true} />
+                    <PaymentOption id="paymeTradeIn" label="By PayMe" qr={assets.paymeCode} instructions={paymeGuide} isTradeIn={true} />
+                    <PaymentOption id="fpsTradeIn" label="By FPS" qr={assets.fpsCode} instructions={fpsGuide} isTradeIn={true} />
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/* RIGHT SIDE: Order Summary */}
+        <div className="lg:w-[400px]">
+          <div className="bg-white border border-gray-100 shadow-xl rounded-3xl p-6 md:p-8 sticky top-10">
+
+            {/* We pass 'method' here so the component knows what you selected in Step 2 */}
+            <CartTotal step="3" selectedMethod={method} />
+
+            <div className="mt-8 space-y-4">
+              <button
+                type="submit"
+                className="w-full bg-black text-white py-4 rounded-2xl font-bold text-lg hover:bg-gray-800 transition-all active:scale-[0.98] shadow-lg shadow-black/10"
+              >
+                PLACE ORDER
+              </button>
+
               <button
                 type="button"
-                className="text-lg font-semibold mb-2 w-full text-left cursor-pointer"
-                onClick={() => setIsFreeDeliveryOpen(!isFreeDeliveryOpen)}
+                onClick={() => navigate("/cart")}
+                className="w-full text-gray-400 font-medium py-2 hover:text-black transition-colors text-sm flex items-center justify-center gap-2"
               >
-                Delivery by SF Express
-                <h5>*Free delivery within Hong Kong area</h5>
-                <h5>
-                  *Order is expected to arrive within 2 weeks after WhatsApp
-                  confirmation
-                </h5>
+                ← Back to Shopping Bag
               </button>
-              {isFreeDeliveryOpen && (
-                <div className="flex flex-col gap-3">
-                  <div
-                    onClick={() => handlePaymentMethodChange("payme")}
-                    className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full"
-                  >
-                    <p
-                      className={`min-w-3.5 h-3.5 border rounded-full ${method === "payme" ? "bg-green-400" : ""
-                        }`}
-                    ></p>
-                    <p className="text-gray-500 text-sm font-medium mx-4">
-                      By PayMe
-                    </p>
-                    {method === "payme" && (
-                      <ol className="list-decimal list-inside mt-2">
-                        <li>
-                          <a
-                            href="https://payme.hsbc/69b506a1e1ac40f0a3ef436a57b245af"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-500 hover:underline"
-                          >
-                            Click here to PayMe
-                          </a>
-                          <br />
-                          Scan QR code to PayMe if you are using PC
-                          <img
-                            className="h-40 w-40 mx-4"
-                            src={assets.paymeCode}
-                            alt="PayMe Code"
-                          />
-                        </li>
-                        <li>
-                          <a
-                            href="https://wa.me/85293442688"
-                            className="mt-3 text-blue-500 hover:underline"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Send us the payment record & delivery address
-                          </a>
-                        </li>
-                        <li>
-                          <button
-                            type="submit"
-                            className="bg-black text-white px-4 py-2 text-sm rounded w-full mt-2"
-                          >
-                            PLACE ORDER
-                          </button>
-                        </li>
-                      </ol>
-                    )}
-                  </div>
-                  <div
-                    onClick={() => handlePaymentMethodChange("fps")}
-                    className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full"
-                  >
-                    <p
-                      className={`min-w-3.5 h-3.5 border rounded-full ${method === "fps" ? "bg-green-400" : ""
-                        }`}
-                    ></p>
-                    <p className="text-gray-500 text-sm font-medium mx-4">
-                      By FPS
-                    </p>
-                    {method === "fps" && (
-                      <ol className="list-decimal list-inside mt-2">
-                        <li>
-                          FPS identifier: 2394658
-                          <br />
-                          Scan QR code to FPS if you are using PC
-                          <img
-                            className="h-40 w-40 mx-4"
-                            src={assets.fpsCode}
-                            alt="PayMe Code"
-                          />
-                        </li>
-                        <li>
-                          <a
-                            href="https://wa.me/85293442688"
-                            className="mt-3 text-blue-500 hover:underline"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Send us the payment record & delivery address
-                          </a>
-                        </li>
-                        <li>
-                          <button
-                            type="submit"
-                            className="bg-black text-white px-4 py-2 text-sm rounded w-full mt-2"
-                          >
-                            PLACE ORDER
-                          </button>
-                        </li>
-                      </ol>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
-
-            {/* Grouped Button for Trade in Person */}
-            <div className="border border-gray-300 rounded-lg p-4 mb-4">
-              <button
-                type="button"
-                className="text-lg font-semibold mb-2 w-full text-left cursor-pointer"
-                onClick={() => setIsTradeInOpen(!isTradeInOpen)}
-              >
-                In-person delivery
-              </button>
-              {isTradeInOpen && (
-                <div>
-                  <div
-                    onClick={() => handlePaymentMethodChange("cod")}
-                    className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full mb-3"
-                  >
-                    <p
-                      className={`min-w-3.5 h-3.5 border rounded-full ${method === "cod" ? "bg-green-400" : ""
-                        }`}
-                    ></p>
-                    <p className="text-gray-500 text-sm font-medium mx-4">
-                      By Cash
-                    </p>
-                    {method === "cod" && (
-                      <ol className="list-decimal list-inside mt-2">
-                        <li>
-                          <a
-                            href="https://wa.me/85293442688"
-                            className="mt-3 text-blue-500 hover:underline"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Schedule meet up on Whatsapp
-                          </a>
-                        </li>
-                        <li>
-                          <button
-                            type="submit"
-                            className="bg-black text-white px-4 py-2 text-sm rounded w-full mt-2"
-                          >
-                            PLACE ORDER
-                          </button>
-                        </li>
-                      </ol>
-                    )}
-                  </div>
-
-                  <div
-                    onClick={() => handlePaymentMethodChange("paymeTradeIn")}
-                    className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full mb-3"
-                  >
-                    <p
-                      className={`min-w-3.5 h-3.5 border rounded-full ${method === "paymeTradeIn" ? "bg-green-400" : ""
-                        }`}
-                    ></p>
-                    <p className="text-gray-500 text-sm font-medium mx-4">
-                      By PayMe
-                    </p>
-                    {method === "paymeTradeIn" && (
-                      <ol className="list-decimal list-inside mt-2">
-                        <li>
-                          <a
-                            href="https://payme.hsbc/69b506a1e1ac40f0a3ef436a57b245af"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-500 hover:underline"
-                          >
-                            Click here to PayMe
-                          </a>
-                          <br />
-                          Scan QR code to PayMe if you are using PC
-                          <img
-                            className="h-40 w-40 mx-4"
-                            src={assets.paymeCode}
-                            alt="PayMe Code"
-                          />
-                        </li>
-                        <li>
-                          <a
-                            href="https://wa.me/85293442688"
-                            className="mt-3 text-blue-500 hover:underline"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Send us the payment record & schedule meet up
-                          </a>
-                        </li>
-                        <li>
-                          <button
-                            type="submit"
-                            className="bg-black text-white px-4 py-2 text-sm rounded w-full mt-2"
-                          >
-                            PLACE ORDER
-                          </button>
-                        </li>
-                      </ol>
-                    )}
-                  </div>
-
-                  <div
-                    onClick={() => handlePaymentMethodChange("fpsTradeIn")}
-                    className="flex flex-col items-start border p-2 px-3 cursor-pointer w-full"
-                  >
-                    <p
-                      className={`min-w-3.5 h-3.5 border rounded-full ${method === "fpsTradeIn" ? "bg-green-400" : ""
-                        }`}
-                    ></p>
-                    <p className="text-gray-500 text-sm font-medium mx-4">
-                      By FPS
-                    </p>
-                    {method === "fpsTradeIn" && (
-                      <ol className="list-decimal list-inside mt-2">
-                        <li>FPS identifier: 2394658</li>
-                        Scan QR code to FPS if you are using PC
-                        <img
-                          className="h-40 w-40 mx-4"
-                          src={assets.fpsCode}
-                          alt="PayMe Code"
-                        />
-                        <li>
-                          <a
-                            href="https://wa.me/85293442688"
-                            className="mt-3 text-blue-500 hover:underline"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Send us the payment record & schedule meet up
-                          </a>
-                        </li>
-                        <li>
-                          <button
-                            type="submit"
-                            className="bg-black text-white px-4 py-2 text-sm rounded w-full mt-2"
-                          >
-                            PLACE ORDER
-                          </button>
-                        </li>
-                      </ol>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* CartTotal section */}
-          <div className="mt-7 min-w-80">
-            <CartTotal step="3" />
-          </div>
-
-          <div className="w-full flex justify-between mt-8">
-            <button
-              type="button"
-              onClick={() => navigate("/cart")}
-              className="bg-gray-300 text-black px-4 py-2 text-sm rounded flex items-center"
-            >
-              <span className="mr-2">←</span> {/* Left arrow */}
-              BACK TO CART
-            </button>
           </div>
         </div>
+
+
       </form>
-      <ConfirmationModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={handleConfirmOrder}
-      />
-    </>
+    </div>
   );
 };
 
