@@ -6,30 +6,39 @@ import { assets } from "../assets/assets";
 import { FcGoogle } from "react-icons/fc";
 
 const Login = () => {
-  const { token, setToken, navigate, backendUrl, getUserCart } = useContext(ShopContext);
+  const { token, setToken, navigate, backendUrl, getUserCart } =
+    useContext(ShopContext);
 
   const [email, setEmail] = useState("");
   const [passcode, setPasscode] = useState("");
   const [isPasscodeSent, setIsPasscodeSent] = useState(false);
   const [cooldown, setCooldown] = useState(false);
   const [countdown, setCountdown] = useState(30);
-
-  // Initial loading state for the branded wave loader
   const [isLoading, setIsLoading] = useState(true);
 
+  // --- NEW: Premium Notification State ---
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
+    const timer = setTimeout(() => setIsLoading(false), 800);
     return () => clearTimeout(timer);
   }, []);
 
-  // --- Google Login Initiation ---
+  // Trigger custom notification
+  const triggerSuccess = (msg) => {
+    setSuccessMsg(msg);
+    setShowSuccess(true);
+    setTimeout(() => {
+      setShowSuccess(false);
+      navigate("/");
+    }, 3000);
+  };
+
   const loginWithGoogle = () => {
     window.location.href = `${backendUrl}/api/user/google`;
   };
 
-  // --- Token Capture from Redirect ---
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const urlToken = params.get("token");
@@ -39,8 +48,7 @@ const Login = () => {
       setToken(urlToken);
       getUserCart(urlToken);
       window.history.replaceState({}, document.title, window.location.pathname);
-      toast.success("Login successful via Google!");
-      navigate("/");
+      triggerSuccess("Authenticated via Google"); // Replaced toast.success
     }
   }, [setToken, navigate, getUserCart]);
 
@@ -48,21 +56,26 @@ const Login = () => {
     event.preventDefault();
     try {
       if (isPasscodeSent) {
-        const response = await axios.post(backendUrl + "/api/user/verify-passcode", { email, passcode });
+        const response = await axios.post(
+          backendUrl + "/api/user/verify-passcode",
+          { email, passcode },
+        );
         if (response.data.success) {
           setToken(response.data.token);
           localStorage.setItem("token", response.data.token);
           await getUserCart(response.data.token);
-          toast.success("Login successful!");
-          navigate("/");
+          triggerSuccess("Welcome Back!"); // Replaced toast.success
         } else {
           toast.error(response.data.message);
         }
       } else {
-        const response = await axios.post(backendUrl + "/api/user/send-passcode", { email });
+        const response = await axios.post(
+          backendUrl + "/api/user/send-passcode",
+          { email },
+        );
         if (response.data.success) {
           setIsPasscodeSent(true);
-          toast.success("Passcode sent to your email.");
+          toast.info("Passcode sent to your email.");
         } else {
           toast.error(response.data.message);
         }
@@ -75,7 +88,10 @@ const Login = () => {
   const resendPasscodeHandler = async () => {
     if (cooldown) return;
     try {
-      const response = await axios.post(backendUrl + "/api/user/resend-passcode", { email });
+      const response = await axios.post(
+        backendUrl + "/api/user/resend-passcode",
+        { email },
+      );
       if (response.data.success) {
         toast.success("New passcode sent!");
         setCooldown(true);
@@ -97,11 +113,55 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if (token) navigate("/");
-  }, [token, navigate]);
+    if (token && !showSuccess) navigate("/");
+  }, [token, navigate, showSuccess]);
 
   return (
     <>
+      {/* PREMIUM SUCCESS NOTIFICATION */}
+      {showSuccess && (
+        <div className="fixed top-6 right-6 z-[60] animate-toast-in">
+          <div className="relative overflow-hidden min-w-[280px] sm:min-w-[340px] bg-white/40 backdrop-blur-xl border border-white/40 shadow-[0_20px_50px_rgba(0,0,0,0.2)] rounded-2xl p-4 flex items-center gap-4">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-tr from-[#003366] to-black flex items-center justify-center shadow-lg shadow-blue-900/20">
+              <svg
+                className="w-5 h-5 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={3}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <div>
+              <p className="text-black font-black text-[10px] uppercase tracking-[0.3em]">
+                Success
+              </p>
+              <p className="text-gray-700 text-sm font-medium">{successMsg}</p>
+            </div>
+            {/* Progress Bar Loader */}
+            <div className="absolute bottom-0 left-0 h-1 bg-black animate-progress-shrink" />
+          </div>
+          <style>{`
+            @keyframes toast-in {
+              0% { transform: translateX(100%) scale(0.9); opacity: 0; }
+              70% { transform: translateX(-10px) scale(1.05); }
+              100% { transform: translateX(0) scale(1); opacity: 1; }
+            }
+            @keyframes progress-shrink {
+              from { width: 100%; }
+              to { width: 0%; }
+            }
+            .animate-toast-in { animation: toast-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+            .animate-progress-shrink { animation: progress-shrink 3s linear forwards; }
+          `}</style>
+        </div>
+      )}
+
       {/* BRANDED WAVE LOADER */}
       {isLoading && (
         <div className="fixed top-[80px] bottom-0 left-0 right-0 z-40 flex flex-col items-center justify-center bg-white">
@@ -126,17 +186,17 @@ const Login = () => {
 
       {/* LOGIN CONTENT */}
       <div
-        className={`w-full px-4 py-12 sm:py-20 min-h-[85vh] flex items-center justify-center transition-opacity duration-1000 ${isLoading ? "opacity-0" : "opacity-100"
-          }`}
+        className={`w-full px-4 py-12 sm:py-20 min-h-[85vh] flex items-center justify-center transition-opacity duration-1000 ${
+          isLoading ? "opacity-0" : "opacity-100"
+        }`}
         style={{
           backgroundImage: `url(${assets.loginBg})`,
           backgroundSize: "cover",
-          backgroundPosition: "center"
+          backgroundPosition: "center",
         }}
       >
         <form
           onSubmit={onSubmitHandler}
-          /* RESPONSIVE SIZE: Smaller max-width and padding on mobile */
           className="flex flex-col items-center w-full max-w-[340px] sm:max-w-[420px] gap-3 sm:gap-4 text-gray-900 bg-white/95 backdrop-blur-md p-6 sm:p-10 rounded-2xl shadow-2xl border border-white/20"
         >
           <div className="text-center mb-1 sm:mb-2">
@@ -194,7 +254,9 @@ const Login = () => {
 
           {isPasscodeSent && (
             <div className="w-full text-center space-y-2 sm:space-y-3">
-              <p className="text-[11px] sm:text-xs text-gray-500">Didn't see it? Check your <b>Spam</b> folder.</p>
+              <p className="text-[11px] sm:text-xs text-gray-500">
+                Didn't see it? Check your <b>Spam</b> folder.
+              </p>
               <button
                 type="button"
                 className={`text-[12px] sm:text-sm font-bold underline transition-colors ${cooldown ? "text-gray-300 cursor-not-allowed" : "text-black hover:text-blue-600"}`}
@@ -206,9 +268,7 @@ const Login = () => {
             </div>
           )}
 
-          <button
-            className="bg-black text-white w-full py-3 sm:py-3.5 rounded-xl font-bold hover:bg-gray-800 active:scale-[0.99] transition-all shadow-lg mt-1 sm:mt-2 text-sm sm:text-base"
-          >
+          <button className="bg-black text-white w-full py-3 sm:py-3.5 rounded-xl font-bold hover:bg-gray-800 active:scale-[0.99] transition-all shadow-lg mt-1 sm:mt-2 text-sm sm:text-base">
             {isPasscodeSent ? "Verify Code" : "Login with Email"}
           </button>
 
