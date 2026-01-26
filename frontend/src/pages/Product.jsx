@@ -169,13 +169,12 @@ const Product = () => {
                   {productData.image.map((src, index) => (
                     <img
                       key={index}
-                      className={`absolute w-full h-full object-contain p-2 transition-transform duration-500 ease-out transform ${
-                        currentImageIndex === index
+                      className={`absolute w-full h-full object-contain p-2 transition-transform duration-500 ease-out transform ${currentImageIndex === index
                           ? "translate-x-0"
                           : currentImageIndex > index
                             ? "-translate-x-full"
                             : "translate-x-full"
-                      }`}
+                        }`}
                       src={src}
                       alt=""
                     />
@@ -209,7 +208,7 @@ const Product = () => {
               </div>
 
               <div className="flex flex-col gap-4 my-8">
-                <p className="text-black font-medium">Select Size</p>
+                <p className="text-black font-medium">Select product / size</p>
                 <div className="flex gap-2">
                   {productData.sizes.map((item) => (
                     <div key={item.size} className="flex flex-col items-center">
@@ -217,12 +216,11 @@ const Product = () => {
                         onClick={() => item.count > 0 && setSize(item.size)}
                         /* FIXED LOGIC: Selected = Black Bg + White Text. Unselected = Gray Bg + Black Text */
                         className={`border-2 py-2 px-4 transition-all duration-200 font-bold 
-                          ${
-                            item.count === 0
-                              ? "bg-gray-200 text-gray-400 border-gray-200 cursor-not-allowed"
-                              : item.size === size
-                                ? "bg-black text-white border-black"
-                                : "bg-gray-100 text-black border-transparent hover:border-black"
+                          ${item.count === 0
+                            ? "bg-gray-200 text-gray-400 border-gray-200 cursor-not-allowed"
+                            : item.size === size
+                              ? "bg-black text-white border-black"
+                              : "bg-gray-100 text-black border-transparent hover:border-black"
                           }`}
                         disabled={item.count === 0}
                       >

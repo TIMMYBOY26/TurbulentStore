@@ -98,9 +98,8 @@ const Collection = () => {
 
       {/* COLLECTION PAGE CONTENT */}
       <div
-        className={`flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 transition-opacity duration-1000 ${
-          isLoading ? "opacity-0" : "opacity-100"
-        }`}
+        className={`flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 transition-opacity duration-1000 ${isLoading ? "opacity-0" : "opacity-100"
+          }`}
       >
         {/* Filter Options */}
         <div className="min-w-60">
@@ -117,9 +116,8 @@ const Collection = () => {
           </p>
           {/* Category Filter */}
           <div
-            className={`border border-gray-300 pl-5 py-3 mt-6 ${
-              showFilter ? "" : "hidden"
-            } sm:block`}
+            className={`border border-gray-300 pl-5 py-3 mt-6 ${showFilter ? "" : "hidden"
+              } sm:block`}
           >
             <p className="mb-3 text-sm font-medium">CATEGORIES</p>
             <div className="flex flex-col gap-2 text-sm font-light text-gray-700">
@@ -149,6 +147,15 @@ const Collection = () => {
                   onChange={toggleCategory}
                 />
                 Music
+              </p>
+              <p className="flex gap-2">
+                <input
+                  className="w-3"
+                  type="checkbox"
+                  value={"CD"}
+                  onChange={toggleCategory}
+                />
+                CD
               </p>
             </div>
           </div>
