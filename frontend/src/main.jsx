@@ -5,22 +5,35 @@ import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import ShopContextProvider from "./context/ShopContext.jsx";
 
-// --- START EASTER EGG ---
-const secretArt = `
-  ______   __  __   ____    ____   _    _   _        ______   _   _   _______ 
- |__   __| |  | |  |  _ \\  |  _ \\ | |  | | | |      |  ____| | \\ | | |__   __|
-    | |    |  | |  | |_) | | |_) || |  | | | |      | |__    |  \\| |    | |   
-    | |    |  | |  |  _ <  |  _ < | |  | | | |      |  __|   | . \` |    | |   
-    | |    |__| |  | |_) | | |_) || |__| | | |____  | |____  | |\\  |    | |   
-    |_|    \\____/  |____/  |____/  \\____/  |______| |______| |_| \\_|    |_|   
-                                                                              
+// --- START LONG PORTRAIT EASTER EGG ---
+const longArt = `
+  >> SYSTEM: TURBULENT_MONOLOGUE_2026
+  >> INITIALIZING LONG_FORMAT_PROTOCOL...
+  
+  [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100%
+
+           (  )
+           (  )
+            ||
+            ||
+            ||
+            ||
+            ||
+            ||
+         ___||___
+        /        \\
+       |   (  )   |
+        \\________/
+
+  >> STATUS: FULLY_EXTENDED
+  >> ACCESS: ROOT_LEVEL
 `;
 
 console.log(
-  `%c${secretArt}`,
-  "font-family: monospace; color: #00FF00; background: #000; font-weight: bold; padding: 10px;",
+  `%c${longArt}`,
+  "font-family: monospace; color: #00FF00; background: #000; font-weight: bold; font-size: 12px; line-height: 1.0; padding: 25px; border-left: 5px solid #00FF00;",
 );
-// --- END EASTER EGG ---
+// --- END ---
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
