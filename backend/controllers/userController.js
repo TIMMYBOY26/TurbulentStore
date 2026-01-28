@@ -15,29 +15,20 @@ const googleClient = new OAuth2Client(
   process.env.GOOGLE_REDIRECT_URI,
 );
 
-// 2. Persistent Pooled Transporter
+// 2. Optimized Transporter for Vercel (No Pooling)
 const transporter = nodemailer.createTransport({
   service: "gmail",
   host: "smtp.gmail.com",
   port: 465,
   secure: true,
-  pool: true,
-  maxConnections: 5,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    pass: process.env.EMAIL_PASS, // Use Google App Password here
   },
 });
 
 // Helper: Token Generator
 const createToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET);
-
-// Helper: Background Email
-const sendMailBackground = (options) => {
-  transporter
-    .sendMail(options)
-    .catch((err) => console.error("Email Error:", err));
-};
 
 // --- GOOGLE OAUTH CONTROLLERS ---
 
@@ -68,7 +59,6 @@ export const googleCallback = async (req, res) => {
     );
 
     const token = createToken(user._id);
-    // Redirect to frontend (Frontend must handle the ?token param)
     res.redirect(`${process.env.FRONTEND_URL}/login?token=${token}`);
   } catch (error) {
     console.error("Google Auth Error:", error);
@@ -81,8 +71,9 @@ export const googleCallback = async (req, res) => {
 export const sendLoginPasscode = async (req, res) => {
   try {
     const { email, name } = req.body;
-    if (!validator.isEmail(email))
-      return res.json({ success: false, message: "Invalid email" });
+    if (!validator.isEmail(email)) {
+      return res.json({ success: false, message: "Invalid email address" });
+    }
 
     const passcode = Math.floor(100000 + Math.random() * 900000).toString();
     const hashedPasscode = await bcrypt.hash(passcode, 10);
@@ -99,16 +90,26 @@ export const sendLoginPasscode = async (req, res) => {
       { upsert: true },
     );
 
-    sendMailBackground({
-      from: process.env.EMAIL_USER,
+    // IMPORTANT: In Serverless (Vercel), we MUST await the email send
+    await transporter.sendMail({
+      from: `"Turbulent Support" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Your Login Passcode",
       text: `Your passcode is: ${passcode}`,
+      html: `
+        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee;">
+          <h2 style="color: #000;">Login Verification</h2>
+          <p>Your verification code is:</p>
+          <div style="font-size: 32px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;">${passcode}</div>
+          <p style="color: #666; font-size: 12px;">This code expires in 10 minutes.</p>
+        </div>
+      `,
     });
 
-    res.json({ success: true, message: "Passcode sent." });
+    res.json({ success: true, message: "Passcode sent successfully." });
   } catch (error) {
-    res.json({ success: false, message: "Error processing request." });
+    console.error("Vercel Email Error:", error);
+    res.json({ success: false, message: "Failed to send email. Check server logs." });
   }
 };
 
@@ -121,6 +122,12 @@ export const verifyPasscode = async (req, res) => {
     const isValid = await bcrypt.compare(passcode, user.passcode);
     if (isValid && user.passcodeExpires > Date.now()) {
       const token = createToken(user._id);
+
+      // Cleanup passcode after successful login
+      user.passcode = undefined;
+      user.passcodeExpires = undefined;
+      await user.save();
+
       res.json({ success: true, token });
     } else {
       res.json({ success: false, message: "Invalid or expired passcode" });
@@ -136,7 +143,7 @@ export const resendLoginPasscode = async (req, res) => {
     const passcode = Math.floor(100000 + Math.random() * 900000).toString();
     const hashedPasscode = await bcrypt.hash(passcode, 10);
 
-    await userModel.findOneAndUpdate(
+    const user = await userModel.findOneAndUpdate(
       { email },
       {
         $set: {
@@ -146,16 +153,18 @@ export const resendLoginPasscode = async (req, res) => {
       },
     );
 
-    sendMailBackground({
+    if (!user) return res.json({ success: false, message: "Email not found" });
+
+    await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
-      subject: "New Passcode",
+      subject: "Your New Passcode",
       text: `Your new passcode is: ${passcode}`,
     });
 
     res.json({ success: true, message: "New passcode sent." });
   } catch (error) {
-    res.json({ success: false, message: "Error resending." });
+    res.json({ success: false, message: "Error resending email." });
   }
 };
 
@@ -171,7 +180,7 @@ export const adminLogin = async (req, res) => {
       const token = jwt.sign(email + password, process.env.JWT_SECRET);
       res.json({ success: true, token });
     } else {
-      res.json({ success: false, message: "Invalid credentials" });
+      res.json({ success: false, message: "Invalid admin credentials" });
     }
   } catch (error) {
     res.json({ success: false, message: error.message });
@@ -198,15 +207,14 @@ export const removeUser = async (req, res) => {
 
 export const getUserProfile = async (req, res) => {
   try {
-    const { userId } = req.body; // Injected by your authUser middleware
+    const { userId } = req.body;
     const user = await userModel.findById(userId).select("email name");
 
     if (!user) {
       return res.json({ success: false, message: "User not found" });
     }
 
-    // Success response
-    res.json({ success: true, email: user.email });
+    res.json({ success: true, email: user.email, name: user.name });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
