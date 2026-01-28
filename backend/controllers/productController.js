@@ -6,7 +6,7 @@ const addProduct = async (req, res) => {
     try {
         const { name, description, price, category, sizes, bestseller } = req.body;
         const images = [];
-        for (let i = 1; i <= 8; i++) {
+        for (let i = 1; i <= 9; i++) {
             const image = req.files[`image${i}`] && req.files[`image${i}`][0];
             if (image) {
                 images.push(image);

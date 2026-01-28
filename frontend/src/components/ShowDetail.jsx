@@ -33,7 +33,7 @@ const ShowDetail = () => {
   // Determine if the show is in the past or upcoming
   const isPastEvent = new Date(show.date) < new Date();
   const instagramButtonText = isPastEvent
-    ? "View on Instagram"
+    ? "View details"
     : "View show details on Instagram";
 
   return (

@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const Add = ({ token }) => {
   // Use an array for images to simplify state management
-  const [images, setImages] = useState(Array(8).fill(null));
+  const [images, setImages] = useState(Array(9).fill(null));
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");

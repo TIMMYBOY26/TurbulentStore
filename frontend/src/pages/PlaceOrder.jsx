@@ -150,6 +150,8 @@ const PlaceOrder = () => {
                   <div>
                     <h3 className="font-bold text-lg"> Delivery by SF Express </h3>
                     <p className="text-sm text-blue-600 font-medium italic">Free Delivery in HK Area</p>
+                    <p className="text-sm text-blue-600 font-medium italic">* Order is expected to arrive within 1 month after Whatsapp confirmation</p>
+
                   </div>
                   <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${deliveryType === 'sf' ? 'border-blue-500 bg-blue-500' : 'border-gray-300'}`}>
                     {deliveryType === 'sf' && <div className="w-2.5 h-2.5 bg-white rounded-full" />}

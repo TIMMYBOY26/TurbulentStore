@@ -22,7 +22,7 @@ const Hero = () => {
   };
 
   const streamUrl =
-    "https://www.youtube.com/watch?v=8SDdX7paBAg&list=OLAK5uy_kIzdpSQfyLe9-dt3bwq5YefOmuBRgYDq4";
+    "https://orcd.co/monologue_turbulent";
 
   return (
     <div
@@ -58,6 +58,9 @@ const Hero = () => {
             </h2>
             <h2 className="text-white sm:text-black text-[11px] sm:text-xl font-bold uppercase tracking-[0.2em] drop-shadow-md sm:drop-shadow-none">
               Out January 28TH
+            </h2>
+            <h2 className="text-white sm:text-black text-[11px] sm:text-xl font-bold uppercase tracking-[0.2em] drop-shadow-md sm:drop-shadow-none">
+              Pre-Order Will start at 8pm
             </h2>
           </div>
 

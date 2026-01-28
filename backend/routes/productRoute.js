@@ -14,6 +14,7 @@ productRouter.post('/add', adminAuth, upload.fields([
     { name: 'image6', adminAuth, maxCount: 1 },
     { name: 'image7', adminAuth, maxCount: 1 },
     { name: 'image8', adminAuth, maxCount: 1 },
+    { name: 'image9', adminAuth, maxCount: 1 },
 ]), addProduct);
 productRouter.post('/remove', removeProduct);
 productRouter.post('/single', singleProduct);
