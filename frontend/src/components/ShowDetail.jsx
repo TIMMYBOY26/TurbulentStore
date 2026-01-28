@@ -53,11 +53,7 @@ const ShowDetail = () => {
 
         <div className="lg:w-1/2">
           {/* Past Event Indicator */}
-          {isPastEvent && (
-            <div className="bg-gray-200 text-gray-700 text-sm px-4 py-1 mb-4">
-              <strong>Past Event:</strong> This event has already taken place.
-            </div>
-          )}
+
           <h1 className="text-3xl sm:text-2xl font-bold mb-2">{show.name}</h1>
           <p>
             <span className="font-medium">
