@@ -132,7 +132,7 @@ const PlaceOrder = () => {
                 className={`font-bold cursor-pointer underline hover:opacity-80 ${isTradeIn ? "text-purple-600" : "text-green-600"}`}
                 onClick={(e) => {
                   e.stopPropagation(); // 阻止切換選項
-                  window.open("https://wa.me", "_blank");
+                  window.open("https://wa.me/85293442688", "_blank");
                 }}
               >
                 2. Send us the payment record on Whatsapp
