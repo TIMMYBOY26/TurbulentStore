@@ -125,6 +125,11 @@ const Orders = ({ token }) => {
 
   // Calculate total income, order count, and items sold by month
   const incomeByMonth = finalFilteredOrders.reduce((acc, order) => {
+    // Skip cancelled orders
+    if (order.status === "Cancelled") {
+      return acc;
+    }
+
     const month = new Date(order.date).toLocaleString("default", {
       month: "long",
       year: "numeric",
@@ -143,6 +148,7 @@ const Orders = ({ token }) => {
 
     return acc;
   }, {});
+
 
   // Calculate average order value by month
   for (const month in incomeByMonth) {
