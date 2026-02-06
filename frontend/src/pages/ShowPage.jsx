@@ -20,6 +20,7 @@ const ShowPage = () => {
       } catch (err) {
         setError(err.message);
       } finally {
+        // 稍微延遲以展示 Branded Loader 動畫
         setTimeout(() => {
           setLoading(false);
         }, 800);
@@ -37,15 +38,28 @@ const ShowPage = () => {
       </div>
     );
 
-  const reversedShows = [...shows].reverse();
+  // --- 排序與過濾邏輯 ---
   const currentDate = new Date();
 
-  const filteredShows = reversedShows.filter((show) => {
-    const showDate = new Date(show.date);
-    if (filter === "upcoming") return showDate >= currentDate;
-    if (filter === "past") return showDate < currentDate;
-    return true;
-  });
+  const filteredShows = shows
+    .filter((show) => {
+      const showDate = new Date(show.date);
+      if (filter === "upcoming") return showDate >= currentDate;
+      if (filter === "past") return showDate < currentDate;
+      return true;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+
+      if (filter === "upcoming") {
+        // 即將到來的活動：日期越近（越早）的排越前面
+        return dateA - dateB;
+      } else {
+        // 全部或過去的活動：日期越新（越晚）的排越前面
+        return dateB - dateA;
+      }
+    });
 
   return (
     <>
@@ -59,7 +73,9 @@ const ShowPage = () => {
             <div className="w-2.5 bg-white border-2 border-gray-200 rounded-full animate-[wave_1.2s_ease-in-out_0.45s_infinite] h-10"></div>
             <div className="w-2.5 bg-[#003366] rounded-full animate-[wave_1.2s_ease-in-out_0.6s_infinite] h-6"></div>
           </div>
-          <p className="mt-10 text-[10px] font-black tracking-[0.6em] text-black uppercase animate-pulse">TURBULENT</p>
+          <p className="mt-10 text-[10px] font-black tracking-[0.6em] text-black uppercase animate-pulse">
+            TURBULENT
+          </p>
           <style>{`
             @keyframes wave {
               0%, 100% { height: 1.5rem; transform: translateY(0); }
@@ -70,9 +86,13 @@ const ShowPage = () => {
       )}
 
       {/* SHOW PAGE CONTENT */}
-      <div className={`container mx-auto px-2 sm:px-4 py-10 transition-opacity duration-1000 ${loading ? "opacity-0" : "opacity-100"}`}>
+      <div
+        className={`container mx-auto px-2 sm:px-4 py-10 transition-opacity duration-1000 ${loading ? "opacity-0" : "opacity-100"}`}
+      >
         <div className="flex flex-col items-center mb-8 sm:mb-12">
-          <h1 className="text-4xl sm:text-5xl font-black italic tracking-tighter mb-4 uppercase text-center">News</h1>
+          <h1 className="text-4xl sm:text-5xl font-black italic tracking-tighter mb-4 uppercase text-center">
+            News
+          </h1>
           <div className="h-1 w-16 sm:w-20 bg-black mb-6 sm:mb-8"></div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
@@ -95,15 +115,15 @@ const ShowPage = () => {
                 <option value="upcoming">Upcoming</option>
                 <option value="past">Past</option>
               </select>
-              <div className="absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none text-[8px]">▼</div>
+              <div className="absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none text-[8px]">
+                ▼
+              </div>
             </div>
           </div>
         </div>
 
         {isCalendarView ? (
-          /* FULL-SCREEN RESPONSIVE CALENDAR VIEW */
           <div className="w-full bg-white rounded-xl sm:rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            {/* Note: p-1 on mobile ensures the grid uses all available screen width */}
             <div className="p-1 sm:p-4 md:p-6">
               <Calendar shows={filteredShows} />
             </div>
