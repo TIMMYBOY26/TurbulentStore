@@ -86,16 +86,7 @@ const Product = () => {
 
   return (
     <>
-      {/* SUCCESS NOTICE & LOADER & LIGHTBOX */}
-      {isZoomed && productData && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 backdrop-blur-2xl animate-in fade-in duration-300">
-          <button onClick={() => setIsZoomed(false)} className="absolute top-6 right-6 z-[110] p-3 bg-black text-white rounded-full">✕</button>
-          <div className="relative w-full h-full flex items-center justify-center p-4" onClick={() => setIsZoomed(false)}>
-            <img src={productData.image[currentImageIndex]} className="max-w-full max-h-[90vh] object-contain animate-in zoom-in-95" alt=""/>
-          </div>
-        </div>
-      )}
-
+      {/* SUCCESS NOTICE & LOADER */}
       {showCartNotice && (
         <div className="fixed top-24 right-5 sm:right-10 z-50 animate-toast-in">
           <div className="relative overflow-hidden min-w-[280px] bg-white/40 backdrop-blur-2xl border rounded-2xl p-5 shadow-2xl flex items-center gap-4">
@@ -105,10 +96,7 @@ const Product = () => {
           </div>
         </div>
       )}
-      {/* BRANDED WAVE LOADER - BLUE, BLACK, & WHITE THEME */}
-            {/* BRANDED WAVE LOADER - 完全同步 Collection 版 */}
 
-      {/* BRANDED WAVE LOADER - BELOW NAV BAR */}
       {isLoading && (
         <div className="fixed top-[80px] bottom-0 left-0 right-0 z-40 flex flex-col items-center justify-center bg-white">
           <div className="flex items-end gap-2 h-16">
@@ -118,36 +106,76 @@ const Product = () => {
             <div className="w-2.5 bg-white border-2 border-gray-200 rounded-full animate-[wave_1.2s_ease-in-out_0.45s_infinite] h-10"></div>
             <div className="w-2.5 bg-[#003366] rounded-full animate-[wave_1.2s_ease-in-out_0.6s_infinite] h-6"></div>
           </div>
-          <p className="mt-10 text-[10px] font-black tracking-[0.6em] text-black uppercase animate-pulse">
-            TURBULENT
-          </p>
-          <style>{`
-            @keyframes wave {
-              0%, 100% { height: 1.5rem; transform: translateY(0); }
-              50% { height: 4rem; transform: translateY(-5px); }
-            }
-          `}</style>
+          <p className="mt-10 text-[10px] font-black tracking-[0.6em] text-black uppercase animate-pulse">TURBULENT</p>
         </div>
       )}
 
-
+      {/* LIGHTBOX */}
+      {isZoomed && productData && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 backdrop-blur-2xl animate-in fade-in duration-300">
+          <button onClick={() => setIsZoomed(false)} className="absolute top-6 right-6 z-[110] p-3 bg-black text-white rounded-full">✕</button>
+          <div className="relative w-full h-full flex items-center justify-center p-4" onClick={() => setIsZoomed(false)}>
+            <img src={productData.image[currentImageIndex]} className="max-w-full max-h-[90vh] object-contain animate-in zoom-in-95" alt=""/>
+          </div>
+        </div>
+      )}
 
       {/* MAIN UI */}
       {productData && (
         <div className={`pt-6 transition-opacity duration-1000 ${isLoading ? "opacity-0" : "opacity-100"}`}>
           <ToastContainer position="top-right" autoClose={2000} />
+          
           <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 px-4 sm:px-0">
+            
+            {/* IMAGE SECTION */}
             <div className="flex-1 flex flex-col-reverse sm:flex-row gap-3">
+              {/* Desktop Sidebar */}
               <div className="hidden sm:flex sm:flex-col overflow-y-auto sm:w-[18%] gap-2">
                 {productData.image.map((item, index) => (
-                  <img onClick={() => setCurrentImageIndex(index)} src={item} key={index} className={`w-full cursor-pointer border rounded-md ${currentImageIndex === index ? "border-black" : "opacity-70"}`} alt=""/>
+                  <img onClick={() => setCurrentImageIndex(index)} src={item} key={index} 
+                    className={`w-full cursor-pointer border rounded-md ${currentImageIndex === index ? "border-black" : "opacity-70"}`} alt=""/>
                 ))}
               </div>
-              <div className="w-full sm:w-[80%] relative overflow-hidden rounded-xl bg-white shadow-sm" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
-                <img src={productData.image[currentImageIndex]} onClick={() => setIsZoomed(true)} className="w-full h-auto cursor-zoom-in object-contain p-2" alt=""/>
+
+              {/* Main Viewport Container */}
+              <div className="w-full sm:w-[82%] flex flex-col">
+                <div className="relative overflow-hidden rounded-xl bg-white">
+                  {/* Swipe Row */}
+                  <div 
+                    className="flex flex-nowrap transition-transform duration-500 ease-out sm:block sm:transform-none"
+                    style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
+                    onTouchStart={handleTouchStart} 
+                    onTouchMove={handleTouchMove} 
+                    onTouchEnd={handleTouchEnd}
+                  >
+                    {productData.image.map((img, idx) => (
+                      <div key={idx} className="w-full min-w-full flex-shrink-0 flex items-center justify-center sm:block">
+                        <img 
+                          src={img} 
+                          onClick={() => setIsZoomed(true)} 
+                          className="w-full h-auto max-h-[70vh] sm:max-h-none object-contain p-2" 
+                          alt=""
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* IMAGE DOTS - OUTSIDE & BELOW IMAGE (Mobile Only) */}
+                <div className="flex justify-center gap-2 mt-4 sm:hidden">
+                  {productData.image.map((_, idx) => (
+                    <div 
+                      key={idx}
+                      className={`h-1.5 transition-all duration-300 rounded-full ${
+                        currentImageIndex === idx ? "w-6 bg-black" : "w-1.5 bg-gray-300"
+                      }`}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 
+            {/* INFO SECTION */}
             <div className="flex-1 px-1 sm:px-0">
               <h1 className="font-medium text-2xl mt-2 uppercase tracking-tight">{productData.name}</h1>
               {Number(productData.price) > 0 && <p className="mt-5 text-3xl font-medium">{currency}{productData.price}</p>}
@@ -155,7 +183,6 @@ const Product = () => {
 
               <div className="flex flex-col gap-4 my-8">
                 {productData.category !== "Tickets" ? (
-                  /* 一般商品邏輯 */
                   <>
                     <p className="text-black font-bold text-xs uppercase tracking-widest">* Select Size</p>
                     <div className="flex gap-2">
@@ -171,28 +198,11 @@ const Product = () => {
                     </button>
                   </>
                 ) : (
-                  /* 門票邏輯：僅限外部連結 */
                   <div className="mt-4 py-6 border-t flex flex-col gap-4">
-                    {productData.isTicketAvailable ? (
-                      <button 
-                        onClick={() => window.open(productData.externalLink || 'https://offgrid.live', '_blank')}
-                        className="bg-black text-white px-8 py-4 text-xs font-black tracking-[0.2em] uppercase hover:bg-gray-800 transition-all shadow-lg text-center"
-                      >
-                        GET TICKETS NOW
-                      </button>
-                    ) : (
-                      <button 
-                        disabled
-                        className="bg-gray-100 text-gray-400 border border-dashed border-gray-300 px-8 py-4 text-xs font-black tracking-[0.2em] uppercase text-center cursor-not-allowed"
-                      >
-                        TICKETS COMING SOON
-                      </button>
-                    )}
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
-                      {productData.isTicketAvailable 
-                        ? "Official tickets are sold via external platform." 
-                        : ""}
-                    </p>
+                    <button onClick={() => window.open(productData.externalLink || 'https://offgrid.live', '_blank')}
+                      className="bg-black text-white px-8 py-4 text-xs font-black tracking-[0.2em] uppercase shadow-lg text-center">
+                      {productData.isTicketAvailable ? "GET TICKETS NOW" : "TICKETS COMING SOON"}
+                    </button>
                   </div>
                 )}
               </div>
@@ -203,12 +213,11 @@ const Product = () => {
       )}
 
       <style>{`
-        @keyframes wave { 0%, 100% { height: 1.5rem; } 50% { height: 4rem; } }
+        @keyframes wave { 0%, 100% { height: 1.5rem; transform: translateY(0); } 50% { height: 4rem; transform: translateY(-5px); } }
         @keyframes toast-in { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes progress-shrink { from { width: 100%; } to { width: 0%; } }
         .animate-toast-in { animation: toast-in 0.5s ease-out forwards; }
         .animate-progress-shrink { animation: progress-shrink 3s linear forwards; }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
       `}</style>
     </>
   );
