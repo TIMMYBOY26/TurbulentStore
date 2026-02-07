@@ -9,8 +9,12 @@ const ShowDetail = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   
-  // 新增：用於存放當前要放大的圖片 URL
   const [selectedImg, setSelectedImg] = useState(null);
+  
+  // 手機版滑動狀態
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [startX, setStartX] = useState(0);
+  const [endX, setEndX] = useState(0);
 
   const API_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -25,124 +29,124 @@ const ShowDetail = () => {
         setLoading(false);
       }
     };
-
     fetchShowDetail();
   }, [API_URL, id]);
 
-  // 當彈窗開啟時，禁止頁面滾動
   useEffect(() => {
-    if (selectedImg) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    document.body.style.overflow = selectedImg ? "hidden" : "unset";
   }, [selectedImg]);
+
+  // 手勢滑動邏輯 (Swipe Logic)
+  const handleTouchStart = (e) => setStartX(e.touches[0].clientX);
+  const handleTouchMove = (e) => setEndX(e.touches[0].clientX);
+  const handleTouchEnd = () => {
+    if (!startX || !endX) return;
+    const swipeThreshold = 50;
+    const distance = startX - endX;
+    if (distance > swipeThreshold) {
+      setCurrentImageIndex((prev) => (prev === show.image.length - 1 ? 0 : prev + 1));
+    } else if (distance < -swipeThreshold) {
+      setCurrentImageIndex((prev) => (prev === 0 ? show.image.length - 1 : prev - 1));
+    }
+    setStartX(0);
+    setEndX(0);
+  };
 
   if (loading) return <p className="text-center text-xl pt-20">Loading...</p>;
   if (error) return <p className="text-center text-red-500 pt-20">Error: {error}</p>;
   if (!show) return <p className="text-center pt-20">Show not found</p>;
 
   const isPastEvent = new Date(show.date) < new Date();
-  const instagramButtonText = isPastEvent
-    ? "View details"
-    : "View show details on Instagram";
+  const instagramButtonText = isPastEvent ? "View details" : "View on Instagram";
 
   return (
     <div className="show-detail container mx-auto p-4 md:p-8 relative">
       
-      {/* 1. 圖片彈窗 Modal */}
+      {/* Lightbox 彈窗 */}
       {selectedImg && (
-        <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md cursor-zoom-out p-4 md:p-10"
-          onClick={() => setSelectedImg(null)}
-        >
-          <button className="absolute top-6 right-6 text-white text-4xl font-light hover:scale-110 transition-transform">
-            ✕
-          </button>
-          <img
-            src={selectedImg}
-            alt="Full view"
-            className="max-w-full max-h-full object-contain shadow-2xl animate-in zoom-in duration-300"
-            onClick={(e) => e.stopPropagation()} // 防止點擊圖片本身時關閉
-          />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-4 cursor-zoom-out" onClick={() => setSelectedImg(null)}>
+          <img src={selectedImg} alt="Full view" className="max-w-full max-h-full object-contain animate-in zoom-in duration-300" />
         </div>
       )}
 
-      <div className="flex flex-col lg:flex-row lg:items-start lg:space-x-12 mb-4 max-w-6xl mx-auto">
+      <div className="flex flex-col lg:flex-row lg:items-start lg:space-x-12 mb-4 max-w-5xl mx-auto">
 
         {/* 圖片區 */}
-        <div className="flex flex-col items-center mb-6 lg:mb-0 lg:w-1/2 w-full">
-          {show.image.map((img, index) => (
-            <div 
-              key={index} 
-              className="group w-full max-w-md bg-gray-50 rounded-lg overflow-hidden mb-4 shadow-sm cursor-zoom-in relative"
-              onClick={() => setSelectedImg(img)} // 點擊開啟彈窗
-            >
+        <div className="lg:w-1/2 w-full mb-6 lg:mb-0">
+          {/* 手機版：Swipe Slider */}
+          <div 
+            className="lg:hidden relative w-full aspect-[4/5] overflow-hidden rounded-xl bg-gray-50 shadow-sm"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            {show.image.map((img, index) => (
               <img
+                key={index}
                 src={img}
-                alt={`${show.name} image ${index + 1}`}
-                className="w-full h-auto max-h-[60vh] object-contain block mx-auto transition-transform duration-500 group-hover:scale-[1.02]"
+                onClick={() => setSelectedImg(img)}
+                className={`absolute inset-0 w-full h-full object-contain p-2 transition-transform duration-500 ease-out ${
+                  currentImageIndex === index ? "translate-x-0" : index < currentImageIndex ? "-translate-x-full" : "translate-x-full"
+                }`}
+                alt=""
               />
-              {/* Hover 提示文字 */}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100">
-                <span className="bg-white/80 px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase shadow-sm">Click to expand</span>
-              </div>
+            ))}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+              {show.image.map((_, i) => (
+                <div key={i} className={`h-1 rounded-full transition-all ${currentImageIndex === i ? "bg-black w-4" : "bg-gray-300 w-1"}`} />
+              ))}
             </div>
-          ))}
+          </div>
+
+          {/* 桌面版：垂直排列 */}
+          <div className="hidden lg:flex flex-col items-center">
+            {show.image.map((img, index) => (
+              <div key={index} className="group w-full max-w-md bg-gray-50 rounded-lg overflow-hidden mb-4 shadow-sm cursor-zoom-in" onClick={() => setSelectedImg(img)}>
+                <img src={img} className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-[1.02]" alt="" />
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* 文字區 */}
+        {/* 文字區：文字尺寸已微調 */}
         <div className="lg:w-1/2 w-full text-left">
-          <h1 className="text-4xl sm:text-5xl font-black mb-4 uppercase tracking-tighter">{show.name}</h1>
+          {/* 標題調小 */}
+          <h1 className="text-3xl sm:text-4xl font-black mb-3 uppercase tracking-tighter leading-tight">
+            {show.name}
+          </h1>
 
-          <div className="mb-6">
-            <p className="text-lg font-bold text-gray-800">
-              {new Date(show.date).toLocaleDateString(undefined, {
-                year: 'numeric', month: 'long', day: 'numeric'
-              })}
+          <div className="mb-4">
+            <p className="text-sm font-bold text-gray-800">
+              {new Date(show.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </div>
 
-          <p className="text-lg mb-6 whitespace-pre-wrap break-words leading-relaxed text-gray-700">
+          {/* 描述文字 (Description) 調小至 text-sm (14px) */}
+          <p className="text-sm mb-6 whitespace-pre-wrap break-words leading-relaxed text-gray-500">
             {show.description}
           </p>
 
-          <div className="space-y-2 mb-8 py-4 border-t border-b border-gray-100">
-            <p className="text-sm">
+          <div className="space-y-2 mb-6 py-4 border-t border-b border-gray-100">
+            <p className="text-[11px]">
               <span className="text-gray-400 uppercase tracking-widest mr-2">Location:</span>
               <span className="font-bold">{show.location}</span>
             </p>
-            <p className="text-sm">
+            <p className="text-[11px]">
               <span className="text-gray-400 uppercase tracking-widest mr-2">Status:</span>
               <span className="font-bold uppercase">{show.status}</span>
             </p>
           </div>
 
-          <div className="flex flex-col space-y-3 max-w-xs">
+          <div className="flex flex-col space-y-2 max-w-xs">
             {show.instagramLink && (
-              <a
-                href={show.instagramLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-center bg-blue-600 text-white font-bold py-3 px-6 hover:bg-blue-700 transition duration-200"
-              >
+              <a href={show.instagramLink} target="_blank" rel="noreferrer" className="text-center bg-blue-600 text-white font-bold py-2.5 text-xs hover:bg-blue-700 transition">
                 {instagramButtonText}
               </a>
             )}
-
-            <a
-              href={show.ticketLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-center bg-black text-white font-bold py-3 px-6 hover:opacity-80 transition duration-200"
-            >
+            <a href={show.ticketLink} target="_blank" rel="noreferrer" className="text-center bg-black text-white font-bold py-2.5 text-xs hover:opacity-80 transition">
               TICKETS / ORDER
             </a>
-
-            <button
-              onClick={() => navigate(-1)}
-              className="text-center bg-gray-100 text-gray-500 font-bold py-2 px-6 hover:bg-gray-200 transition duration-200 uppercase text-xs tracking-widest"
-            >
+            <button onClick={() => navigate(-1)} className="text-center bg-gray-100 text-gray-400 font-bold py-2 text-[9px] hover:bg-gray-200 transition uppercase tracking-widest">
               ← Back
             </button>
           </div>
