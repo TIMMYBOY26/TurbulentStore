@@ -10,6 +10,8 @@ import fpsCode from "./fpscode.jpg";
 import hero_img from "./hero_img.png";
 import hero_bg from "./HeroBg.jpg";
 import loginBg from "./loginBg.jpg";
+import herowhiteground from "./herowhiteground.jpeg";
+
 
 import cart_icon from "./cart_icon.png";
 import bin_icon from "./bin_icon.png";
@@ -30,6 +32,8 @@ import cross_icon from "./cross_icon.png";
 import parcel_icon from "./parcel_icon.svg";
 
 import Monologue_hero from "./TURBULENT MONOLOGUE COVER.png";
+import Taiwan_hero from "./TaiwanTour1.jpeg";
+import Taiwan_2 from "./TaiwanTour2.jpeg";
 import lightwall from "./lightwall.jpeg";
 import lightwallvideo from "./lightwallvideo.mp4";
 
@@ -64,7 +68,10 @@ export const assets = {
   hero_bg,
   loginBg,
   parcel_icon,
-  support_icon
+  support_icon,
+  Taiwan_hero,
+  Taiwan_2,
+  herowhiteground,
 };
 
 // export const products = [

@@ -1,82 +1,153 @@
-import React from "react"; // Removed useState as it's no longer needed
+import React, { useState, useEffect } from "react";
 import { assets } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
   const navigate = useNavigate();
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Updated handler to navigate to the product page
-  const handleOrderClick = (e) => {
-    e.stopPropagation(); // Prevents the parent div's onClick (handleHeroClick) from firing
-    navigate("/product/6979cafd223a9477d223e7c6");
+  const heroBackground = assets.herowhiteground; 
+
+  const slides = [
+    {
+      id: 1,
+      image: assets.Taiwan_hero,
+      titleLine1: "Upcoming Tour",
+      titleLine2: "Tickets Available",
+      showMobileText: false, 
+      canvasColor: "bg-white", 
+      textColor: "sm:text-black",
+      btnBorder: "sm:border-black",
+      btnBg: "sm:bg-black",
+      btnText: "sm:text-white",
+      orderBtnText: "TICKETS", 
+      streamBtnText: "TOUR INFO",
+      // 這裡現在可以放內部路徑，也可以放完整網址
+      orderLink: "https://www.offgrid.day", 
+      streamUrl: "/shows",
+      heroLink: "/tour",
+    },
+    {
+      id: 2,
+      image: assets.Monologue_hero,
+      titleLine1: "The New Album",
+      titleLine2: "Out Now",
+      showMobileText: true, 
+      canvasColor: "bg-white", 
+      textColor: "sm:text-black",
+      btnBorder: "sm:border-black",
+      btnBg: "sm:bg-black",
+      btnText: "sm:text-white",
+      orderBtnText: "ORDER NOW",
+      streamBtnText: "STREAM",
+      orderLink: "/product/6979cafd223a9477d223e7c6", // 測試外部連結
+      streamUrl: "https://orcd.co/monologue_turbulent",
+      heroLink: "/shows/6973054cc4bb617639eacce5",
+    }
+  ];
+
+  // 抽出一個導向函式，自動判斷是內連還是外連
+  const handleLink = (path) => {
+    if (path.startsWith("http")) {
+      window.open(path, "_blank");
+    } else {
+      navigate(path);
+    }
   };
 
-  const handleHeroClick = () => {
-    navigate("/shows/6973054cc4bb617639eacce5");
-  };
-
-  const streamUrl = "https://orcd.co/monologue_turbulent";
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [slides.length, currentIndex]);
 
   return (
-    <div
-      className="group relative flex flex-col sm:flex-row cursor-pointer h-auto sm:h-[80vh] w-full overflow-hidden transition-transform duration-200 active:scale-[0.98] sm:active:scale-100"
-      onClick={handleHeroClick}
-    >
-      <div
-        className="absolute inset-0 transition-transform duration-700 ease-in-out sm:group-hover:scale-105"
+    <div className="relative w-full aspect-square sm:aspect-video sm:max-h-[75vh] overflow-hidden bg-white">
+      
+      <div 
+        className="hidden sm:block absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: `url(${assets.Monologue_hero})`,
-          backgroundSize: "contain",
-          backgroundRepeat: "no-repeat",
+          backgroundImage: `url(${heroBackground})`,
+          backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       />
 
-      <div className="w-full aspect-square sm:aspect-auto sm:h-full flex flex-col sm:flex-row relative z-10">
-        <div className="w-full sm:w-1/2 flex items-center justify-center py-10 sm:py-0"></div>
-        <div className="w-full sm:w-1/2"></div>
+      {slides.map((slide, index) => {
+        const isActive = index === currentIndex;
+        
+        return (
+          <div
+            key={slide.id}
+            className={`absolute inset-0 transition-transform duration-1000 ease-in-out cursor-pointer ${
+              isActive ? "translate-x-0 z-10" : "translate-x-full z-0"
+            } ${slide.canvasColor} sm:bg-transparent`}
+          >
+            <div className="w-full h-full flex flex-col sm:flex-row relative z-10">
+              
+              <div 
+                className="w-full h-full sm:w-[55%] relative flex items-center justify-center overflow-hidden sm:p-12 lg:p-20"
+                onClick={() => handleLink(slide.heroLink)}
+              >
+                <div
+                  className="absolute inset-0 sm:inset-12 lg:inset-20 transition-all duration-700 ease-in-out sm:group-hover:scale-105 sm:drop-shadow-2xl"
+                  style={{
+                    backgroundImage: `url(${slide.image})`,
+                    backgroundSize: "contain",
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "center",
+                  }}
+                />
+              </div>
 
-        <div className="absolute bottom-[11%] sm:bottom-[20%] left-0 w-full flex flex-col items-center px-4">
+              <div className="absolute bottom-[6%] sm:static sm:w-[45%] sm:flex sm:flex-col sm:items-start sm:justify-center sm:pl-12 z-20 left-0 w-full flex flex-col items-center">
+                
+                <div className={`flex flex-col items-center sm:items-start mb-3 sm:mb-8 leading-tight 
+                  ${slide.showMobileText ? "flex" : "hidden sm:flex"}`}>
+                  <h2 className={`text-white ${slide.textColor} text-[9px] sm:text-[32px] lg:text-[40px] font-black uppercase tracking-[0.2em] sm:tracking-tight drop-shadow-md sm:drop-shadow-none`}>
+                    {slide.titleLine1}
+                  </h2>
+                  <h2 className={`text-white ${slide.textColor} text-[9px] sm:text-[32px] lg:text-[40px] font-black uppercase tracking-[0.2em] sm:tracking-tight drop-shadow-md sm:drop-shadow-none`}>
+                    {slide.titleLine2}
+                  </h2>
+                </div>
 
-          {/* Removed the conditional notification div to clean up the UI */}
+                <div className="flex justify-center sm:justify-start gap-2 sm:gap-4 mb-6 sm:mb-12">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleLink(slide.orderLink); }}
+                    className={`px-3.5 py-1.5 sm:px-10 sm:py-3.5 border-[1px] border-white ${slide.btnBorder} ${slide.btnBg} text-white ${slide.btnText} rounded-sm font-medium sm:font-bold uppercase tracking-widest text-[8.5px] sm:text-[14px] transition-all duration-300 hover:opacity-80 active:scale-95`}
+                  >
+                    {slide.orderBtnText}
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleLink(slide.streamUrl); }}
+                    className={`px-3.5 py-1.5 sm:px-10 sm:py-3.5 border-[1px] border-white ${slide.btnBorder} text-white ${slide.textColor} bg-transparent rounded-sm font-medium sm:font-bold uppercase tracking-widest text-[8.5px] sm:text-[14px] transition-all duration-300 hover:bg-white hover:text-black active:scale-95`}
+                  >
+                    {slide.streamBtnText}
+                  </button>
+                </div>
 
-          <div className="flex flex-col items-center mb-2 sm:mb-4 leading-tight">
-            <h2 className="text-white sm:text-black text-[11px] sm:text-xl font-bold uppercase tracking-[0.2em] drop-shadow-md sm:drop-shadow-none">
-              The New Album
-            </h2>
-            <h2 className="text-white sm:text-black text-[11px] sm:text-xl font-bold uppercase tracking-[0.2em] drop-shadow-md sm:drop-shadow-none">
-              Out Now
-            </h2>
+                <div className="hidden sm:flex items-center gap-6">
+                  {slides.map((_, dotIndex) => (
+                    <button
+                      key={dotIndex}
+                      onClick={(e) => { e.stopPropagation(); setCurrentIndex(dotIndex); }}
+                      className="group/dot flex items-center gap-3 focus:outline-none"
+                    >
+                      <span className={`text-[12px] font-bold ${dotIndex === currentIndex ? "text-black" : "text-black/30"}`}>
+                        {String(dotIndex + 1).padStart(2, '0')}
+                      </span>
+                      <div className={`h-[2px] transition-all duration-500 ${dotIndex === currentIndex ? "w-12 bg-black" : "w-4 bg-black/10"}`} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+            </div>
           </div>
-
-          <div className="flex justify-center gap-3 sm:gap-6">
-            <button
-              onClick={handleOrderClick}
-              className="px-5 py-1.5 sm:px-10 sm:py-2.5 border-[1px] sm:border-2 border-white sm:border-black text-white sm:text-black bg-transparent sm:bg-white rounded-sm font-medium uppercase tracking-wider text-[11px] sm:text-base transition-all duration-300 hover:bg-white sm:hover:bg-black hover:text-black sm:hover:text-white active:scale-95"
-            >
-              ORDER
-            </button>
-
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open(streamUrl, "_blank", "noopener,noreferrer");
-              }}
-              className="px-5 py-1.5 sm:px-10 sm:py-2.5 border-[1px] sm:border-2 border-white sm:border-black text-white sm:text-black bg-transparent sm:bg-white rounded-sm font-medium uppercase tracking-wider text-[11px] sm:text-base transition-all duration-300 hover:bg-white sm:hover:bg-black hover:text-black sm:hover:text-white active:scale-95"
-            >
-              STREAM
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <style jsx>{`
-        @media (min-width: 640px) {
-          .absolute.inset-0 {
-            background-size: cover !important;
-          }
-        }
-      `}</style>
+        );
+      })}
     </div>
   );
 };
