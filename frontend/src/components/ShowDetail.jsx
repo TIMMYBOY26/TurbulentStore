@@ -121,19 +121,20 @@ const ShowDetail = () => {
             </p>
           </div>
 
-          {/* 描述文字 (Description)：已從 text-sm 調整為 text-base */}
+          {/* 描述文字 (Description): text-base */}
           <p className="text-base mb-6 whitespace-pre-wrap break-words leading-relaxed text-gray-600">
             {show.description}
           </p>
 
-          <div className="space-y-2 mb-6 py-4 border-t border-b border-gray-100">
-            <p className="text-[11px]">
-              <span className="text-gray-400 uppercase tracking-widest mr-2">Location:</span>
-              <span className="font-bold">{show.location}</span>
+          {/* Location & Status: 從 text-[11px] 放大至 text-sm */}
+          <div className="space-y-3 mb-6 py-5 border-t border-b border-gray-100">
+            <p className="text-sm flex items-baseline">
+              <span className="text-gray-400 uppercase tracking-widest text-[10px] mr-3 w-20 flex-shrink-0">Location:</span>
+              <span className="font-bold text-gray-800">{show.location}</span>
             </p>
-            <p className="text-[11px]">
-              <span className="text-gray-400 uppercase tracking-widest mr-2">Status:</span>
-              <span className="font-bold uppercase">{show.status}</span>
+            <p className="text-sm flex items-baseline">
+              <span className="text-gray-400 uppercase tracking-widest text-[10px] mr-3 w-20 flex-shrink-0">Status:</span>
+              <span className="font-bold uppercase text-gray-800">{show.status}</span>
             </p>
           </div>
 
