@@ -8,6 +8,9 @@ const ShowDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  
+  // 新增：用於存放當前要放大的圖片 URL
+  const [selectedImg, setSelectedImg] = useState(null);
 
   const API_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -26,9 +29,18 @@ const ShowDetail = () => {
     fetchShowDetail();
   }, [API_URL, id]);
 
-  if (loading) return <p className="text-center text-xl">Loading...</p>;
-  if (error) return <p className="text-center text-red-500">Error: {error}</p>;
-  if (!show) return <p className="text-center">Show not found</p>;
+  // 當彈窗開啟時，禁止頁面滾動
+  useEffect(() => {
+    if (selectedImg) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+  }, [selectedImg]);
+
+  if (loading) return <p className="text-center text-xl pt-20">Loading...</p>;
+  if (error) return <p className="text-center text-red-500 pt-20">Error: {error}</p>;
+  if (!show) return <p className="text-center pt-20">Show not found</p>;
 
   const isPastEvent = new Date(show.date) < new Date();
   const instagramButtonText = isPastEvent
@@ -36,21 +48,45 @@ const ShowDetail = () => {
     : "View show details on Instagram";
 
   return (
-    <div className="show-detail container mx-auto p-4 md:p-8">
-      {/* 限制容器最大寬度，避免在大螢幕上分散太開 */}
+    <div className="show-detail container mx-auto p-4 md:p-8 relative">
+      
+      {/* 1. 圖片彈窗 Modal */}
+      {selectedImg && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md cursor-zoom-out p-4 md:p-10"
+          onClick={() => setSelectedImg(null)}
+        >
+          <button className="absolute top-6 right-6 text-white text-4xl font-light hover:scale-110 transition-transform">
+            ✕
+          </button>
+          <img
+            src={selectedImg}
+            alt="Full view"
+            className="max-w-full max-h-full object-contain shadow-2xl animate-in zoom-in duration-300"
+            onClick={(e) => e.stopPropagation()} // 防止點擊圖片本身時關閉
+          />
+        </div>
+      )}
+
       <div className="flex flex-col lg:flex-row lg:items-start lg:space-x-12 mb-4 max-w-6xl mx-auto">
 
-        {/* 圖片區：增加 max-w-md 讓圖片在桌面端更小 */}
+        {/* 圖片區 */}
         <div className="flex flex-col items-center mb-6 lg:mb-0 lg:w-1/2 w-full">
           {show.image.map((img, index) => (
-            <div key={index} className="w-full max-w-md bg-gray-50 rounded-lg overflow-hidden mb-4 shadow-sm">
+            <div 
+              key={index} 
+              className="group w-full max-w-md bg-gray-50 rounded-lg overflow-hidden mb-4 shadow-sm cursor-zoom-in relative"
+              onClick={() => setSelectedImg(img)} // 點擊開啟彈窗
+            >
               <img
                 src={img}
                 alt={`${show.name} image ${index + 1}`}
-                // object-contain: 確保圖片完整顯示不裁剪
-                // max-h: 防止圖片垂直方向拉得太長
-                className="w-full h-auto max-h-[60vh] object-contain block mx-auto"
+                className="w-full h-auto max-h-[60vh] object-contain block mx-auto transition-transform duration-500 group-hover:scale-[1.02]"
               />
+              {/* Hover 提示文字 */}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100">
+                <span className="bg-white/80 px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase shadow-sm">Click to expand</span>
+              </div>
             </div>
           ))}
         </div>
@@ -82,7 +118,6 @@ const ShowDetail = () => {
             </p>
           </div>
 
-          {/* 按鈕區 */}
           <div className="flex flex-col space-y-3 max-w-xs">
             {show.instagramLink && (
               <a

@@ -22,10 +22,9 @@ const Hero = () => {
       btnText: "sm:text-white",
       orderBtnText: "TICKETS", 
       streamBtnText: "TOUR INFO",
-      // 這裡現在可以放內部路徑，也可以放完整網址
       orderLink: "https://www.offgrid.day", 
-      streamUrl: "/shows",
-      heroLink: "/tour",
+      streamUrl: "/shows/69876c55266afcf9ab41b2ae",
+      heroLink: "/shows/69876c55266afcf9ab41b2ae",
     },
     {
       id: 2,
@@ -40,13 +39,12 @@ const Hero = () => {
       btnText: "sm:text-white",
       orderBtnText: "ORDER NOW",
       streamBtnText: "STREAM",
-      orderLink: "/product/6979cafd223a9477d223e7c6", // 測試外部連結
+      orderLink: "/product/6979cafd223a9477d223e7c6",
       streamUrl: "https://orcd.co/monologue_turbulent",
       heroLink: "/shows/6973054cc4bb617639eacce5",
     }
   ];
 
-  // 抽出一個導向函式，自動判斷是內連還是外連
   const handleLink = (path) => {
     if (path.startsWith("http")) {
       window.open(path, "_blank");
@@ -86,12 +84,13 @@ const Hero = () => {
           >
             <div className="w-full h-full flex flex-col sm:flex-row relative z-10">
               
+              {/* 圖片區域：加入了 group 類名來觸發子元素的 hover 效果 */}
               <div 
-                className="w-full h-full sm:w-[55%] relative flex items-center justify-center overflow-hidden sm:p-12 lg:p-20"
+                className="group w-full h-full sm:w-[55%] relative flex items-center justify-center overflow-hidden sm:p-12 lg:p-20"
                 onClick={() => handleLink(slide.heroLink)}
               >
                 <div
-                  className="absolute inset-0 sm:inset-12 lg:inset-20 transition-all duration-700 ease-in-out sm:group-hover:scale-105 sm:drop-shadow-2xl"
+                  className="absolute inset-0 sm:inset-12 lg:inset-20 transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:brightness-110 sm:drop-shadow-2xl"
                   style={{
                     backgroundImage: `url(${slide.image})`,
                     backgroundSize: "contain",
@@ -99,6 +98,8 @@ const Hero = () => {
                     backgroundPosition: "center",
                   }}
                 />
+                {/* 增加一個細微的覆蓋層，讓滑鼠移入時更有回饋感 */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/[0.02] transition-all duration-700 pointer-events-none" />
               </div>
 
               <div className="absolute bottom-[6%] sm:static sm:w-[45%] sm:flex sm:flex-col sm:items-start sm:justify-center sm:pl-12 z-20 left-0 w-full flex flex-col items-center">
