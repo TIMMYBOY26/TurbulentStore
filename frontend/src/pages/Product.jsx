@@ -14,13 +14,12 @@ const Product = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // New State for Lightbox
   const [isZoomed, setIsZoomed] = useState(false);
-
-  // Swipe States
   const [startX, setStartX] = useState(0);
   const [endX, setEndX] = useState(0);
   const [showCartNotice, setShowCartNotice] = useState(false);
+
+  const isUpcomingProduct = productId === "69876c55266afcf9ab41b2ae";
 
   const fetchProductData = async () => {
     let found = products.find((item) => item._id === productId);
@@ -32,10 +31,9 @@ const Product = () => {
 
   useEffect(() => {
     fetchProductData();
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, [productId, products]);
 
-  // Lock scroll when zoomed
   useEffect(() => {
     document.body.style.overflow = isZoomed ? 'hidden' : 'auto';
   }, [isZoomed]);
@@ -54,18 +52,15 @@ const Product = () => {
   };
 
   const handlePrevImage = () => {
-    setCurrentImageIndex((prev) =>
-      prev === 0 ? productData.image.length - 1 : prev - 1,
-    );
+    setCurrentImageIndex((prev) => (prev === 0 ? productData.image.length - 1 : prev - 1));
   };
 
   const handleNextImage = () => {
-    setCurrentImageIndex((prev) =>
-      prev === productData.image.length - 1 ? 0 : prev + 1,
-    );
+    setCurrentImageIndex((prev) => (prev === productData.image.length - 1 ? 0 : prev + 1));
   };
 
   const handleAddToCart = () => {
+    if (isUpcomingProduct) return;
     if (token) {
       if (!size) {
         toast.error("Please select a size");
@@ -80,61 +75,40 @@ const Product = () => {
   };
 
   const formatDescription = (description) => {
-    return description.split("-").map((part, index) => (
+    if (!description) return "";
+    return description.split("-").map((part, index, array) => (
       <React.Fragment key={index}>
         {part.trim()}
-        {index < description.split("-").length - 1 && <br />}
+        {index < array.length - 1 && <br />}
       </React.Fragment>
     ));
   };
 
   return (
     <>
-      {/* FULLSCREEN IMAGE LIGHTBOX */}
-      {isZoomed && (
+      {/* SUCCESS NOTICE & LOADER & LIGHTBOX */}
+      {isZoomed && productData && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 backdrop-blur-2xl animate-in fade-in duration-300">
-          <button
-            onClick={() => setIsZoomed(false)}
-            className="absolute top-6 right-6 sm:top-10 sm:right-10 z-[110] p-3 bg-black text-white rounded-full hover:scale-110 active:scale-95 transition-all shadow-2xl"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-
-          <div
-            className="relative w-full h-full flex items-center justify-center p-4"
-            onClick={() => setIsZoomed(false)}
-          >
-            <img
-              src={productData.image[currentImageIndex]}
-              className="max-w-full max-h-[90vh] object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.25)] animate-in zoom-in-95 duration-300"
-              alt="Zoomed Product"
-              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image itself
-            />
+          <button onClick={() => setIsZoomed(false)} className="absolute top-6 right-6 z-[110] p-3 bg-black text-white rounded-full">✕</button>
+          <div className="relative w-full h-full flex items-center justify-center p-4" onClick={() => setIsZoomed(false)}>
+            <img src={productData.image[currentImageIndex]} className="max-w-full max-h-[90vh] object-contain animate-in zoom-in-95" alt=""/>
           </div>
         </div>
       )}
 
-      {/* PREMIUM GLASSMORTHISM NOTICE */}
       {showCartNotice && (
         <div className="fixed top-24 right-5 sm:right-10 z-50 animate-toast-in">
-          <div className="relative overflow-hidden min-w-[280px] sm:min-w-[320px] bg-white/40 backdrop-blur-2xl border border-white/50 rounded-2xl p-5 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)] flex items-center gap-4">
-            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-black flex items-center justify-center shadow-lg">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-[10px] font-black tracking-[0.2em] text-black uppercase">Success</p>
-              <p className="text-xs font-semibold text-gray-700">1 item added to cart successfully!</p>
-            </div>
+          <div className="relative overflow-hidden min-w-[280px] bg-white/40 backdrop-blur-2xl border rounded-2xl p-5 shadow-2xl flex items-center gap-4">
+            <div className="w-11 h-11 rounded-xl bg-black flex items-center justify-center text-white">✓</div>
+            <div><p className="text-[10px] font-black uppercase">Success</p><p className="text-xs font-semibold">Added to cart!</p></div>
             <div className="absolute bottom-0 left-0 h-1 bg-black animate-progress-shrink" />
           </div>
         </div>
       )}
+      {/* BRANDED WAVE LOADER - BLUE, BLACK, & WHITE THEME */}
+            {/* BRANDED WAVE LOADER - 完全同步 Collection 版 */}
 
-      {/* BRANDED WAVE LOADER */}
+      {/* BRANDED WAVE LOADER - BELOW NAV BAR */}
       {isLoading && (
         <div className="fixed top-[80px] bottom-0 left-0 right-0 z-40 flex flex-col items-center justify-center bg-white">
           <div className="flex items-end gap-2 h-16">
@@ -144,125 +118,96 @@ const Product = () => {
             <div className="w-2.5 bg-white border-2 border-gray-200 rounded-full animate-[wave_1.2s_ease-in-out_0.45s_infinite] h-10"></div>
             <div className="w-2.5 bg-[#003366] rounded-full animate-[wave_1.2s_ease-in-out_0.6s_infinite] h-6"></div>
           </div>
-          <p className="mt-10 text-[10px] font-black tracking-[0.6em] text-black uppercase animate-pulse">TURBULENT</p>
+          <p className="mt-10 text-[10px] font-black tracking-[0.6em] text-black uppercase animate-pulse">
+            TURBULENT
+          </p>
+          <style>{`
+            @keyframes wave {
+              0%, 100% { height: 1.5rem; transform: translateY(0); }
+              50% { height: 4rem; transform: translateY(-5px); }
+            }
+          `}</style>
         </div>
       )}
 
-      {productData && (
-        <div className={`pt-6 transition-opacity ease-in duration-1000 relative ${isLoading ? "opacity-0" : "opacity-100"}`}>
-          <ToastContainer position="top-right" autoClose={2000} />
 
+
+      {/* MAIN UI */}
+      {productData && (
+        <div className={`pt-6 transition-opacity duration-1000 ${isLoading ? "opacity-0" : "opacity-100"}`}>
+          <ToastContainer position="top-right" autoClose={2000} />
           <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 px-4 sm:px-0">
-            {/* Image Section */}
             <div className="flex-1 flex flex-col-reverse sm:flex-row gap-3">
-              <div className="hidden sm:flex sm:flex-col overflow-y-auto hide-scrollbar sm:w-[18%] gap-2">
+              <div className="hidden sm:flex sm:flex-col overflow-y-auto sm:w-[18%] gap-2">
                 {productData.image.map((item, index) => (
-                  <img
-                    onClick={() => setCurrentImageIndex(index)}
-                    src={item}
-                    key={index}
-                    className={`w-full cursor-pointer border rounded-md transition-all ${currentImageIndex === index ? "border-black scale-[1.02]" : "border-transparent opacity-70"}`}
-                    alt=""
-                  />
+                  <img onClick={() => setCurrentImageIndex(index)} src={item} key={index} className={`w-full cursor-pointer border rounded-md ${currentImageIndex === index ? "border-black" : "opacity-70"}`} alt=""/>
                 ))}
               </div>
-
-              <div className="flex flex-col w-full sm:w-[80%] gap-4">
-                <div
-                  className="w-full aspect-square sm:aspect-auto sm:h-[600px] relative overflow-hidden rounded-xl bg-white shadow-sm cursor-zoom-in"
-                  style={{ touchAction: "pan-y" }}
-                  onTouchStart={handleTouchStart}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-                  onClick={() => setIsZoomed(true)} // Open Lightbox
-                >
-                  {productData.image.map((src, index) => (
-                    <img
-                      key={index}
-                      className={`absolute w-full h-full object-contain p-2 transition-transform duration-500 ease-out transform ${currentImageIndex === index
-                        ? "translate-x-0"
-                        : currentImageIndex > index
-                          ? "-translate-x-full"
-                          : "translate-x-full"
-                        }`}
-                      src={src}
-                      alt=""
-                    />
-                  ))}
-                </div>
-
-                <div className="flex justify-center gap-2 sm:hidden py-1">
-                  {productData.image.map((_, index) => (
-                    <div
-                      key={index}
-                      className={`h-2 rounded-full transition-all duration-300 border border-black ${currentImageIndex === index ? "bg-black w-6" : "bg-white w-2"}`}
-                    />
-                  ))}
-                </div>
+              <div className="w-full sm:w-[80%] relative overflow-hidden rounded-xl bg-white shadow-sm" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
+                <img src={productData.image[currentImageIndex]} onClick={() => setIsZoomed(true)} className="w-full h-auto cursor-zoom-in object-contain p-2" alt=""/>
               </div>
             </div>
 
-            {/* Info Section */}
             <div className="flex-1 px-1 sm:px-0">
-              <h1 className="font-medium text-2xl mt-2 text-black uppercase tracking-tight">
-                {productData.name}
-              </h1>
-              <p className="mt-5 text-3xl font-medium text-black">
-                {currency}{productData.price}
-              </p>
-              <div className="mt-5 text-gray-500 md:w-4/5 text-sm leading-relaxed">
-                {formatDescription(productData.description)}
-              </div>
+              <h1 className="font-medium text-2xl mt-2 uppercase tracking-tight">{productData.name}</h1>
+              {Number(productData.price) > 0 && <p className="mt-5 text-3xl font-medium">{currency}{productData.price}</p>}
+              <div className="mt-5 text-gray-500 text-sm leading-relaxed">{formatDescription(productData.description)}</div>
 
               <div className="flex flex-col gap-4 my-8">
-                <p className="text-black font-bold text-xs uppercase tracking-widest">* Select Size</p>
-                <div className="flex gap-2">
-                  {productData.sizes.map((item) => (
-                    <div key={item.size} className="flex flex-col items-center">
-                      <button
-                        onClick={() => item.count > 0 && setSize(item.size)}
-                        className={`border-2 py-3 px-5 transition-all duration-200 font-bold text-xs
-                          ${item.count === 0
-                            ? "bg-gray-100 text-gray-400 border-gray-100 cursor-not-allowed"
-                            : item.size === size
-                              ? "bg-black text-white border-black shadow-lg scale-105"
-                              : "bg-white text-black border-gray-200 hover:border-black"
-                          }`}
-                        disabled={item.count === 0}
-                      >
-                        {item.size}
-                      </button>
-                      {item.count <= 0 && (
-                        <span className="text-[10px] text-red-500 mt-1 font-black uppercase">Sold Out</span>
-                      )}
+                {productData.category !== "Tickets" ? (
+                  /* 一般商品邏輯 */
+                  <>
+                    <p className="text-black font-bold text-xs uppercase tracking-widest">* Select Size</p>
+                    <div className="flex gap-2">
+                      {productData.sizes.map((item) => (
+                        <button key={item.size} disabled={item.count === 0 || isUpcomingProduct} onClick={() => setSize(item.size)}
+                          className={`border-2 py-3 px-5 font-bold text-xs ${item.size === size ? "bg-black text-white" : "bg-white"} ${(item.count === 0 || isUpcomingProduct) && "opacity-30 cursor-not-allowed"}`}>
+                          {item.size}
+                        </button>
+                      ))}
                     </div>
-                  ))}
-                </div>
-                <button
-                  onClick={handleAddToCart}
-                  className={`bg-black text-white px-8 py-4 text-xs tracking-[0.2em] active:bg-gray-700 transition-all font-black mt-4 rounded-sm ${size === "" ? "cursor-not-allowed opacity-50" : "hover:shadow-2xl hover:-translate-y-0.5"}`}
-                  disabled={size === ""}
-                >
-                  {token ? "ADD TO BAG" : "LOGIN TO ADD"}
-                </button>
+                    <button onClick={handleAddToCart} className="bg-black text-white px-8 py-4 text-xs font-black tracking-[0.2em] mt-4 uppercase">
+                      {isUpcomingProduct ? "Coming Soon" : token ? "Add to Bag" : "Login to Add"}
+                    </button>
+                  </>
+                ) : (
+                  /* 門票邏輯：僅限外部連結 */
+                  <div className="mt-4 py-6 border-t flex flex-col gap-4">
+                    {productData.isTicketAvailable ? (
+                      <button 
+                        onClick={() => window.open(productData.externalLink || 'https://offgrid.live', '_blank')}
+                        className="bg-black text-white px-8 py-4 text-xs font-black tracking-[0.2em] uppercase hover:bg-gray-800 transition-all shadow-lg text-center"
+                      >
+                        GET TICKETS NOW
+                      </button>
+                    ) : (
+                      <button 
+                        disabled
+                        className="bg-gray-100 text-gray-400 border border-dashed border-gray-300 px-8 py-4 text-xs font-black tracking-[0.2em] uppercase text-center cursor-not-allowed"
+                      >
+                        TICKETS COMING SOON
+                      </button>
+                    )}
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+                      {productData.isTicketAvailable 
+                        ? "Official tickets are sold via external platform." 
+                        : ""}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-
           <RelatedProducts category={productData.category} currentProductId={productId} />
         </div>
       )}
 
       <style>{`
-        @keyframes wave { 0%, 100% { height: 1.5rem; transform: translateY(0); } 50% { height: 4rem; transform: translateY(-5px); } }
-        @keyframes toast-in { 0% { transform: translateX(120%) scale(0.9); opacity: 0; } 60% { transform: translateX(-10px) scale(1.02); } 100% { transform: translateX(0) scale(1); opacity: 1; } }
+        @keyframes wave { 0%, 100% { height: 1.5rem; } 50% { height: 4rem; } }
+        @keyframes toast-in { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes progress-shrink { from { width: 100%; } to { width: 0%; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .animate-toast-in { animation: toast-in 0.7s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
+        .animate-toast-in { animation: toast-in 0.5s ease-out forwards; }
         .animate-progress-shrink { animation: progress-shrink 3s linear forwards; }
-        .animate-in { animation: fadeIn 0.4s ease-out forwards; }
-        .zoom-in-95 { animation: zoomIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
       `}</style>
     </>

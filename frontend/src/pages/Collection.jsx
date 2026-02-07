@@ -143,10 +143,10 @@ const Collection = () => {
                 <input
                   className="w-3"
                   type="checkbox"
-                  value={"MUSIC"}
+                  value={"Tickets"}
                   onChange={toggleCategory}
                 />
-                Music
+                Tickets
               </p>
               <p className="flex gap-2">
                 <input

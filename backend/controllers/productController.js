@@ -4,7 +4,8 @@ import productModel from "../models/productModel.js";
 // Function for adding a product 
 const addProduct = async (req, res) => {
     try {
-        const { name, description, price, category, sizes, bestseller } = req.body;
+        const { name, description, price, category, sizes, bestseller, externalLink, isTicketAvailable } = req.body;
+        
         const images = [];
         for (let i = 1; i <= 9; i++) {
             const image = req.files[`image${i}`] && req.files[`image${i}`][0];
@@ -20,10 +21,9 @@ const addProduct = async (req, res) => {
             })
         );
 
-        // Parse sizes to include size and count
         const sizesParsed = JSON.parse(sizes).map(size => ({
-            size: size.size,  // e.g., "M"
-            count: Number(size.count)  // e.g., 10
+            size: size.size,
+            count: Number(size.count)
         }));
 
         const productData = {
@@ -35,6 +35,9 @@ const addProduct = async (req, res) => {
             sizes: sizesParsed,
             image: imagesUrl,
             date: Date.now(),
+            // --- 新增 Ticket 欄位 ---
+            externalLink: externalLink || "",
+            isTicketAvailable: isTicketAvailable === "true",
         };
 
         const product = new productModel(productData);
@@ -48,62 +51,47 @@ const addProduct = async (req, res) => {
     }
 };
 
-// Function for listing products 
-const listProduct = async (req, res) => {
-    try {
-        const products = await productModel.find({});
-        res.json({ success: true, products });
-
-    } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: error.message });
-    }
-};
-
-// Function for updating product price and sizes
+// Function for updating product price, sizes, and ticket status
 const updateProduct = async (req, res) => {
-    const { id, price, sizes } = req.body;
+    const { id, price, sizes, externalLink, isTicketAvailable } = req.body;
     try {
-        const updateData = {};
-
-        // Update price if provided
-        if (price) {
-            updateData.price = Number(price);
+        const product = await productModel.findById(id);
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found.' });
         }
 
-        // Update sizes if provided
+        // 1. 更新價格
+        if (price !== undefined) {
+            product.price = Number(price);
+        }
+
+        // 2. 更新 Ticket 相關欄位 (僅在提供時更新)
+        if (externalLink !== undefined) {
+            product.externalLink = externalLink;
+        }
+        if (isTicketAvailable !== undefined) {
+            product.isTicketAvailable = isTicketAvailable === "true" || isTicketAvailable === true;
+        }
+
+        // 3. 更新尺寸與庫存
         if (sizes) {
             const sizesParsed = JSON.parse(sizes).map(size => ({
                 size: size.size,
                 count: Number(size.count)
             }));
 
-            // Find the product and update sizes
-            const product = await productModel.findById(id);
-            if (!product) {
-                return res.status(404).json({ success: false, message: 'Product not found.' });
-            }
-
-            // Update the sizes in the product
             sizesParsed.forEach(newSize => {
                 const existingSize = product.sizes.find(size => size.size === newSize.size);
                 if (existingSize) {
-                    // If the size exists, update its count
                     existingSize.count = newSize.count;
                 } else {
-                    // If the size doesn't exist, add it
                     product.sizes.push(newSize);
                 }
             });
-
-            // Save the updated product
-            await product.save();
-            return res.json({ success: true, message: 'Product updated!' });
         }
 
-        // If only price is updated
-        await productModel.findByIdAndUpdate(id, updateData);
-        res.json({ success: true, message: 'Product price updated!' });
+        await product.save();
+        res.json({ success: true, message: 'Product updated successfully!' });
 
     } catch (error) {
         console.log(error);
@@ -111,7 +99,18 @@ const updateProduct = async (req, res) => {
     }
 };
 
-// Function for removing a product 
+// --- 其餘函數保持不變 ---
+
+const listProduct = async (req, res) => {
+    try {
+        const products = await productModel.find({});
+        res.json({ success: true, products });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
 const removeProduct = async (req, res) => {
     try {
         await productModel.findByIdAndDelete(req.body.id);
@@ -122,13 +121,11 @@ const removeProduct = async (req, res) => {
     }
 };
 
-// Function for single product info
 const singleProduct = async (req, res) => {
     try {
         const { productId } = req.body;
         const product = await productModel.findById(productId);
         res.json({ success: true, product });
-
     } catch (error) {
         console.log(error);
         res.json({ success: false, message: error.message });
