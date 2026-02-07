@@ -40,7 +40,7 @@ const ShowDetail = () => {
   const handleTouchStart = (e) => setStartX(e.touches[0].clientX);
   const handleTouchMove = (e) => setEndX(e.touches[0].clientX);
   const handleTouchEnd = () => {
-    if (!startX || !endX) return;
+    if (!startX || !endX || !show?.image) return;
     const swipeThreshold = 50;
     const distance = startX - endX;
     if (distance > swipeThreshold) {
@@ -108,9 +108,9 @@ const ShowDetail = () => {
           </div>
         </div>
 
-        {/* 文字區：文字尺寸已微調 */}
+        {/* 文字區 */}
         <div className="lg:w-1/2 w-full text-left">
-          {/* 標題調小 */}
+          {/* 標題 */}
           <h1 className="text-3xl sm:text-4xl font-black mb-3 uppercase tracking-tighter leading-tight">
             {show.name}
           </h1>
@@ -121,8 +121,8 @@ const ShowDetail = () => {
             </p>
           </div>
 
-          {/* 描述文字 (Description) 調小至 text-sm (14px) */}
-          <p className="text-sm mb-6 whitespace-pre-wrap break-words leading-relaxed text-gray-500">
+          {/* 描述文字 (Description)：已從 text-sm 調整為 text-base */}
+          <p className="text-base mb-6 whitespace-pre-wrap break-words leading-relaxed text-gray-600">
             {show.description}
           </p>
 
