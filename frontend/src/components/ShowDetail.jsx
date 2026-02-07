@@ -18,6 +18,9 @@ const ShowDetail = () => {
 
   const API_URL = import.meta.env.VITE_BACKEND_URL;
 
+  // 判定是否為即將到來的特定場次 ID
+  const isUpcoming = id === "69876c55266afcf9ab41b2ae";
+
   useEffect(() => {
     const fetchShowDetail = async () => {
       try {
@@ -121,12 +124,12 @@ const ShowDetail = () => {
             </p>
           </div>
 
-          {/* 描述文字 (Description): text-base */}
+          {/* 描述文字 */}
           <p className="text-base mb-6 whitespace-pre-wrap break-words leading-relaxed text-gray-600">
             {show.description}
           </p>
 
-          {/* Location & Status: 從 text-[11px] 放大至 text-sm */}
+          {/* Location & Status */}
           <div className="space-y-3 mb-6 py-5 border-t border-b border-gray-100">
             <p className="text-sm flex items-baseline">
               <span className="text-gray-400 uppercase tracking-widest text-[10px] mr-3 w-20 flex-shrink-0">Location:</span>
@@ -144,9 +147,18 @@ const ShowDetail = () => {
                 {instagramButtonText}
               </a>
             )}
-            <a href={show.ticketLink} target="_blank" rel="noreferrer" className="text-center bg-black text-white font-bold py-2.5 text-xs hover:opacity-80 transition">
-              TICKETS / ORDER
-            </a>
+
+            {/* TICKETS 按鈕判斷 */}
+            {isUpcoming ? (
+              <div className="text-center bg-gray-200 text-gray-400 font-bold py-2.5 text-xs uppercase tracking-widest cursor-not-allowed border border-gray-300">
+                Tickets Coming Soon
+              </div>
+            ) : (
+              <a href={show.ticketLink} target="_blank" rel="noreferrer" className="text-center bg-black text-white font-bold py-2.5 text-xs hover:opacity-80 transition">
+                TICKETS / ORDER
+              </a>
+            )}
+
             <button onClick={() => navigate(-1)} className="text-center bg-gray-100 text-gray-400 font-bold py-2 text-[9px] hover:bg-gray-200 transition uppercase tracking-widest">
               ← Back
             </button>

@@ -10,7 +10,7 @@ const Hero = () => {
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
 
-  const minSwipeDistance = 50; // 最小滑動距離（像素）
+  const minSwipeDistance = 50; 
 
   const heroBackground = assets.herowhiteground; 
 
@@ -19,8 +19,8 @@ const Hero = () => {
       id: 1,
       image: assets.Taiwan_hero,
       titleLine1: "Upcoming Tour",
-      titleLine2: "Tickets Available",
       showMobileText: false, 
+      hideOrderBtn: true, // <--- 設置為 true 會變為灰色不可點擊
       canvasColor: "bg-white", 
       textColor: "sm:text-black",
       btnBorder: "sm:border-black",
@@ -38,6 +38,7 @@ const Hero = () => {
       titleLine1: "The New Album",
       titleLine2: "Out Now",
       showMobileText: true, 
+      hideOrderBtn: false, 
       canvasColor: "bg-white", 
       textColor: "sm:text-black",
       btnBorder: "sm:border-black",
@@ -59,17 +60,14 @@ const Hero = () => {
     }
   };
 
-  // 切換至下一張
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
   };
 
-  // 切換至上一張
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
   };
 
-  // 手機滑動邏輯
   const onTouchStart = (e) => {
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
@@ -147,12 +145,20 @@ const Hero = () => {
                 </div>
 
                 <div className="flex justify-center sm:justify-start gap-2 sm:gap-4 mb-6 sm:mb-12">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleLink(slide.orderLink); }}
-                    className={`px-3.5 py-1.5 sm:px-10 sm:py-3.5 border-[1px] border-white ${slide.btnBorder} ${slide.btnBg} text-white ${slide.btnText} rounded-sm font-medium sm:font-bold uppercase tracking-widest text-[8.5px] sm:text-[14px] transition-all duration-300 hover:opacity-80 active:scale-95`}
-                  >
-                    {slide.orderBtnText}
-                  </button>
+                  {/* TICKETS / ORDER Button Logic */}
+                  {slide.hideOrderBtn ? (
+                    <div className="px-3.5 py-1.5 sm:px-10 sm:py-3.5 border-[1px] border-gray-300 bg-gray-200 text-gray-400 rounded-sm font-medium sm:font-bold uppercase tracking-widest text-[8.5px] sm:text-[14px] cursor-not-allowed">
+                     Coming Soon
+                    </div>
+                  ) : (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleLink(slide.orderLink); }}
+                      className={`px-3.5 py-1.5 sm:px-10 sm:py-3.5 border-[1px] border-white ${slide.btnBorder} ${slide.btnBg} text-white ${slide.btnText} rounded-sm font-medium sm:font-bold uppercase tracking-widest text-[8.5px] sm:text-[14px] transition-all duration-300 hover:opacity-80 active:scale-95`}
+                    >
+                      {slide.orderBtnText}
+                    </button>
+                  )}
+                  
                   <button
                     onClick={(e) => { e.stopPropagation(); handleLink(slide.streamUrl); }}
                     className={`px-3.5 py-1.5 sm:px-10 sm:py-3.5 border-[1px] border-white ${slide.btnBorder} text-white ${slide.textColor} bg-transparent rounded-sm font-medium sm:font-bold uppercase tracking-widest text-[8.5px] sm:text-[14px] transition-all duration-300 hover:bg-white hover:text-black active:scale-95`}
