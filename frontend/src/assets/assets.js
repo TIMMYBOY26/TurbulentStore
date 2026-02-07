@@ -32,7 +32,7 @@ import cross_icon from "./cross_icon.png";
 import parcel_icon from "./parcel_icon.svg";
 
 import Monologue_hero from "./TURBULENT MONOLOGUE COVER.png";
-import Taiwan_hero from "./TaiwanTour1.jpeg";
+import Taiwan_hero from "./TaiwanTicket.jpeg";
 import Taiwan_2 from "./TaiwanTour2.jpeg";
 import lightwall from "./lightwall.jpeg";
 import lightwallvideo from "./lightwallvideo.mp4";

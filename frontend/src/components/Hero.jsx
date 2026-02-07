@@ -148,7 +148,7 @@ const Hero = () => {
                   {/* TICKETS / ORDER Button Logic */}
                   {slide.hideOrderBtn ? (
                     <div className="px-3.5 py-1.5 sm:px-10 sm:py-3.5 border-[1px] border-gray-300 bg-gray-200 text-gray-400 rounded-sm font-medium sm:font-bold uppercase tracking-widest text-[8.5px] sm:text-[14px] cursor-not-allowed">
-                     Coming Soon
+                     Coming
                     </div>
                   ) : (
                     <button
