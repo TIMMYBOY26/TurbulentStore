@@ -122,7 +122,7 @@ const Product = () => {
 
       {/* MAIN UI */}
       {productData && (
-        <div className={`pt-6 transition-opacity duration-1000 ${isLoading ? "opacity-0" : "opacity-100"}`}>
+        <div className={`pt-2 sm:pt-6 transition-opacity duration-1000 ${isLoading ? "opacity-0" : "opacity-100"}`}>
           <ToastContainer position="top-right" autoClose={2000} />
           
           <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 px-4 sm:px-0">
@@ -132,44 +132,50 @@ const Product = () => {
               {/* Desktop Sidebar */}
               <div className="hidden sm:flex sm:flex-col overflow-y-auto sm:w-[18%] gap-2">
                 {productData.image.map((item, index) => (
-                  <img onClick={() => setCurrentImageIndex(index)} src={item} key={index} 
-                    className={`w-full cursor-pointer border rounded-md ${currentImageIndex === index ? "border-black" : "opacity-70"}`} alt=""/>
+                  <img 
+                    onClick={() => setCurrentImageIndex(index)} 
+                    src={item} 
+                    key={index} 
+                    className={`w-full cursor-pointer border rounded-md transition-all ${currentImageIndex === index ? "border-black opacity-100" : "opacity-50 border-transparent hover:opacity-80"}`} 
+                    alt=""
+                  />
                 ))}
               </div>
 
               {/* Main Viewport Container */}
               <div className="w-full sm:w-[82%] flex flex-col">
                 <div className="relative overflow-hidden rounded-xl bg-white">
-                  {/* Swipe Row */}
+                  
+                  {/* Mobile Swipe Wrapper */}
                   <div 
-                    className="flex flex-nowrap transition-transform duration-500 ease-out sm:block sm:transform-none"
+                    className="flex flex-nowrap transition-transform duration-500 ease-out sm:hidden"
                     style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
                     onTouchStart={handleTouchStart} 
                     onTouchMove={handleTouchMove} 
                     onTouchEnd={handleTouchEnd}
                   >
                     {productData.image.map((img, idx) => (
-                      <div key={idx} className="w-full min-w-full flex-shrink-0 flex items-center justify-center sm:block">
-                        <img 
-                          src={img} 
-                          onClick={() => setIsZoomed(true)} 
-                          className="w-full h-auto max-h-[70vh] sm:max-h-none object-contain p-2" 
-                          alt=""
-                        />
+                      <div key={idx} className="w-full min-w-full flex-shrink-0 flex items-center justify-center">
+                        <img src={img} onClick={() => setIsZoomed(true)} className="w-full h-auto max-h-[65vh] object-contain p-0" alt=""/>
                       </div>
                     ))}
                   </div>
+
+                  {/* Desktop Static Display - 修正大螢幕只顯示選中圖片 */}
+                  <div className="hidden sm:block w-full">
+                    <img 
+                      src={productData.image[currentImageIndex]} 
+                      onClick={() => setIsZoomed(true)} 
+                      className="w-full h-auto object-contain p-0 cursor-zoom-in animate-in fade-in duration-300" 
+                      alt=""
+                    />
+                  </div>
                 </div>
 
-                {/* IMAGE DOTS - OUTSIDE & BELOW IMAGE (Mobile Only) */}
-                <div className="flex justify-center gap-2 mt-4 sm:hidden">
+                {/* IMAGE DOTS (Mobile Only) */}
+                <div className="flex justify-center gap-2 mt-2 sm:hidden">
                   {productData.image.map((_, idx) => (
-                    <div 
-                      key={idx}
-                      className={`h-1.5 transition-all duration-300 rounded-full ${
-                        currentImageIndex === idx ? "w-6 bg-black" : "w-1.5 bg-gray-300"
-                      }`}
-                    />
+                    <div key={idx} className={`h-1 transition-all duration-300 rounded-full ${currentImageIndex === idx ? "w-6 bg-black" : "w-1.5 bg-gray-300"}`} />
                   ))}
                 </div>
               </div>
