@@ -37,7 +37,7 @@ const Hero = () => {
       btnBorder: "sm:border-black",
       btnBg: "sm:bg-black",
       btnText: "sm:text-white",
-      orderBtnText: "ORDER NOW",
+      orderBtnText: "ORDER",
       streamBtnText: "STREAM",
       orderLink: "/product/6979cafd223a9477d223e7c6",
       streamUrl: "https://orcd.co/monologue_turbulent",
