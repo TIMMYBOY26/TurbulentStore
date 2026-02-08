@@ -5,30 +5,30 @@ import { useNavigate } from "react-router-dom";
 const Hero = () => {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
-  
+
   // 滑動偵測狀態
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
 
-  const minSwipeDistance = 50; 
+  const minSwipeDistance = 50;
 
-  const heroBackground = assets.herowhiteground; 
+  const heroBackground = assets.herowhiteground;
 
   const slides = [
     {
       id: 1,
       image: assets.Taiwan_hero,
       titleLine1: "Upcoming Tour",
-      showMobileText: false, 
-      hideOrderBtn: true, // <--- 設置為 true 會變為灰色不可點擊
-      canvasColor: "bg-white", 
+      showMobileText: false,
+      hideOrderBtn: false, // <--- 設置為 true 會變為灰色不可點擊
+      canvasColor: "bg-white",
       textColor: "sm:text-black",
       btnBorder: "sm:border-black",
       btnBg: "sm:bg-black",
       btnText: "sm:text-white",
-      orderBtnText: "TICKETS", 
+      orderBtnText: "TICKETS",
       streamBtnText: "TOUR INFO",
-      orderLink: "https://www.offgrid.day", 
+      orderLink: "https://www.offgrid.day/clubs/19/214?stage=compilation-detail&compilationId=8",
       streamUrl: "/shows/69876c55266afcf9ab41b2ae",
       heroLink: "/shows/69876c55266afcf9ab41b2ae",
     },
@@ -37,9 +37,9 @@ const Hero = () => {
       image: assets.Monologue_hero,
       titleLine1: "The New Album",
       titleLine2: "Out Now",
-      showMobileText: true, 
-      hideOrderBtn: false, 
-      canvasColor: "bg-white", 
+      showMobileText: true,
+      hideOrderBtn: false,
+      canvasColor: "bg-white",
       textColor: "sm:text-black",
       btnBorder: "sm:border-black",
       btnBg: "sm:bg-black",
@@ -80,7 +80,7 @@ const Hero = () => {
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
-    
+
     if (isLeftSwipe) nextSlide();
     if (isRightSwipe) prevSlide();
   };
@@ -91,13 +91,13 @@ const Hero = () => {
   }, [currentIndex]);
 
   return (
-    <div 
+    <div
       className="relative w-full aspect-square sm:aspect-video sm:max-h-[75vh] overflow-hidden bg-white touch-pan-y"
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      <div 
+      <div
         className="hidden sm:block absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: `url(${heroBackground})`,
@@ -108,16 +108,15 @@ const Hero = () => {
 
       {slides.map((slide, index) => {
         const isActive = index === currentIndex;
-        
+
         return (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-transform duration-1000 ease-in-out cursor-pointer ${
-              isActive ? "translate-x-0 z-10" : index > currentIndex ? "translate-x-full z-0" : "-translate-x-full z-0"
-            } ${slide.canvasColor} sm:bg-transparent`}
+            className={`absolute inset-0 transition-transform duration-1000 ease-in-out cursor-pointer ${isActive ? "translate-x-0 z-10" : index > currentIndex ? "translate-x-full z-0" : "-translate-x-full z-0"
+              } ${slide.canvasColor} sm:bg-transparent`}
           >
             <div className="w-full h-full flex flex-col sm:flex-row relative z-10">
-              <div 
+              <div
                 className="group w-full h-full sm:w-[55%] relative flex items-center justify-center overflow-hidden sm:p-12 lg:p-20"
                 onClick={() => handleLink(slide.heroLink)}
               >
@@ -148,7 +147,7 @@ const Hero = () => {
                   {/* TICKETS / ORDER Button Logic */}
                   {slide.hideOrderBtn ? (
                     <div className="px-3.5 py-1.5 sm:px-10 sm:py-3.5 border-[1px] border-gray-300 bg-gray-200 text-gray-400 rounded-sm font-medium sm:font-bold uppercase tracking-widest text-[8.5px] sm:text-[14px] cursor-not-allowed">
-                     Coming
+                      Coming
                     </div>
                   ) : (
                     <button
@@ -158,7 +157,7 @@ const Hero = () => {
                       {slide.orderBtnText}
                     </button>
                   )}
-                  
+
                   <button
                     onClick={(e) => { e.stopPropagation(); handleLink(slide.streamUrl); }}
                     className={`px-3.5 py-1.5 sm:px-10 sm:py-3.5 border-[1px] border-white ${slide.btnBorder} text-white ${slide.textColor} bg-transparent rounded-sm font-medium sm:font-bold uppercase tracking-widest text-[8.5px] sm:text-[14px] transition-all duration-300 hover:bg-white hover:text-black active:scale-95`}

@@ -97,13 +97,21 @@ const Product = () => {
       {isLoading && (
         <div className="fixed top-[80px] bottom-0 left-0 right-0 z-40 flex flex-col items-center justify-center bg-white">
           <div className="flex items-end gap-2 h-16">
-            <div className="w-2.5 bg-[#003366] rounded-full animate-wave h-6"></div>
-            <div className="w-2.5 bg-[#ADD8E6] rounded-full animate-wave [animation-delay:0.15s] h-10"></div>
-            <div className="w-2.5 bg-black rounded-full animate-wave [animation-delay:0.3s] h-14"></div>
-            <div className="w-2.5 bg-white border-2 border-gray-200 rounded-full animate-wave [animation-delay:0.45s] h-10"></div>
-            <div className="w-2.5 bg-[#003366] rounded-full animate-wave [animation-delay:0.6s] h-6"></div>
+            <div className="w-2.5 bg-[#003366] rounded-full animate-[wave_1.2s_ease-in-out_infinite] h-6"></div>
+            <div className="w-2.5 bg-[#ADD8E6] rounded-full animate-[wave_1.2s_ease-in-out_0.15s_infinite] h-10"></div>
+            <div className="w-2.5 bg-black rounded-full animate-[wave_1.2s_ease-in-out_0.3s_infinite] h-14"></div>
+            <div className="w-2.5 bg-white border-2 border-gray-200 rounded-full animate-[wave_1.2s_ease-in-out_0.45s_infinite] h-10"></div>
+            <div className="w-2.5 bg-[#003366] rounded-full animate-[wave_1.2s_ease-in-out_0.6s_infinite] h-6"></div>
           </div>
-          <p className="mt-10 text-[10px] font-black tracking-[0.6em] text-black uppercase animate-pulse">TURBULENT</p>
+          <p className="mt-10 text-[10px] font-black tracking-[0.6em] text-black uppercase animate-pulse">
+            TURBULENT
+          </p>
+          <style>{`
+            @keyframes wave {
+              0%, 100% { height: 1.5rem; transform: translateY(0); }
+              50% { height: 4rem; transform: translateY(-5px); }
+            }
+          `}</style>
         </div>
       )}
 
@@ -120,17 +128,17 @@ const Product = () => {
 
       {/* LIGHTBOX */}
       {isZoomed && productData && (
-        <div 
+        <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 backdrop-blur-2xl animate-in fade-in duration-300 cursor-zoom-out"
           onClick={() => setIsZoomed(false)}
         >
           <button className="absolute top-6 right-6 z-[110] p-3 bg-black text-white rounded-full">✕</button>
           <div className="relative w-full h-full flex items-center justify-center p-4">
-            <img 
-              src={productData.image[currentImageIndex]} 
-              className="max-w-full max-h-[90vh] object-contain animate-in zoom-in-95" 
+            <img
+              src={productData.image[currentImageIndex]}
+              className="max-w-full max-h-[90vh] object-contain animate-in zoom-in-95"
               alt="Zoomed product"
-              onClick={(e) => e.stopPropagation()} 
+              onClick={(e) => e.stopPropagation()}
             />
           </div>
         </div>
@@ -140,18 +148,18 @@ const Product = () => {
       {productData && (
         <div className={`pt-2 sm:pt-6 transition-opacity duration-1000 ${isLoading ? "opacity-0" : "opacity-100"}`}>
           <ToastContainer position="top-right" autoClose={2000} />
-          
+
           <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 px-4 sm:px-0">
-            
+
             {/* IMAGE SECTION */}
             <div className="flex-1 flex flex-col-reverse sm:flex-row gap-3">
               <div className="hidden sm:flex sm:flex-col overflow-y-auto sm:w-[18%] gap-2">
                 {productData.image.map((item, index) => (
-                  <img 
-                    onClick={() => setCurrentImageIndex(index)} 
-                    src={item} 
-                    key={index} 
-                    className={`w-full cursor-pointer border rounded-md transition-all ${currentImageIndex === index ? "border-black opacity-100" : "opacity-50 border-transparent hover:opacity-80"}`} 
+                  <img
+                    onClick={() => setCurrentImageIndex(index)}
+                    src={item}
+                    key={index}
+                    className={`w-full cursor-pointer border rounded-md transition-all ${currentImageIndex === index ? "border-black opacity-100" : "opacity-50 border-transparent hover:opacity-80"}`}
                     alt=""
                   />
                 ))}
@@ -160,25 +168,25 @@ const Product = () => {
               <div className="w-full sm:w-[82%] flex flex-col">
                 <div className="relative overflow-hidden rounded-xl bg-white aspect-[3/4]">
                   {/* Mobile Swipe */}
-                  <div 
+                  <div
                     className="flex flex-nowrap transition-transform duration-500 ease-out sm:hidden h-full"
                     style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
                     onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}
                   >
                     {productData.image.map((img, idx) => (
                       <div key={idx} className="w-full min-w-full flex-shrink-0 flex items-center justify-center">
-                        <img src={img} onClick={() => setIsZoomed(true)} className="w-full h-full object-contain" alt=""/>
+                        <img src={img} onClick={() => setIsZoomed(true)} className="w-full h-full object-contain" alt="" />
                       </div>
                     ))}
                   </div>
 
                   {/* Desktop Display */}
                   <div className="hidden sm:block w-full h-full">
-                    <img 
+                    <img
                       key={currentImageIndex}
-                      src={productData.image[currentImageIndex]} 
-                      onClick={() => setIsZoomed(true)} 
-                      className="w-full h-full object-contain cursor-zoom-in animate-in fade-in duration-300" 
+                      src={productData.image[currentImageIndex]}
+                      onClick={() => setIsZoomed(true)}
+                      className="w-full h-full object-contain cursor-zoom-in animate-in fade-in duration-300"
                       alt=""
                     />
                   </div>
@@ -205,7 +213,7 @@ const Product = () => {
               </h1>
 
               {Number(productData.price) > 0 && <p className="mt-5 text-3xl font-medium">{currency}{productData.price}</p>}
-              
+
               <div className="mt-5 text-gray-500 text-sm leading-relaxed">
                 {formatDescription(productData.description)}
               </div>
@@ -216,9 +224,9 @@ const Product = () => {
                     <p className="text-black font-bold text-xs uppercase tracking-widest">* Select Size</p>
                     <div className="flex gap-2">
                       {productData.sizes.map((item) => (
-                        <button 
-                          key={item.size} 
-                          disabled={item.count === 0 || isUpcomingProduct} 
+                        <button
+                          key={item.size}
+                          disabled={item.count === 0 || isUpcomingProduct}
                           onClick={() => setSize(item.size)}
                           className={`border-2 py-3 px-5 font-bold text-xs transition-colors ${item.size === size ? "bg-black text-white" : "bg-white"} ${(item.count === 0 || isUpcomingProduct) && "opacity-30 cursor-not-allowed"}`}
                         >
@@ -233,12 +241,12 @@ const Product = () => {
                 ) : (
                   /* TICKET BUTTON LOGIC */
                   <div className="mt-4 py-6 border-t flex flex-col gap-4">
-                    <button 
+                    <button
                       onClick={() => productData.isTicketAvailable && window.open(productData.externalLink || 'https://www.offgrid.day', '_blank')}
                       disabled={!productData.isTicketAvailable}
                       className={`px-8 py-4 text-xs font-black tracking-[0.2em] uppercase shadow-lg text-center transition-all duration-300
-                        ${productData.isTicketAvailable 
-                          ? "bg-black text-white cursor-pointer hover:bg-gray-800 active:scale-[0.98]" 
+                        ${productData.isTicketAvailable
+                          ? "bg-black text-white cursor-pointer hover:bg-gray-800 active:scale-[0.98]"
                           : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
                         }`}
                     >
