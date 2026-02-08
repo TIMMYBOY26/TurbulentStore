@@ -18,12 +18,10 @@ const ShowDetail = () => {
 
   const API_URL = import.meta.env.VITE_BACKEND_URL;
 
-  // 判定是否為即將到來的特定場次 ID
-  const isUpcoming = id === "69876c55266afcf9ab41b2ae";
-
   useEffect(() => {
     const fetchShowDetail = async () => {
       try {
+        // 保持您原本的 API 路徑不變
         const response = await axios.get(`${API_URL}/api/shows/${id}`);
         setShow(response.data.show);
       } catch (err) {
@@ -55,9 +53,9 @@ const ShowDetail = () => {
     setEndX(0);
   };
 
-  if (loading) return <p className="text-center text-xl pt-20">Loading...</p>;
-  if (error) return <p className="text-center text-red-500 pt-20">Error: {error}</p>;
-  if (!show) return <p className="text-center pt-20">Show not found</p>;
+  if (loading) return <p className="text-center text-xl pt-20 font-black uppercase tracking-widest">Loading...</p>;
+  if (error) return <p className="text-center text-red-500 pt-20 font-bold">Error: {error}</p>;
+  if (!show) return <p className="text-center pt-20 font-black">Show not found</p>;
 
   const isPastEvent = new Date(show.date) < new Date();
   const instagramButtonText = isPastEvent ? "View details" : "View on Instagram";
@@ -76,7 +74,6 @@ const ShowDetail = () => {
 
         {/* 圖片區 */}
         <div className="lg:w-1/2 w-full mb-6 lg:mb-0">
-          {/* 手機版：Swipe Slider */}
           <div 
             className="lg:hidden relative w-full aspect-[4/5] overflow-hidden rounded-xl bg-gray-50 shadow-sm"
             onTouchStart={handleTouchStart}
@@ -101,7 +98,6 @@ const ShowDetail = () => {
             </div>
           </div>
 
-          {/* 桌面版：垂直排列 */}
           <div className="hidden lg:flex flex-col items-center">
             {show.image.map((img, index) => (
               <div key={index} className="group w-full max-w-md bg-gray-50 rounded-lg overflow-hidden mb-4 shadow-sm cursor-zoom-in" onClick={() => setSelectedImg(img)}>
@@ -113,17 +109,15 @@ const ShowDetail = () => {
 
         {/* 文字區 */}
         <div className="lg:w-1/2 w-full text-left">
-          {/* 標題 */}
-   {/* 標題區域：檢測 "-" 並換行 */}
-<h1 className="text-3xl sm:text-4xl font-black mb-3 uppercase tracking-tighter leading-tight">
-  {show.name.split('-').map((part, index, array) => (
-    <React.Fragment key={index}>
-      {part.trim()}
-      {index < array.length - 1 && <br />}
-    </React.Fragment>
-  ))}
-</h1>
-
+          {/* 標題區域：檢測 "-" 並換行 */}
+          <h1 className="text-3xl sm:text-4xl font-black mb-3 uppercase tracking-tighter leading-tight">
+            {show.name.split('-').map((part, index, array) => (
+              <React.Fragment key={index}>
+                {part.trim()}
+                {index < array.length - 1 && <br />}
+              </React.Fragment>
+            ))}
+          </h1>
 
           <div className="mb-4">
             <p className="text-sm font-bold text-gray-800">
@@ -132,41 +126,35 @@ const ShowDetail = () => {
           </div>
 
           {/* 描述文字 */}
-          <p className="text-base mb-6 whitespace-pre-wrap break-words leading-relaxed text-gray-600">
+          <p className="text-base mb-6 whitespace-pre-wrap break-words leading-relaxed text-gray-600 font-medium">
             {show.description}
           </p>
 
           {/* Location & Status */}
           <div className="space-y-3 mb-6 py-5 border-t border-b border-gray-100">
             <p className="text-sm flex items-baseline">
-              <span className="text-gray-400 uppercase tracking-widest text-[10px] mr-3 w-20 flex-shrink-0">Location:</span>
+              <span className="text-gray-400 uppercase tracking-widest text-[10px] mr-3 w-20 flex-shrink-0 font-black">Location:</span>
               <span className="font-bold text-gray-800">{show.location}</span>
             </p>
             <p className="text-sm flex items-baseline">
-              <span className="text-gray-400 uppercase tracking-widest text-[10px] mr-3 w-20 flex-shrink-0">Status:</span>
+              <span className="text-gray-400 uppercase tracking-widest text-[10px] mr-3 w-20 flex-shrink-0 font-black">Status:</span>
               <span className="font-bold uppercase text-gray-800">{show.status}</span>
             </p>
           </div>
 
           <div className="flex flex-col space-y-2 max-w-xs">
             {show.instagramLink && (
-              <a href={show.instagramLink} target="_blank" rel="noreferrer" className="text-center bg-blue-600 text-white font-bold py-2.5 text-xs hover:bg-blue-700 transition">
+              <a href={show.instagramLink} target="_blank" rel="noreferrer" className="text-center bg-blue-600 text-white font-black py-3 text-[10px] uppercase tracking-widest hover:bg-blue-700 transition">
                 {instagramButtonText}
               </a>
             )}
 
-            {/* TICKETS 按鈕判斷 */}
-            {isUpcoming ? (
-              <div className="text-center bg-gray-200 text-gray-400 font-bold py-2.5 text-xs uppercase tracking-widest cursor-not-allowed border border-gray-300">
-                Tickets Coming Soon
-              </div>
-            ) : (
-              <a href={show.ticketLink} target="_blank" rel="noreferrer" className="text-center bg-black text-white font-bold py-2.5 text-xs hover:opacity-80 transition">
-                TICKETS / ORDER
-              </a>
-            )}
+            {/* 直接顯示按鈕，不再判定 isUpcoming */}
+            <a href={show.ticketLink} target="_blank" rel="noreferrer" className="text-center bg-black text-white font-black py-3 text-[10px] uppercase tracking-widest hover:opacity-80 transition shadow-lg active:scale-95">
+              TICKETS / ORDER
+            </a>
 
-            <button onClick={() => navigate(-1)} className="text-center bg-gray-100 text-gray-400 font-bold py-2 text-[9px] hover:bg-gray-200 transition uppercase tracking-widest">
+            <button onClick={() => navigate(-1)} className="text-center bg-gray-100 text-gray-400 font-black py-2.5 text-[9px] hover:bg-gray-200 transition uppercase tracking-widest mt-4">
               ← Back
             </button>
           </div>
