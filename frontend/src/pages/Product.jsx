@@ -130,7 +130,7 @@ const Product = () => {
               src={productData.image[currentImageIndex]} 
               className="max-w-full max-h-[90vh] object-contain animate-in zoom-in-95" 
               alt="Zoomed product"
-              onClick={(e) => e.stopPropagation()} // 防止點擊圖片時關閉
+              onClick={(e) => e.stopPropagation()} 
             />
           </div>
         </div>
@@ -159,7 +159,7 @@ const Product = () => {
 
               <div className="w-full sm:w-[82%] flex flex-col">
                 <div className="relative overflow-hidden rounded-xl bg-white aspect-[3/4]">
-                  {/* Mobile Swipe Wrapper */}
+                  {/* Mobile Swipe */}
                   <div 
                     className="flex flex-nowrap transition-transform duration-500 ease-out sm:hidden h-full"
                     style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
@@ -194,9 +194,21 @@ const Product = () => {
 
             {/* INFO SECTION */}
             <div className="flex-1 px-1 sm:px-0">
-              <h1 className="font-medium text-2xl mt-2 uppercase tracking-tight">{productData.name}</h1>
+              {/* 產品名稱：自動檢測 '-' 並換行 */}
+              <h1 className="font-medium text-2xl mt-2 uppercase tracking-tight leading-tight">
+                {productData.name.split("-").map((part, index, array) => (
+                  <React.Fragment key={index}>
+                    {part.trim()}
+                    {index < array.length - 1 && <br />}
+                  </React.Fragment>
+                ))}
+              </h1>
+
               {Number(productData.price) > 0 && <p className="mt-5 text-3xl font-medium">{currency}{productData.price}</p>}
-              <div className="mt-5 text-gray-500 text-sm leading-relaxed">{formatDescription(productData.description)}</div>
+              
+              <div className="mt-5 text-gray-500 text-sm leading-relaxed">
+                {formatDescription(productData.description)}
+              </div>
 
               <div className="flex flex-col gap-4 my-8">
                 {productData.category !== "Tickets" ? (
@@ -204,8 +216,12 @@ const Product = () => {
                     <p className="text-black font-bold text-xs uppercase tracking-widest">* Select Size</p>
                     <div className="flex gap-2">
                       {productData.sizes.map((item) => (
-                        <button key={item.size} disabled={item.count === 0 || isUpcomingProduct} onClick={() => setSize(item.size)}
-                          className={`border-2 py-3 px-5 font-bold text-xs transition-colors ${item.size === size ? "bg-black text-white" : "bg-white"} ${(item.count === 0 || isUpcomingProduct) && "opacity-30 cursor-not-allowed"}`}>
+                        <button 
+                          key={item.size} 
+                          disabled={item.count === 0 || isUpcomingProduct} 
+                          onClick={() => setSize(item.size)}
+                          className={`border-2 py-3 px-5 font-bold text-xs transition-colors ${item.size === size ? "bg-black text-white" : "bg-white"} ${(item.count === 0 || isUpcomingProduct) && "opacity-30 cursor-not-allowed"}`}
+                        >
                           {item.size}
                         </button>
                       ))}
@@ -218,7 +234,7 @@ const Product = () => {
                   /* TICKET BUTTON LOGIC */
                   <div className="mt-4 py-6 border-t flex flex-col gap-4">
                     <button 
-                      onClick={() => productData.isTicketAvailable && window.open(productData.externalLink || 'https://www.offgrid.day/', '_blank')}
+                      onClick={() => productData.isTicketAvailable && window.open(productData.externalLink || 'https://www.offgrid.day', '_blank')}
                       disabled={!productData.isTicketAvailable}
                       className={`px-8 py-4 text-xs font-black tracking-[0.2em] uppercase shadow-lg text-center transition-all duration-300
                         ${productData.isTicketAvailable 

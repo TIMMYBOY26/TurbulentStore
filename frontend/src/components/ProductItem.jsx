@@ -11,10 +11,18 @@ export const ProductItem = ({ id, image, name, price }) => {
         <img
           className="hover:scale-110 transition ease-in-out"
           src={image[0]}
-          alt=""
+          alt={name}
         />
       </div>
-      <p className="pt-3 pb-1 text-sm">{name}</p>
+      {/* 僅更新此處：產品名稱檢測 '-' 並自動換行 */}
+      <p className="pt-3 pb-1 text-sm leading-tight">
+        {name.split("-").map((part, index, array) => (
+          <React.Fragment key={index}>
+            {part.trim()}
+            {index < array.length - 1 && <br />}
+          </React.Fragment>
+        ))}
+      </p>
       <p className="text-sm font-medium">
         {currency}
         {price}

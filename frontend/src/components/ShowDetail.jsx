@@ -114,9 +114,16 @@ const ShowDetail = () => {
         {/* 文字區 */}
         <div className="lg:w-1/2 w-full text-left">
           {/* 標題 */}
-          <h1 className="text-3xl sm:text-4xl font-black mb-3 uppercase tracking-tighter leading-tight">
-            {show.name}
-          </h1>
+   {/* 標題區域：檢測 "-" 並換行 */}
+<h1 className="text-3xl sm:text-4xl font-black mb-3 uppercase tracking-tighter leading-tight">
+  {show.name.split('-').map((part, index, array) => (
+    <React.Fragment key={index}>
+      {part.trim()}
+      {index < array.length - 1 && <br />}
+    </React.Fragment>
+  ))}
+</h1>
+
 
           <div className="mb-4">
             <p className="text-sm font-bold text-gray-800">
