@@ -19,7 +19,7 @@ const Hero = () => {
       id: 1,
       image: assets.Taiwan_hero,
       titleLine1: "Upcoming Tour",
-      showMobileText: false,
+      showMobileText: false, // <--- 設置為 true text會變為not show in mobile
       hideOrderBtn: false, // <--- 設置為 true 會變為灰色不可點擊
       canvasColor: "bg-white",
       textColor: "sm:text-black",
@@ -28,16 +28,17 @@ const Hero = () => {
       btnText: "sm:text-white",
       orderBtnText: "TICKETS",
       streamBtnText: "TOUR INFO",
-      orderLink: "https://www.offgrid.day/clubs/19/214?stage=compilation-detail&compilationId=8",
+      orderLink:
+        "https://www.offgrid.day/clubs/19/214?stage=compilation-detail&compilationId=8",
       streamUrl: "/shows/69876c55266afcf9ab41b2ae",
       heroLink: "/shows/69876c55266afcf9ab41b2ae",
     },
     {
       id: 2,
       image: assets.Monologue_hero,
-      titleLine1: "The New Album",
+      titleLine1: "The New Album《MONOLOGUE》",
       titleLine2: "Out Now",
-      showMobileText: true,
+      showMobileText: false,
       hideOrderBtn: false,
       canvasColor: "bg-white",
       textColor: "sm:text-black",
@@ -49,7 +50,7 @@ const Hero = () => {
       orderLink: "/product/6979cafd223a9477d223e7c6",
       streamUrl: "https://orcd.co/monologue_turbulent",
       heroLink: "/shows/6973054cc4bb617639eacce5",
-    }
+    },
   ];
 
   const handleLink = (path) => {
@@ -112,8 +113,13 @@ const Hero = () => {
         return (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-transform duration-1000 ease-in-out cursor-pointer ${isActive ? "translate-x-0 z-10" : index > currentIndex ? "translate-x-full z-0" : "-translate-x-full z-0"
-              } ${slide.canvasColor} sm:bg-transparent`}
+            className={`absolute inset-0 transition-transform duration-1000 ease-in-out cursor-pointer ${
+              isActive
+                ? "translate-x-0 z-10"
+                : index > currentIndex
+                  ? "translate-x-full z-0"
+                  : "-translate-x-full z-0"
+            } ${slide.canvasColor} sm:bg-transparent`}
           >
             <div className="w-full h-full flex flex-col sm:flex-row relative z-10">
               <div
@@ -133,12 +139,18 @@ const Hero = () => {
               </div>
 
               <div className="absolute bottom-[6%] sm:static sm:w-[45%] sm:flex sm:flex-col sm:items-start sm:justify-center sm:pl-12 z-20 left-0 w-full flex flex-col items-center">
-                <div className={`flex flex-col items-center sm:items-start mb-3 sm:mb-8 leading-tight 
-                  ${slide.showMobileText ? "flex" : "hidden sm:flex"}`}>
-                  <h2 className={`text-white ${slide.textColor} text-[9px] sm:text-[32px] lg:text-[40px] font-black uppercase tracking-[0.2em] sm:tracking-tight drop-shadow-md sm:drop-shadow-none`}>
+                <div
+                  className={`flex flex-col items-center sm:items-start mb-3 sm:mb-8 leading-tight 
+                  ${slide.showMobileText ? "flex" : "hidden sm:flex"}`}
+                >
+                  <h2
+                    className={`text-white ${slide.textColor} text-[9px] sm:text-[32px] lg:text-[40px] font-black uppercase tracking-[0.2em] sm:tracking-tight drop-shadow-md sm:drop-shadow-none`}
+                  >
                     {slide.titleLine1}
                   </h2>
-                  <h2 className={`text-white ${slide.textColor} text-[9px] sm:text-[32px] lg:text-[40px] font-black uppercase tracking-[0.2em] sm:tracking-tight drop-shadow-md sm:drop-shadow-none`}>
+                  <h2
+                    className={`text-white ${slide.textColor} text-[9px] sm:text-[32px] lg:text-[40px] font-black uppercase tracking-[0.2em] sm:tracking-tight drop-shadow-md sm:drop-shadow-none`}
+                  >
                     {slide.titleLine2}
                   </h2>
                 </div>
@@ -151,7 +163,10 @@ const Hero = () => {
                     </div>
                   ) : (
                     <button
-                      onClick={(e) => { e.stopPropagation(); handleLink(slide.orderLink); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleLink(slide.orderLink);
+                      }}
                       className={`px-3.5 py-1.5 sm:px-10 sm:py-3.5 border-[1px] border-white ${slide.btnBorder} ${slide.btnBg} text-white ${slide.btnText} rounded-sm font-medium sm:font-bold uppercase tracking-widest text-[8.5px] sm:text-[14px] transition-all duration-300 hover:opacity-80 active:scale-95`}
                     >
                       {slide.orderBtnText}
@@ -159,7 +174,10 @@ const Hero = () => {
                   )}
 
                   <button
-                    onClick={(e) => { e.stopPropagation(); handleLink(slide.streamUrl); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleLink(slide.streamUrl);
+                    }}
                     className={`px-3.5 py-1.5 sm:px-10 sm:py-3.5 border-[1px] border-white ${slide.btnBorder} text-white ${slide.textColor} bg-transparent rounded-sm font-medium sm:font-bold uppercase tracking-widest text-[8.5px] sm:text-[14px] transition-all duration-300 hover:bg-white hover:text-black active:scale-95`}
                   >
                     {slide.streamBtnText}
@@ -170,13 +188,20 @@ const Hero = () => {
                   {slides.map((_, dotIndex) => (
                     <button
                       key={dotIndex}
-                      onClick={(e) => { e.stopPropagation(); setCurrentIndex(dotIndex); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentIndex(dotIndex);
+                      }}
                       className="group/dot flex items-center gap-3 focus:outline-none"
                     >
-                      <span className={`text-[12px] font-bold ${dotIndex === currentIndex ? "text-black" : "text-black/30"}`}>
-                        {String(dotIndex + 1).padStart(2, '0')}
+                      <span
+                        className={`text-[12px] font-bold ${dotIndex === currentIndex ? "text-black" : "text-black/30"}`}
+                      >
+                        {String(dotIndex + 1).padStart(2, "0")}
                       </span>
-                      <div className={`h-[2px] transition-all duration-500 ${dotIndex === currentIndex ? "w-12 bg-black" : "w-4 bg-black/10"}`} />
+                      <div
+                        className={`h-[2px] transition-all duration-500 ${dotIndex === currentIndex ? "w-12 bg-black" : "w-4 bg-black/10"}`}
+                      />
                     </button>
                   ))}
                 </div>
