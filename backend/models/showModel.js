@@ -5,14 +5,25 @@ const showSchema = new mongoose.Schema({
   description: { type: String, required: true },
   date: { type: Date, required: true },
   location: { type: String, required: true },
-  ticketLink: { type: String, required: true }, // 可選，鏈接到購票網站
-  image: { type: [String], default: [] }, // 演出圖片
+  ticketLink: { type: String, default: "" }, // Changed from required: true to allow empty links for upcoming shows
+  image: { type: [String], default: [] },
   status: {
     type: String,
-    enum: ["upcoming", "past", "cancelled"], // 限制選擇
+    enum: ["upcoming", "past", "cancelled"],
     required: true,
   },
-  instagramLink: { type: String }, // New field for Instagram post link
+  instagramLink: { type: String },
+
+  // --- NEW CONTROL FIELDS ---
+  isTicketAvailable: {
+    type: Boolean,
+    default: false, // Prevents errors for old data (defaults to inactive)
+  },
+  ticketStatus: {
+    type: String,
+    enum: ["Available", "Sold Out", "Coming Soon"],
+    default: "Coming Soon", // Prevents errors for old data
+  },
 });
 
 const showModel = mongoose.model("Show", showSchema);

@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import showModel from "../models/showModel.js";
 
-// 添加演出
+// 1. Add Show
 const addShow = async (req, res) => {
   try {
     const {
@@ -12,13 +12,13 @@ const addShow = async (req, res) => {
       ticketLink,
       status,
       instagramLink,
-    } = req.body; // Add instagramLink
-    const image1 = req.files.image1 && req.files.image1[0];
-    const image2 = req.files.image2 && req.files.image2[0];
-    const image3 = req.files.image3 && req.files.image3[0];
+    } = req.body;
+    const image1 = req.files?.image1 && req.files.image1[0];
+    const image2 = req.files?.image2 && req.files.image2[0];
+    const image3 = req.files?.image3 && req.files.image3[0];
 
     const images = [image1, image2, image3].filter(
-      (item) => item !== undefined
+      (item) => item !== undefined,
     );
 
     let imagesUrl = await Promise.all(
@@ -27,7 +27,7 @@ const addShow = async (req, res) => {
           resource_type: "image",
         });
         return result.secure_url;
-      })
+      }),
     );
 
     const showData = {
@@ -38,21 +38,18 @@ const addShow = async (req, res) => {
       ticketLink,
       image: imagesUrl,
       status,
-      instagramLink, // Include instagramLink in the show data
+      instagramLink,
     };
-
-    console.log(showData);
     const show = new showModel(showData);
     await show.save();
 
     res.json({ success: true, message: "Show Added" });
   } catch (error) {
-    console.error("Error adding show:", error); // Log the error
     res.json({ success: false, message: error.message });
   }
 };
 
-// 列出所有演出
+// 2. List All Shows
 const listShows = async (req, res) => {
   try {
     const shows = await showModel.find({});
@@ -62,31 +59,55 @@ const listShows = async (req, res) => {
   }
 };
 
-// 獲取單個演出信息
+// 3. Single Show Info
 const singleShow = async (req, res) => {
   try {
     const { id } = req.params;
     const show = await showModel.findById(id);
-    if (!show) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Show not found" });
-    }
     res.json({ success: true, show });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
 };
 
-// 根據狀態過濾演出（即將舉行或過去的演出）
+// 4. Remove Show
+const removeShow = async (req, res) => {
+  try {
+    await showModel.findByIdAndDelete(req.body.id);
+    res.json({ success: true, message: "Show Removed" });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// 5. Update Show
+const updateShow = async (req, res) => {
+  try {
+    const { id, ...updateData } = req.body;
+    await showModel.findByIdAndUpdate(id, updateData);
+    res.json({ success: true, message: "Show Updated" });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// 6. Filter by Status
 const filterShowsByStatus = async (req, res) => {
   try {
-    const { status } = req.params; // 從路由參數中獲取狀態
-    const shows = await showModel.find({ status }); // 根據狀態查詢演出
+    const { status } = req.params;
+    const shows = await showModel.find({ status });
     res.json({ success: true, shows });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
 };
 
-export { addShow, listShows, singleShow, filterShowsByStatus };
+// CRITICAL: All names here must match the const names above
+export {
+  addShow,
+  listShows,
+  singleShow,
+  removeShow,
+  updateShow,
+  filterShowsByStatus,
+};
