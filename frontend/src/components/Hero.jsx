@@ -36,9 +36,9 @@ const Hero = () => {
     {
       id: 2,
       image: assets.Monologue_hero,
-      titleLine1: "The New Album《MONOLOGUE》",
+      titleLine1: "The New Album",
       titleLine2: "Out Now",
-      showMobileText: false,
+      showMobileText: true,
       hideOrderBtn: false,
       canvasColor: "bg-white",
       textColor: "sm:text-black",
