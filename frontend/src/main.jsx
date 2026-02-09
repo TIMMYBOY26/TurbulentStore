@@ -4,6 +4,11 @@ import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import ShopContextProvider from "./context/ShopContext.jsx";
+// --- ADD THIS IMPORT ---
+import { registerSW } from "virtual:pwa-register";
+
+// Automatically updates the app when you push new changes to Vercel
+registerSW({ immediate: true });
 
 // --- START LONG PORTRAIT EASTER EGG ---
 const longArt = `
