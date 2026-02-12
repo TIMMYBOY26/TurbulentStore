@@ -10,8 +10,7 @@ import fpsCode from "./fpscode.jpg";
 import hero_img from "./hero_img.png";
 import hero_bg from "./HeroBg.jpg";
 import loginBg from "./loginBg.jpg";
-import herowhiteground from "./herowhiteground.jpeg";
-
+import herowhiteground from "./herowhiteground.jpg";
 
 import cart_icon from "./cart_icon.png";
 import bin_icon from "./bin_icon.png";
