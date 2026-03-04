@@ -16,9 +16,9 @@ const Hero = () => {
 
   const slides = [
     {
-      id: 1,
+      id: 2,
       image: assets.Taiwan_hero,
-      titleLine1: "Upcoming Tour",
+      titleLine1: "MONOLOGUE Tour",
       showMobileText: false, // <--- 設置為 true text會變為not show in mobile
       hideOrderBtn: false, // <--- 設置為 true 會變為灰色不可點擊
       canvasColor: "bg-white",
@@ -34,7 +34,7 @@ const Hero = () => {
       heroLink: "/shows/69876c55266afcf9ab41b2ae",
     },
     {
-      id: 2,
+      id: 1,
       image: assets.Monologue_hero,
       titleLine1: "The New Album",
       titleLine2: "Out Now",
