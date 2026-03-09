@@ -1,10 +1,65 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant-HK">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/tablogo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Turbulent Store</title>
+
+    <!-- 1. 核心 SEO：加入 "Hong Kong Band" 關鍵字 -->
+    <title>Turbulent Official Store | Hong Kong Band Merch & Tickets</title>
+    <meta
+      name="description"
+      content="Official store for Turbulent, a Hong Kong based band. Shop latest merch, CDs, vinyl, and tickets. Get the latest news and music releases here."
+    />
+    <meta
+      name="keywords"
+      content="Turbulent, Turbulent Band, 香港樂隊, HK Band, Band Merch, Independent Music HK, 樂隊周邊, 演唱會門票"
+    />
+    <meta name="author" content="Turbulent" />
+
+    <!-- 2. 社群媒體分享 (Open Graph) -->
+    <meta property="og:title" content="Turbulent Official Store - HK Band" />
+    <meta
+      property="og:description"
+      content="支持香港本地音樂！購買 Turbulent 官方周邊、CD 及演出門票。"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://turbulent-store.vercel.app" />
+
+    <!-- 3. 結構化數據 (JSON-LD)：明確標註地區為 Hong Kong -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "MusicGroup",
+        "name": "Turbulent",
+        "url": "https://turbulent-store.vercel.app",
+        "description": "An energetic band from Hong Kong.",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Hong Kong",
+          "addressCountry": "HK"
+        },
+        "genre": "Rock / Indie",
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "Band Merchandise",
+          "itemListElement": [
+            {
+              "@type": "Offer",
+              "itemOffered": { "@type": "Product", "name": "T-shirts" }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": { "@type": "Product", "name": "CDs & Vinyl" }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": { "@type": "Event", "name": "Live Show Tickets" }
+            }
+          ]
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
