@@ -220,7 +220,7 @@ const Product = () => {
                         className={`px-8 py-4 text-xs font-black tracking-[0.2em] uppercase shadow-lg text-center transition-all duration-300
                           ${productData.isTicketAvailable ? "bg-black text-white cursor-pointer hover:bg-gray-800 active:scale-[0.98]" : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"}`}
                       >
-                        {productData.isTicketAvailable ? (token ? "ADD TICKET TO BAG" : "LOGIN TO BOOK") : "TICKETS SOLD OUT"}
+                        {productData.isTicketAvailable ? (token ? "ADD TICKET TO BAG" : "LOGIN TO GET TICKETS") : "TICKETS SOLD OUT"}
                       </button>
                     )}
                   </div>
