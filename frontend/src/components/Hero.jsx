@@ -16,7 +16,24 @@ const Hero = () => {
 
   const slides = [
     {
-      id: 2,
+      id: 1,
+      image: assets.Taiwan_hero,
+      titleLine1: "MONOLOGUE《MONOLOGUE》專輯發佈巡演最終站 香港",
+      showMobileText: false, // <--- 設置為 true text會變為not show in mobile
+      hideOrderBtn: false, // <--- 設置為 true 會變為灰色不可點擊
+      canvasColor: "bg-white",
+      textColor: "sm:text-black",
+      btnBorder: "sm:border-black",
+      btnBg: "sm:bg-black",
+      btnText: "sm:text-white",
+      orderBtnText: "TICKETS",
+      streamBtnText: "TOUR INFO",
+      orderLink: "https://www.offgrid.day/clubs/19/219?stage=show-detail",
+      streamUrl: "/shows/69ba358fd800308dd2f833c3",
+      heroLink: "/shows/69ba358fd800308dd2f833c3",
+    },
+    {
+      id: 3,
       image: assets.Taiwan_hero,
       titleLine1: "MONOLOGUE Tour",
       showMobileText: false, // <--- 設置為 true text會變為not show in mobile
@@ -34,7 +51,7 @@ const Hero = () => {
       heroLink: "/shows/69876c55266afcf9ab41b2ae",
     },
     {
-      id: 1,
+      id: 2,
       image: assets.Monologue_hero,
       titleLine1: "The New Album",
       titleLine2: "Out Now",
