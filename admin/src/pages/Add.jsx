@@ -15,7 +15,8 @@ const Add = ({ token }) => {
   const [sizes, setSizes] = useState([]);
   const [sizeCount, setSizeCount] = useState({});
 
-  // --- Ticket 專屬 State (純外部售票) ---
+  // --- Ticket 專屬 State ---
+  const [ticketType, setTicketType] = useState("external"); // 'external' (外部) 或 'internal' (內購)
   const [isTicketAvailable, setIsTicketAvailable] = useState(false);
   const [externalLink, setExternalLink] = useState("");
 
@@ -44,21 +45,31 @@ const Add = ({ token }) => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
+    // --- 自動格式化 Description：確保每一行開頭都有 '-' ---
+    const formattedDescription = description
+      .split('\n')
+      .map(line => {
+        const trimmed = line.trim();
+        if (trimmed === "") return ""; // 保留空行
+        return trimmed.startsWith('-') ? trimmed : `-${trimmed}`;
+      })
+      .join('\n');
+
     try {
       const formData = new FormData();
       formData.append("name", name);
-      formData.append("description", description);
+      formData.append("description", formattedDescription);
       formData.append("price", price);
       formData.append("category", category);
       formData.append("bestseller", bestseller);
       formData.append("sizes", JSON.stringify(sizes.map(size => ({ size, count: Number(sizeCount[size]) || 0 }))));
       formData.append("date", Date.now());
 
-      // --- Ticket 欄位：發送至後端 Schema ---
+      // --- Ticket 欄位發送 ---
       if (category === "Tickets") {
-        formData.append("ticketType", "external"); // 固定為外部模式
+        formData.append("ticketType", ticketType);
         formData.append("isTicketAvailable", isTicketAvailable);
-        formData.append("externalLink", externalLink);
+        formData.append("externalLink", ticketType === "external" ? externalLink : "");
       } else {
         formData.append("ticketType", "none");
         formData.append("isTicketAvailable", false);
@@ -86,6 +97,7 @@ const Add = ({ token }) => {
         setSizeCount({});
         setExternalLink("");
         setIsTicketAvailable(false);
+        setTicketType("external");
         setCategory("TEES");
       } else {
         toast.error(response.data.message || "Failed to add product.");
@@ -145,8 +157,8 @@ const Add = ({ token }) => {
               <textarea
                 onChange={(e) => setDescription(e.target.value)}
                 value={description}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-black outline-none min-h-[100px] transition-all"
-                placeholder="Use '-' for new lines in description"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-black outline-none min-h-[120px] transition-all"
+                placeholder="Lines will automatically start with '-'"
                 required
               />
             </div>
@@ -165,7 +177,7 @@ const Add = ({ token }) => {
                 <option value="ACCESSORIES">ACCESSORIES</option>
                 <option value="MUSIC">MUSIC</option>
                 <option value="CD">CD</option>
-                <option value="Tickets">Tickets (External)</option>
+                <option value="Tickets">Tickets</option>
               </select>
             </div>
 
@@ -182,11 +194,11 @@ const Add = ({ token }) => {
             </div>
           </div>
 
-          {/* 4. Ticket 專屬設定區塊 (純外部連結) */}
+          {/* 4. Ticket 專屬設定區塊 */}
           {category === "Tickets" && (
             <div className="w-full p-5 bg-gray-50 border border-gray-200 rounded-xl flex flex-col gap-4 animate-in fade-in slide-in-from-top-2">
               <div className="flex items-center justify-between border-b pb-3">
-                <p className="font-black text-xs uppercase tracking-widest text-black">🎫 External Ticket Settings</p>
+                <p className="font-black text-xs uppercase tracking-widest text-black">🎫 Ticket Settings</p>
                 <div className="flex items-center gap-2">
                   <input 
                     type="checkbox" 
@@ -199,20 +211,54 @@ const Add = ({ token }) => {
                 </div>
               </div>
 
-              <div className="w-full">
-                <p className="mb-2 text-xs font-bold text-gray-500 uppercase">Ticket Link (Redirect URL)</p>
-                <input 
-                  type="url"
-                  value={externalLink}
-                  onChange={(e) => setExternalLink(e.target.value)}
-                  placeholder="https://eventbrite.com"
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-black outline-none transition-all"
-                  required={isTicketAvailable} 
-                />
-                <p className="mt-2 text-[9px] text-gray-400 font-bold uppercase tracking-widest italic">
-                  * Users will be redirected to this external site when clicking 'Get Tickets'.
-                </p>
+              {/* 選擇內部或外部售票 */}
+              <div className="flex gap-6 py-2">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input 
+                    type="radio" 
+                    name="ticketType" 
+                    value="external" 
+                    checked={ticketType === "external"} 
+                    onChange={(e) => setTicketType(e.target.value)}
+                    className="w-4 h-4 accent-black"
+                  />
+                  <span className="text-xs font-bold uppercase group-hover:text-black transition-colors">External Link</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input 
+                    type="radio" 
+                    name="ticketType" 
+                    value="internal" 
+                    checked={ticketType === "internal"} 
+                    onChange={(e) => setTicketType(e.target.value)}
+                    className="w-4 h-4 accent-black"
+                  />
+                  <span className="text-xs font-bold uppercase group-hover:text-black transition-colors">Internal Booking (On-site)</span>
+                </label>
               </div>
+
+              {ticketType === "external" ? (
+                <div className="w-full">
+                  <p className="mb-2 text-xs font-bold text-gray-500 uppercase">Ticket Link (Redirect URL)</p>
+                  <input 
+                    type="url"
+                    value={externalLink}
+                    onChange={(e) => setExternalLink(e.target.value)}
+                    placeholder="https://eventbrite.com"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-black outline-none transition-all"
+                    required={isTicketAvailable && ticketType === "external"} 
+                  />
+                  <p className="mt-2 text-[9px] text-gray-400 font-bold uppercase tracking-widest italic">
+                    * Users will be redirected to this link.
+                  </p>
+                </div>
+              ) : (
+                <div className="w-full p-3 bg-black/5 border border-black/10 rounded-lg">
+                  <p className="text-[10px] text-black font-bold uppercase tracking-widest leading-relaxed">
+                    ℹ️ Internal Mode: Ticket will be processed through the website's native checkout system. Make sure inventory is set below.
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
