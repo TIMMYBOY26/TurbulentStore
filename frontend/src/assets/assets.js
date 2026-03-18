@@ -32,6 +32,7 @@ import parcel_icon from "./parcel_icon.svg";
 
 import Monologue_hero from "./TURBULENT MONOLOGUE COVER.png";
 import Taiwan_hero from "./TaiwanTicket.jpeg";
+import Monologue_hkhero from "./Monologue_hkhero.jpeg";
 import Taiwan_2 from "./TaiwanTour2.jpeg";
 import lightwall from "./lightwall.jpeg";
 import lightwallvideo from "./lightwallvideo.mp4";
@@ -69,6 +70,7 @@ export const assets = {
   parcel_icon,
   support_icon,
   Taiwan_hero,
+  Monologue_hkhero,
   Taiwan_2,
   herowhiteground,
 };
