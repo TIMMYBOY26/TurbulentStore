@@ -22,6 +22,10 @@ import "react-toastify/dist/ReactToastify.css";
 const App = () => {
   const location = useLocation();
 
+  // --- AD POPUP STATE (FOR HOME PAGE) ---
+  // 當頁面重新整理時會重置為 false，但在分頁切換時會保持 true
+  const [hasSeenAd, setHasSeenAd] = useState(false);
+
   // --- GLOBAL PREMIUM NOTIFICATION STATE ---
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
@@ -29,7 +33,6 @@ const App = () => {
   const triggerGlobalSuccess = (msg) => {
     setSuccessMsg(msg);
     setShowSuccess(true);
-    // REVERTED: Back to original 3-second duration
     setTimeout(() => {
       setShowSuccess(false);
     }, 3000);
@@ -39,7 +42,7 @@ const App = () => {
     <div className="relative">
       <ToastContainer />
 
-      {/* PREMIUM SUCCESS NOTIFICATION - Solid with Original Timings */}
+      {/* PREMIUM SUCCESS NOTIFICATION */}
       {showSuccess && (
         <div className="fixed top-6 right-6 z-[100] animate-toast-in">
           <div className="relative overflow-hidden min-w-[280px] sm:min-w-[340px] bg-white border border-gray-200 shadow-[0_20px_50px_rgba(0,0,0,0.2)] rounded-2xl p-4 flex items-center gap-4">
@@ -66,7 +69,6 @@ const App = () => {
               <p className="text-gray-700 text-sm font-medium">{successMsg}</p>
             </div>
 
-            {/* REVERTED: Original 3s Progress Bar */}
             <div className="absolute bottom-0 left-0 h-1 bg-black animate-progress-shrink" />
           </div>
 
@@ -80,11 +82,9 @@ const App = () => {
               from { width: 100%; }
               to { width: 0%; }
             }
-            /* REVERTED: Original 0.6s entry */
             .animate-toast-in { 
               animation: toast-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; 
             }
-            /* REVERTED: Original 3s shrink */
             .animate-progress-shrink { 
               animation: progress-shrink 3s linear forwards; 
             }
@@ -101,7 +101,12 @@ const App = () => {
 
       <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
         <Routes>
-          <Route path="/" element={<Home />} />
+          {/* 傳遞廣告狀態與設定函式給 Home 組件 */}
+          <Route
+            path="/"
+            element={<Home hasSeenAd={hasSeenAd} setHasSeenAd={setHasSeenAd} />}
+          />
+
           <Route path="/collection" element={<Collection />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/product/:productId" element={<Product />} />
