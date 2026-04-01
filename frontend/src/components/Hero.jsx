@@ -81,7 +81,7 @@ const Hero = () => {
       btnBorder: "sm:border-black",
       btnBg: "sm:bg-black",
       btnText: "sm:text-white",
-      orderBtnText: "TICKETS",
+      orderBtnText: "ORDER",
       streamBtnText: "TOUR INFO",
       orderLink: "https://www.fireonshop.com/products/turbulent-monologue",
       streamUrl: "/shows/69ba358fd800308dd2f833c3",
@@ -201,7 +201,7 @@ const Hero = () => {
                 <div className="flex justify-center sm:justify-start gap-2 sm:gap-4 mb-6 sm:mb-12">
                   {slide.hideOrderBtn ? (
                     <div className="px-3.5 py-1.5 sm:px-10 sm:py-3.5 border-[1px] border-gray-300 bg-gray-200 text-gray-400 rounded-sm font-medium sm:font-bold uppercase tracking-widest text-[8.5px] sm:text-[14px] cursor-not-allowed">
-                      Coming
+                      SOLD OUT
                     </div>
                   ) : (
                     <button
