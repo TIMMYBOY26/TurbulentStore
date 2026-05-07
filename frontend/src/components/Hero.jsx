@@ -20,7 +20,7 @@ const Hero = () => {
       titleLine1: "《MONOLOGUE》",
       titleLine2: "專輯發佈巡演最終站 香港",
       showMobileText: false, // false = 手機版隱藏文字 (照你代碼註解邏輯)
-      hideOrderBtn: false,
+      hideOrderBtn: true,
       canvasColor: "bg-white",
       textColor: "sm:text-black",
       btnBorder: "sm:border-black",

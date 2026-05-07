@@ -9,53 +9,56 @@ const Home = ({ hasSeenAd, setHasSeenAd }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [showAd, setShowAd] = useState(false);
 
-  // 1. 當 Loading 或 廣告顯示時，防止背景頁面捲動 (Scroll Lock)
+  /**
+   * 💡 廣告活動開關 (Ad Campaign Toggle)
+   * 巡演結束時設為 false；未來有新活動需要彈窗時，只需改回 true。
+   */
+  const isAdCampaignActive = false;
+
+  // 1. 處理頁面捲動鎖定 (Scroll Lock)
   useEffect(() => {
-    if (isLoading || showAd) {
+    // 只有在 Loading 中，或者「活動開啟且廣告顯示時」才鎖定捲動
+    if (isLoading || (isAdCampaignActive && showAd)) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
     }
-    // 組件卸載時恢復捲動，避免影響其他頁面
+
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [isLoading, showAd]);
+  }, [isLoading, showAd, isAdCampaignActive]);
 
   // 2. 頁面加載偵測與廣告跳出邏輯
   useEffect(() => {
     const handleLoad = () => {
-      // 設定 1 秒的加載動畫時間
+      // 設定 1 秒的品牌加載動畫時間
       setTimeout(() => {
         setIsLoading(false);
 
         /**
-         * 核心邏輯：
-         * 只有在 App 層級的 hasSeenAd 為 false 時才顯示廣告。
-         * - 分頁切換時：hasSeenAd 已被設為 true，所以不會顯示。
-         * - 重新整理 (F5)：App 狀態重置為 false，廣告會再次顯示。
+         * 廣告彈出邏輯：
+         * 只有在 isAdCampaignActive 為 true，且 App 層級 hasSeenAd 為 false 時才執行。
          */
-        if (!hasSeenAd) {
+        if (isAdCampaignActive && !hasSeenAd) {
           setTimeout(() => {
             setShowAd(true);
-          }, 800); // 頁面內容浮現完畢後 0.8 秒彈出廣告
+          }, 800);
         }
       }, 1000);
     };
 
-    // 檢查瀏覽器是否已完成資源加載
     if (document.readyState === "complete") {
       handleLoad();
     } else {
       window.addEventListener("load", handleLoad);
       return () => window.removeEventListener("load", handleLoad);
     }
-  }, [hasSeenAd]);
+  }, [hasSeenAd, isAdCampaignActive]);
 
   // 3. 處理廣告關閉
   const handleCloseAd = () => {
     setShowAd(false);
-    // 更新 App.jsx 中的狀態，這樣分頁切換就不會再看到
     setHasSeenAd(true);
   };
 
@@ -85,8 +88,8 @@ const Home = ({ hasSeenAd, setHasSeenAd }) => {
         </div>
       )}
 
-      {/* --- 2. AD POPUP (極簡 Apple 風格) --- */}
-      {!isLoading && showAd && (
+      {/* --- 2. AD POPUP (受開關控制) --- */}
+      {isAdCampaignActive && !isLoading && showAd && (
         <AdPopup
           onClose={handleCloseAd}
           image={assets.Monologue_hkhero}
@@ -95,7 +98,7 @@ const Home = ({ hasSeenAd, setHasSeenAd }) => {
         />
       )}
 
-      {/* --- 3. PAGE CONTENT (帶有向上浮現動畫) --- */}
+      {/* --- 3. PAGE CONTENT --- */}
       <div
         className={`transition-all duration-1000 ease-out ${
           isLoading ? "opacity-0 translate-y-10" : "opacity-100 translate-y-0"
