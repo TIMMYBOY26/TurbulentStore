@@ -6,7 +6,7 @@ import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-// --- 1. 確認下單彈窗 ---
+// --- 1. Confirm Order Modal ---
 const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;
   return (
@@ -30,7 +30,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
   );
 };
 
-// --- 2. 補交收據提醒彈窗 ---
+// --- 2. No Receipt Warning Modal ---
 const PendingReceiptModal = ({ isOpen, onCancel, onProceed }) => {
   if (!isOpen) return null;
   return (
@@ -44,7 +44,7 @@ const PendingReceiptModal = ({ isOpen, onCancel, onProceed }) => {
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">No Receipt Attached</h2>
           <p className="text-gray-500 text-sm leading-relaxed">
-            You can place the order now and upload the receipt later in the <b>"My Orders"</b> section. We will process your order once payment is verified.
+            You can place the order now and upload the receipt later in <b>"My Orders"</b>. We will process your order once payment is verified.
           </p>
         </div>
         <div className="flex flex-col gap-2 mt-6">
@@ -56,7 +56,7 @@ const PendingReceiptModal = ({ isOpen, onCancel, onProceed }) => {
   );
 };
 
-// --- 3. 成功下單後的彈窗 ---
+// --- 3. Success Modal ---
 const SuccessOrderModal = ({ isOpen, onDirectRedirect, hasTicket, receiptUploaded }) => {
   if (!isOpen) return null;
   return (
@@ -71,17 +71,17 @@ const SuccessOrderModal = ({ isOpen, onDirectRedirect, hasTicket, receiptUploade
         <div className="mb-8 px-2 space-y-3 text-sm leading-relaxed">
           {receiptUploaded ? (
             <div className="bg-green-50 p-4 rounded-2xl">
-              <p className="text-green-700 font-bold">付款記錄已成功上傳 ✓</p>
-              <p className="text-xs text-green-600 mt-1">我們將儘快核實您的訂單，您可以在「My Orders」查看進度。</p>
+              <p className="text-green-700 font-bold">Receipt Uploaded ✓</p>
+              <p className="text-xs text-green-600 mt-1">We will verify your order soon. Check "My Orders" for updates.</p>
             </div>
           ) : (
             <div className="bg-blue-50 p-4 rounded-2xl">
-              <p className="text-blue-700 font-bold">等待付款證明</p>
-              <p className="text-xs text-blue-600 mt-1">請記得在「My Orders」頁面補傳付款截圖以完成訂購。</p>
+              <p className="text-blue-700 font-bold">Pending Payment Proof</p>
+              <p className="text-xs text-blue-600 mt-1">Please upload your payment screenshot in "My Orders" to complete.</p>
             </div>
           )}
           {hasTicket && (
-            <p className="text-gray-400 italic text-xs">※ 電子門票資訊將於付款核實後發送至您的電話</p>
+            <p className="text-gray-400 italic text-xs">※ Ticket info will be sent to your phone after verification.</p>
           )}
         </div>
         <button onClick={onDirectRedirect} className="w-full py-4 bg-black text-white font-bold rounded-2xl hover:bg-gray-800 transition-all uppercase shadow-lg active:scale-[0.98]">Check My Orders</button>
@@ -169,7 +169,7 @@ const PlaceOrder = () => {
         <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-600 space-y-3">
           {qr && <img src={qr} className="w-32 h-32 mx-auto rounded-lg border shadow-sm" alt="QR" />}
           {isCash ? (
-            <p className="text-purple-600 font-bold italic">Meetup will be arranged after order confirmation</p>
+            <p className="text-purple-600 font-bold italic">Meetup details after order confirmation</p>
           ) : (
             <>
               {instructions}
@@ -190,7 +190,7 @@ const PlaceOrder = () => {
                 </label>
               </div>
               <p className="font-bold italic text-[11px] text-blue-600">
-                ※ If not uploaded now, please submit via "My Orders" page later.
+                ※ If not uploaded now, please submit via "My Orders" later.
               </p>
             </>
           )}
@@ -210,9 +210,9 @@ const PlaceOrder = () => {
       <form onSubmit={handleFormSubmit} className="flex flex-col lg:flex-row gap-12">
         <div className="flex-1 space-y-10">
           <section>
-            <Title text1={"STEP 1:"} text2={"YOUR INFORMATION"} />
+            <Title text1={"STEP 1:"} text2={"YOUR INFO"} />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-              <input required name="firstName" onChange={onChangeHandler} className="w-full border-gray-200 border rounded-xl py-3 px-4 focus:ring-2 focus:ring-black outline-none bg-gray-50" placeholder="First Name" />
+              <input required name="firstName" onChange={onChangeHandler} className="w-full border-gray-200 border rounded-xl py-3 px-4 focus:ring-2 focus:ring-black outline-none bg-gray-50" placeholder="Name" />
               <input required name="phone" onChange={onChangeHandler} className="w-full border-gray-200 border rounded-xl py-3 px-4 focus:ring-2 focus:ring-black outline-none bg-gray-50" placeholder="Phone Number" maxLength={8} pattern="[0-9]*" />
             </div>
           </section>
@@ -228,9 +228,6 @@ const PlaceOrder = () => {
                     <h3 className="font-bold text-lg">SF Express Delivery</h3>
                     <p className="text-sm text-blue-600 italic">Free Delivery in HK Area</p>
                   </div>
-                  {/* <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${deliveryType === "sf" ? "border-blue-500 bg-blue-500" : "border-gray-300"}`}>
-                    {deliveryType === "sf" && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
-                  </div> */}
                 </div>
                 {deliveryType === "sf" && (
                   <div className="p-5 border-t border-blue-100 space-y-3 bg-white">
@@ -239,25 +236,6 @@ const PlaceOrder = () => {
                   </div>
                 )}
               </div>
-
-              {/* 🙈 Hidden In-Person Collection Section (Reserved for future use) */}
-              {/* 
-              <div className={`rounded-2xl border-2 transition-all cursor-pointer ${deliveryType === "inPerson" ? "border-purple-500 bg-purple-50/10 shadow-md" : "border-gray-100 bg-white"}`} onClick={() => { setDeliveryType("inPerson"); setMethod("cod"); }}>
-                <div className="p-5 flex justify-between items-center">
-                  <h3 className="font-bold text-lg">In-Person Collection</h3>
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${deliveryType === "inPerson" ? "border-purple-500 bg-purple-500" : "border-gray-300"}`}>
-                    {deliveryType === "inPerson" && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
-                  </div>
-                </div>
-                {deliveryType === "inPerson" && (
-                  <div className="p-5 border-t border-purple-100 space-y-3 bg-white">
-                    <PaymentOption id="cod" label="By Cash" instructions={<></>} isTradeIn={true} isCash={true} />
-                    <PaymentOption id="paymeTradeIn" label="By PayMe" qr={assets.paymeCode} instructions={<p>1. Pay via link/QR</p>} isTradeIn={true} />
-                    <PaymentOption id="fpsTradeIn" label="By FPS" qr={assets.fpsCode} instructions={<p>1. FPS ID: 2394658</p>} isTradeIn={true} />
-                  </div>
-                )}
-              </div> 
-              */}
 
             </div>
           </section>
