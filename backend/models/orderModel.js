@@ -1,14 +1,18 @@
 import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
-    // 使用 ObjectId 並關聯到 user model
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
     items: { type: Array, required: true },
     amount: { type: Number, required: true },
     address: { type: Object, required: true },
 
-    // 狀態建議：預設改為 Order Placed
-    status: { type: String, required: true, default: 'Order Placed' },
+    // 優化 1: 將預設狀態改為 'Payment Processing' 
+    // 這樣可以與你 Controller 的邏輯統一，代表「等待付款/上傳收據」
+    status: {
+        type: String,
+        required: true,
+        default: 'Payment Processing'
+    },
 
     paymentMethod: { type: String, required: true },
 
@@ -17,13 +21,14 @@ const orderSchema = new mongoose.Schema({
 
     date: { type: Number, required: true },
 
-    // 訂單編號，設為唯一的數字以便對帳
-    orderNumber: { type: Number, required: true, unique: true },
+    // 優化 2: 訂單編號建議設為 String
+    // 雖然現在是 Number，但未來如果你想加入日期前綴 (如 20260508001) 
+    // String 會比 Number 更有彈性，且能避免大數字精度問題
+    orderNumber: { type: String, required: true, unique: true },
 
-    // 🟢 新增：儲存 Cloudinary 的收據圖片連結
-    // 設為 String 類型，預設為空字串，方便前端判斷是否有圖
+    // 儲存 Cloudinary 的收據圖片連結
     receiptImage: { type: String, default: "" }
-});
+}, { minimize: false }); // 優化 3: 加入 minimize: false 確保空物件也會存入 DB
 
 const orderModel = mongoose.models.order || mongoose.model('order', orderSchema);
 

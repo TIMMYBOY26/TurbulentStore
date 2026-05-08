@@ -2,7 +2,7 @@ import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import productModel from "../models/productModel.js";
 import axios from "axios";
-import { v2 as cloudinary } from "cloudinary"; // 確保你有引入 cloudinary
+import { v2 as cloudinary } from "cloudinary";
 
 // --- 輔助函式：發送 Telegram ---
 const sendTelegramNotification = async (chatId, message) => {
@@ -15,10 +15,14 @@ const sendTelegramNotification = async (chatId, message) => {
   }
 };
 
-// --- 輔助函式：生成訂單號 ---
+// --- 輔助函式：生成訂單號 (修正 196 + 1 = 1961 的問題) ---
 const generateOrderNumber = async () => {
   const lastOrder = await orderModel.findOne().sort({ orderNumber: -1 }).exec();
-  return lastOrder ? lastOrder.orderNumber + 1 : 1;
+  if (lastOrder) {
+    // 使用 parseInt 確保是數字相加，避免字串連接導致 1961
+    return parseInt(lastOrder.orderNumber, 10) + 1;
+  }
+  return 1;
 };
 
 // --- 輔助函式：扣減庫存 ---
@@ -50,13 +54,13 @@ const processOrder = async (req, res, methodLabel, isCOD = false) => {
   try {
     const { userId, amount } = req.body;
 
-    // 🟢 因為前端用 FormData，這裡必須解析 JSON 字串
+    // 前端 FormData 傳來的 JSON 字串解析
     const items = JSON.parse(req.body.items);
     const address = JSON.parse(req.body.address);
 
     const orderNumber = await generateOrderNumber();
 
-    // 🟢 處理圖片上傳 (Cloudinary)
+    // 1. 處理圖片上傳
     let receiptUrl = "";
     if (req.file) {
       const imageUpload = await cloudinary.uploader.upload(req.file.path, {
@@ -66,29 +70,36 @@ const processOrder = async (req, res, methodLabel, isCOD = false) => {
       receiptUrl = imageUpload.secure_url;
     }
 
+    // 2. 核心邏輯：狀態自動分流
+    // 如果有收據 -> 備貨中 (Goods Arrangement in Progress)
+    // 如果沒收據 -> 待付款 (Payment Processing)
+    const currentStatus = receiptUrl ? "Goods Arrangement in Progress" : "Payment Processing";
+
     const orderData = {
       userId,
       items,
       address,
-      amount,
+      amount: Number(amount),
       paymentMethod: methodLabel,
       payment: false,
       date: Date.now(),
       orderNumber,
-      receiptImage: receiptUrl, // 儲存截圖 URL (選填)
+      receiptImage: receiptUrl,
+      status: currentStatus, // 自動設定狀態
     };
 
     const newOrder = new orderModel(orderData);
     await newOrder.save({ session });
 
+    // 扣減庫存
     await reduceProductSizeCount(items, session);
 
-    // 更新用戶名稱及清空購物車
+    // 更新用戶名與清空購物車
     await userModel.findByIdAndUpdate(userId, { name: address.firstName, cartData: {} }, { session });
 
     // 發送 Telegram
-    const statusText = receiptUrl ? "✅ 已附上截圖" : "⚠️ 待補交截圖";
-    const message = `🔔 收到新訂單 (#${orderNumber})\n金額: $${amount}\n付款方式: ${methodLabel}\n截圖狀態: ${isCOD ? "N/A" : statusText}`;
+    const statusText = receiptUrl ? "✅ 已附上截圖 (備貨中)" : "⚠️ 待補交截圖 (待處理)";
+    const message = `🔔 收到新訂單 (#${orderNumber})\n金額: $${amount}\n付款方式: ${methodLabel}\n狀態: ${currentStatus}\n${statusText}`;
     await sendTelegramNotification("-1002324020435", message);
 
     await session.commitTransaction();
@@ -102,7 +113,7 @@ const processOrder = async (req, res, methodLabel, isCOD = false) => {
   }
 };
 
-// --- 各種付款方式路由處理 ---
+// --- 付款方式分流 ---
 const placeOrder = (req, res) => processOrder(req, res, "COD", true);
 const placeOrderPayme = (req, res) => processOrder(req, res, "PayMe");
 const placeOrderFps = (req, res) => processOrder(req, res, "FPS");
@@ -110,7 +121,7 @@ const tradeInPersonPlaceOrderPayme = (req, res) => processOrder(req, res, "payme
 const tradeInPersonPlaceOrderFps = (req, res) => processOrder(req, res, "fpsTradeIn");
 
 /**
- * 🟢 新功能：使用者在訂單列表補傳截圖
+ * 補傳截圖功能：自動更新狀態
  */
 const updateOrderReceipt = async (req, res) => {
   try {
@@ -124,27 +135,30 @@ const updateOrderReceipt = async (req, res) => {
       folder: "Payment_record",
     });
 
+    // 補傳截圖後，將狀態從 Payment Processing 改為 Goods Arrangement in Progress
     const updatedOrder = await orderModel.findByIdAndUpdate(
       orderId,
-      { receiptImage: imageUpload.secure_url },
+      {
+        receiptImage: imageUpload.secure_url,
+        status: "Goods Arrangement in Progress"
+      },
       { new: true }
     );
 
-    // 補傳截圖後發送通知給 Admin
-    const message = `📸 訂單補交截圖 (#${updatedOrder.orderNumber})\n客戶: ${updatedOrder.address.firstName}\n金額: $${updatedOrder.amount}`;
+    const message = `📸 訂單補交截圖 (#${updatedOrder.orderNumber})\n狀態已更新為: Goods Arrangement in Progress\n客戶: ${updatedOrder.address.firstName}`;
     await sendTelegramNotification("-1002324020435", message);
 
-    res.json({ success: true, message: "收據已成功更新", receiptImage: imageUpload.secure_url });
+    res.json({ success: true, message: "收據已更新，訂單進入備貨流程", receiptImage: imageUpload.secure_url });
   } catch (error) {
     console.error(error);
     res.json({ success: false, message: error.message });
   }
 };
 
-// --- 其他管理功能 ---
+// --- 管理功能 ---
 const allOrders = async (req, res) => {
   try {
-    const orders = await orderModel.find({}).populate('userId', 'email');
+    const orders = await orderModel.find({}).populate('userId', 'email').sort({ orderNumber: -1 });
     res.json({ success: true, orders });
   } catch (error) {
     res.json({ success: false, message: error.message });
@@ -154,7 +168,7 @@ const allOrders = async (req, res) => {
 const userOrders = async (req, res) => {
   try {
     const { userId } = req.body;
-    const orders = await orderModel.find({ userId });
+    const orders = await orderModel.find({ userId }).sort({ date: -1 });
     res.json({ success: true, orders });
   } catch (error) {
     res.json({ success: false, message: error.message });
@@ -188,7 +202,7 @@ export {
   placeOrderFps,
   tradeInPersonPlaceOrderPayme,
   tradeInPersonPlaceOrderFps,
-  updateOrderReceipt, // 🟢 匯出新功能
+  updateOrderReceipt,
   allOrders,
   userOrders,
   updateStatus,

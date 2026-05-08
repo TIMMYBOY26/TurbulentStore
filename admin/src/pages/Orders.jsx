@@ -14,11 +14,12 @@ const Orders = ({ token }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("All");
 
-  const fetchAllOrders = async () => {
-    if (!token) {
-      return null;
-    }
+  // 用於放大查看收據的狀態
+  const [showModal, setShowModal] = useState(false);
+  const [modalImage, setModalImage] = useState("");
 
+  const fetchAllOrders = async () => {
+    if (!token) return null;
     try {
       const response = await axios.post(
         backendUrl + "/api/order/list",
@@ -31,7 +32,7 @@ const Orders = ({ token }) => {
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.log("no data fetched here");
+      console.log("Error fetching data");
       toast.error(error.message);
     }
   };
@@ -47,7 +48,6 @@ const Orders = ({ token }) => {
         await fetchAllOrders();
       }
     } catch (error) {
-      console.log(error);
       toast.error(error.message);
     }
   };
@@ -58,31 +58,25 @@ const Orders = ({ token }) => {
       toast.error("Please enter a valid amount.");
       return;
     }
-
     try {
       const response = await axios.post(
         backendUrl + "/api/order/update-amount",
         { orderId, amount },
         { headers: { token } }
       );
-
       if (response.data.success) {
         toast.success("Order amount updated successfully.");
-        await fetchAllOrders(); // Refresh the order list
+        await fetchAllOrders();
       } else {
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.log(error);
       toast.error(error.message);
     }
   };
 
   const handleAmountChange = (orderId, value) => {
-    setNewAmounts({
-      ...newAmounts,
-      [orderId]: value,
-    });
+    setNewAmounts({ ...newAmounts, [orderId]: value });
   };
 
   const handleAmountBlur = (orderId) => {
@@ -91,337 +85,233 @@ const Orders = ({ token }) => {
   };
 
   const handleKeyPress = (event, orderId) => {
-    if (event.key === "Enter") {
-      handleAmountBlur(orderId);
-    }
+    if (event.key === "Enter") handleAmountBlur(orderId);
   };
 
   useEffect(() => {
     fetchAllOrders();
   }, [token]);
 
-  const sortedOrders = [...orders].sort(
-    (a, b) => new Date(b.date) - new Date(a.date)
-  );
+  // 排序與過濾
+  const sortedOrders = [...orders].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  // Inside your Orders component, update the filteredOrders constant:
   const filteredOrders = sortedOrders.filter((order) => {
     const searchTermLower = searchTerm.toLowerCase();
     const orderNumberMatch = String(order.orderNumber).toLowerCase().includes(searchTermLower);
-
-    // If you used .populate('userId'), the email is at order.userId.email
-    // If you used the manual join, it might be at order.userEmail
-    const emailMatch = (order.userId?.email || order.userEmail || "")
-      .toLowerCase()
-      .includes(searchTermLower);
-
+    const emailMatch = (order.userId?.email || order.userEmail || "").toLowerCase().includes(searchTermLower);
     return orderNumberMatch || emailMatch;
   });
 
-  const finalFilteredOrders =
-    selectedStatus === "All"
-      ? filteredOrders
-      : filteredOrders.filter((order) => order.status === selectedStatus);
+  const finalFilteredOrders = selectedStatus === "All"
+    ? filteredOrders
+    : filteredOrders.filter((order) => order.status === selectedStatus);
 
-  // Calculate total income, order count, and items sold by month
+  // 計算統計數據
   const incomeByMonth = finalFilteredOrders.reduce((acc, order) => {
-    // Skip cancelled orders
-    if (order.status === "Cancelled") {
-      return acc;
-    }
-
-    const month = new Date(order.date).toLocaleString("default", {
-      month: "long",
-      year: "numeric",
-    });
-
-    if (!acc[month]) {
-      acc[month] = { totalIncome: 0, orderCount: 0, totalItems: 0 };
-    }
-
+    if (order.status === "Cancelled") return acc;
+    const month = new Date(order.date).toLocaleString("default", { month: "long", year: "numeric" });
+    if (!acc[month]) acc[month] = { totalIncome: 0, orderCount: 0, totalItems: 0 };
     acc[month].totalIncome += order.amount;
     acc[month].orderCount += 1;
-    acc[month].totalItems += order.items.reduce(
-      (sum, item) => sum + item.quantity,
-      0
-    );
-
+    acc[month].totalItems += order.items.reduce((sum, item) => sum + item.quantity, 0);
     return acc;
   }, {});
 
-
-  // Calculate average order value by month
-  for (const month in incomeByMonth) {
-    incomeByMonth[month].averageOrderValue = (
-      incomeByMonth[month].totalIncome / incomeByMonth[month].orderCount
-    ).toFixed(2);
-  }
-
-  // Calculate order status counts based on original orders
   const statusCounts = orders.reduce((acc, order) => {
     acc[order.status] = (acc[order.status] || 0) + 1;
     return acc;
   }, {});
 
-  const allStatuses = [
-    "Payment Processing",
-    "Goods Arrangement in Progress",
-    "Delivery in Progress",
-    "Shipped",
-    "Order Completed",
-    "Cancelled",
-  ];
+  const allStatuses = ["Payment Processing", "Goods Arrangement in Progress", "Delivery in Progress", "Shipped", "Order Completed", "Cancelled"];
 
-  // Function to determine the color based on status
   const getStatusColor = (status) => {
     switch (status) {
-      case "Order Completed":
-        return "bg-green-500"; // Green
-      case "Delivery in Progress":
-        return "bg-yellow-500"; // Yellow
-      case "Shipped":
-        return "bg-blue-500"; // Blue
-      case "Payment Processing":
-        return "bg-orange-500"; // Orange
-      case "Cancelled":
-        return "bg-red-500"; // Red
-      case "Goods Arrangement in Progress":
-        return "bg-gray-500"; // Light Gray
-      default:
-        return "bg-gray-500"; // Default color
+      case "Order Completed": return "bg-green-500";
+      case "Delivery in Progress": return "bg-yellow-500";
+      case "Shipped": return "bg-blue-500";
+      case "Payment Processing": return "bg-orange-500";
+      case "Cancelled": return "bg-red-500";
+      default: return "bg-gray-500";
     }
   };
 
   return (
-    <div>
-      {/* Income Table Section */}
-      <div className="my-4">
-        <button
-          onClick={() => setIsIncomeVisible(!isIncomeVisible)}
-          className="text-lg font-semibold mb-2"
+    <div className="p-4 bg-gray-50 min-h-screen">
+      {/* 圖片放大 Modal */}
+      {showModal && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm transition-all"
+          onClick={() => setShowModal(false)}
         >
-          {isIncomeVisible ? "Hide" : "Show"} Total Income by Month
+          <div className="relative max-w-5xl w-full flex flex-col items-center">
+            <button className="absolute -top-12 right-0 text-white text-3xl font-light hover:rotate-90 transition-transform">✕</button>
+            <img
+              src={modalImage}
+              alt="Receipt Full"
+              className="max-w-full max-h-[85vh] object-contain rounded shadow-2xl shadow-blue-500/20"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <p className="mt-4 text-gray-400 text-sm tracking-widest uppercase">Click anywhere to close</p>
+          </div>
+        </div>
+      )}
+
+      {/* 營收統計 */}
+      <div className="mb-8 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <button onClick={() => setIsIncomeVisible(!isIncomeVisible)} className="text-lg font-bold text-gray-800 flex items-center gap-2">
+          {isIncomeVisible ? "▼" : "▶"} Total Income by Month
         </button>
         {isIncomeVisible && (
-          <table className="min-w-full max-w-lg mx-auto border border-gray-300 text-sm">
-            <thead>
-              <tr>
-                <th className="border border-gray-300 p-1">Month</th>
-                <th className="border border-gray-300 p-1">Total Income</th>
-                <th className="border border-gray-300 p-1">Total Orders</th>
-                <th className="border border-gray-300 p-1">Total Items Sold</th>
-                <th className="border border-gray-300 p-1">
-                  Average Order Value
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(incomeByMonth).map(
-                (
-                  [
-                    month,
-                    { totalIncome, orderCount, totalItems, averageOrderValue },
-                  ],
-                  index
-                ) => (
-                  <tr key={index}>
-                    <td className="border border-gray-300 p-1">{month}</td>
-                    <td className="border border-gray-300 p-1">
-                      {currency}
-                      {totalIncome.toFixed(2)}
-                    </td>
-                    <td className="border border-gray-300 p-1">{orderCount}</td>
-                    <td className="border border-gray-300 p-1">{totalItems}</td>
-                    <td className="border border-gray-300 p-1">
-                      {currency}
-                      {averageOrderValue}
-                    </td>
-                  </tr>
-                )
-              )}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      {/* Status Count Table Section */}
-      <div className="my-4">
-        <button
-          onClick={() => setIsStatusVisible(!isStatusVisible)}
-          className="text-lg font-semibold mb-2"
-        >
-          {isStatusVisible ? "Hide" : "Show"} Order Status Counts
-        </button>
-        {isStatusVisible && (
-          <table className="min-w-full max-w-lg mx-auto border border-gray-300 text-sm">
-            <thead>
-              <tr>
-                <th className="border border-gray-300 p-1">Status</th>
-                <th className="border border-gray-300 p-1">Count</th>
-              </tr>
-            </thead>
-            <tbody>
-              {allStatuses.map((status, index) => (
-                <tr key={index}>
-                  <td className="border border-gray-300 p-1 flex items-center">
-                    <span
-                      className={`inline-block w-3 h-3 rounded-full mr-2 ${getStatusColor(
-                        status
-                      )}`}
-                    ></span>
-                    {status}
-                  </td>
-                  <td className="border border-gray-300 p-1">
-                    {statusCounts[status] || 0}
-                  </td>
+          <div className="overflow-x-auto mt-4">
+            <table className="min-w-full border-collapse">
+              <thead>
+                <tr className="bg-gray-50 text-gray-600 text-left text-xs uppercase tracking-wider">
+                  <th className="p-3 border-b">Month</th>
+                  <th className="p-3 border-b">Income</th>
+                  <th className="p-3 border-b">Orders</th>
+                  <th className="p-3 border-b">Items</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="text-sm">
+                {Object.entries(incomeByMonth).map(([month, data], index) => (
+                  <tr key={index} className="hover:bg-gray-50">
+                    <td className="p-3 border-b font-medium">{month}</td>
+                    <td className="p-3 border-b text-blue-600 font-bold">{currency}{data.totalIncome.toFixed(2)}</td>
+                    <td className="p-3 border-b">{data.orderCount}</td>
+                    <td className="p-3 border-b text-gray-500">{data.totalItems}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
-      <h3>Orders</h3>
-
-      {/* Search Input and Status Filter Section */}
-      <div className="flex flex-col sm:flex-row my-4 gap-4">
-        <input
-          type="text"
-          placeholder="Search by Order Number"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="border border-gray-300 p-2 rounded w-full sm:w-1/2"
-        />
-        <select
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-          className="border border-gray-300 p-2 rounded w-full sm:w-1/2"
-        >
-          <option value="All">All</option>
-          {allStatuses.map((status, index) => (
-            <option key={index} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
+      {/* 搜尋與過濾器 */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+        <h3 className="text-2xl font-black text-gray-800">ORDERS</h3>
+        <div className="flex w-full md:w-auto gap-2">
+          <input
+            type="text"
+            placeholder="Search Order # or Email"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="border border-gray-300 p-2 rounded-lg text-sm w-full md:w-64 focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="border border-gray-300 p-2 rounded-lg text-sm bg-white"
+          >
+            <option value="All">All Status</option>
+            {allStatuses.map((status, index) => <option key={index} value={status}>{status}</option>)}
+          </select>
+        </div>
       </div>
 
-      <div>
+      {/* 訂單列表 */}
+      <div className="space-y-4">
         {finalFilteredOrders.map((order, index) => (
           <div
-            className="grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-x-gray-200 p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-gray-700"
+            className="grid grid-cols-1 sm:grid-cols-[100px_2fr_1fr_1fr_1fr_1fr] gap-4 items-start border border-gray-200 bg-white p-6 rounded-xl hover:border-blue-300 transition-colors shadow-sm"
             key={index}
           >
-            <img className="w-12" src={assets.parcel_icon} alt="" />
-            <div>
-              <p className="text-sm sm:text-[15px]">
-                Order Number : {order.orderNumber}
-              </p>
-              <hr />
-              <div>
-                {order.items.map((item, itemIndex) => (
-                  <p className="py-0.5" key={itemIndex}>
-                    {item.name} x {item.quantity} <span>{item.size}</span>
-                    {itemIndex < order.items.length - 1 && ","}
+            {/* 1. 收據預覽 */}
+            <div className="flex flex-col items-center gap-2">
+              <img className="w-8 opacity-20" alt="" />
+              {order.receiptImage ? (
+                <div
+                  className="relative cursor-pointer group"
+                  onClick={() => { setModalImage(order.receiptImage); setShowModal(true); }}
+                >
+                  <img
+                    src={order.receiptImage}
+                    alt="Receipt"
+                    className="w-20 h-20 object-cover rounded-lg border-2 border-blue-100 group-hover:border-blue-500 transition-all shadow-sm"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 rounded-lg transition-opacity">
+                    <span className="text-[10px] text-white font-bold bg-blue-600 px-2 py-0.5 rounded">VIEW</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="w-20 h-20 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center text-gray-300">
+                  <span className="text-xl">✕</span>
+                  <span className="text-[9px] font-bold">NO RECEIPT</span>
+                </div>
+              )}
+            </div>
+
+            {/* 2. 訂單內容 */}
+            <div className="text-sm">
+              <p className="font-bold text-gray-900 mb-2">Order: {order.orderNumber}</p>
+              <div className="space-y-1 text-gray-600">
+                {order.items.map((item, i) => (
+                  <p key={i} className="text-xs">
+                    • {item.name} x {item.quantity} <span className="text-blue-500">[{item.size}]</span>
                   </p>
                 ))}
-
               </div>
-              <p className="text-sm sm:text-[17px] mt-3 mb-2 font-medium">
-                {order.address.firstName || ""} {order.address.lastName || ""}
-              </p>
-              <div>
-                <p>{order.address.street || ""}</p>
-                <p>
-                  {[
-                    order.address.city,
-                    order.address.state,
-                    order.address.country,
-                    order.address.zipcode,
-                  ]
-                    .filter(Boolean) // Filters out any undefined or empty values
-                    .join(" ")}
-                </p>
-
-              </div>
-
-              <p>{order.address.phone || ""}</p>
-              {/* Display User Login Email Here */}
-              <div className="mt-2 mb-2 p-2 bg-gray-50 rounded border border-dashed border-gray-300">
-                <p className="text-[11px] text-gray-400 uppercase font-bold tracking-widest">Login Account</p>
-                <p className="text-sm text-blue-600 font-semibold italic">
-                  {order.userId?.email || order.userEmail || "Email Not Found"}
-                </p>
+              <div className="mt-4 pt-2 border-t border-gray-50">
+                <p className="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">Login Account</p>
+                <p className="text-xs text-blue-600 font-medium truncate">{order.userId?.email || order.userEmail || "Guest User"}</p>
               </div>
             </div>
-            <div>
-              <p className="text-sm sm:text-[15px]">
-                Items : {order.items.length}
-              </p>
-              <p className="mt-3">
-                Method:{" "}
-                <span>
-                  {order.paymentMethod === "paymeTradeIn"
-                    ? "Payme, In-person delivery"
-                    : order.paymentMethod === "fpsTradeIn"
-                      ? "FPS, In-person delivery"
-                      : order.paymentMethod === "COD"
-                        ? "Cash, In-person delivery"
-                        : order.paymentMethod === "PayMe"
-                          ? "Payme, Delivery by SF Express"
-                          : order.paymentMethod === "FPS"
-                            ? "FPS, Delivery by SF Express"
-                            : order.paymentMethod}
-                </span>
-              </p>
-              <p>Payment : {order.payment ? "Done" : "Pending"}</p>
-              <p>Date: {new Date(order.date).toLocaleDateString()}</p>
+
+            {/* 3. 收件資訊 */}
+            <div className="text-xs text-gray-600">
+              <p className="font-bold text-gray-800 mb-1">{order.address.firstName} {order.address.lastName}</p>
+              <p>{order.address.phone}</p>
+              <p className="mt-1 text-gray-400">{order.address.street}</p>
+              <p className="text-gray-400">{order.address.city}, {order.address.state}</p>
             </div>
 
-            {/* Editable Amount Field */}
-            {editingOrderId === order._id ? (
-              <input
-                type="number"
-                value={newAmounts[order._id] || order.amount}
-                onChange={(e) => handleAmountChange(order._id, e.target.value)}
-                onBlur={() => handleAmountBlur(order._id)}
-                onKeyPress={(e) => handleKeyPress(e, order._id)}
-                className="text-sm sm:text-[20px] border p-1 rounded"
-              />
-            ) : (
-              <p
-                className="text-sm sm:text-[20px] cursor-pointer"
-                onClick={() => {
-                  setEditingOrderId(order._id);
-                  setNewAmounts({ ...newAmounts, [order._id]: order.amount });
-                }}
-              >
-                {currency}
-                {order.amount}
+            {/* 4. 付款方式 */}
+            <div className="text-xs">
+              <p className="font-bold text-gray-800 mb-1">Payment</p>
+              <p className="text-gray-500 italic lowercase">{order.paymentMethod}</p>
+              <p className={`mt-2 font-black ${order.payment ? 'text-green-600' : 'text-orange-500'}`}>
+                {order.payment ? "PAID" : "PENDING"}
               </p>
-            )}
+              <p className="text-gray-400 text-[10px] mt-1">{new Date(order.date).toLocaleDateString()}</p>
+            </div>
 
-            <div className="flex items-center">
-              <span
-                className={`inline-block w-3 h-3 rounded-full mr-2 ${getStatusColor(
-                  order.status
-                )}`}
-              ></span>
+            {/* 5. 金額修改 */}
+            <div className="text-right">
+              {editingOrderId === order._id ? (
+                <input
+                  type="number"
+                  autoFocus
+                  value={newAmounts[order._id] || order.amount}
+                  onChange={(e) => handleAmountChange(order._id, e.target.value)}
+                  onBlur={() => handleAmountBlur(order._id)}
+                  onKeyPress={(e) => handleKeyPress(e, order._id)}
+                  className="w-20 text-right border-b-2 border-blue-500 outline-none font-bold text-lg bg-transparent"
+                />
+              ) : (
+                <p
+                  className="text-lg font-black text-gray-800 cursor-pointer hover:text-blue-600 transition-colors"
+                  onClick={() => {
+                    setEditingOrderId(order._id);
+                    setNewAmounts({ ...newAmounts, [order._id]: order.amount });
+                  }}
+                >
+                  {currency}{order.amount}
+                </p>
+              )}
+            </div>
+
+            {/* 6. 狀態管理 */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${getStatusColor(order.status)}`}></span>
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</span>
+              </div>
               <select
                 onChange={(event) => statusHandler(event, order._id)}
                 value={order.status}
-                className={`p-2 font-semibold border border-gray-300 rounded`}
+                className="text-xs p-2 bg-gray-50 border border-gray-200 rounded-lg font-bold outline-none focus:border-blue-500"
               >
-                <option value="Payment Processing">Payment Processing</option>
-                <option value="Delivery in Progress">
-                  Delivery in Progress
-                </option>
-                <option value="Goods Arrangement in Progress">
-                  Goods Arrangement in Progress
-                </option>
-                <option value="Shipped">Shipped</option>
-                <option value="Order Completed">Order Completed</option>
-                <option value="Cancelled">Cancelled</option>
+                {allStatuses.map((s, i) => <option key={i} value={s}>{s}</option>)}
               </select>
             </div>
           </div>

@@ -11,11 +11,21 @@ const Orders = () => {
   const loadOrderData = async () => {
     try {
       if (!token) return null;
-      const response = await axios.post(backendUrl + '/api/order/userorders', {}, { headers: { token } });
+      const response = await axios.post(
+        backendUrl + '/api/order/userorders',
+        {},
+        { headers: { token } }
+      );
+
       if (response.data.success) {
-        // 確保 orders 存在且是數組
         const orders = response.data.orders || [];
-        setOrderData(orders.reverse());
+
+        // 🟢 取代 .reverse()，改用時間戳排序
+        const sortedOrders = orders.sort((a, b) => {
+          return new Date(b.date) - new Date(a.date);
+        });
+
+        setOrderData(sortedOrders);
       }
     } catch (error) {
       console.log(error);
