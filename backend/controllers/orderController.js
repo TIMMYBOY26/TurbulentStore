@@ -1,343 +1,149 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
-import productModel from "../models/productModel.js"; // Import your product model
+import productModel from "../models/productModel.js";
 import axios from "axios";
+import { v2 as cloudinary } from "cloudinary"; // 確保你有引入 cloudinary
 
-// Function to send Telegram notifications
+// --- 輔助函式：發送 Telegram ---
 const sendTelegramNotification = async (chatId, message) => {
-  const token = "7804211306:AAHkJwg-ejrIB4evQ-EHQpCV8UJJB8eQaoY"; // Replace with your bot token
+  const token = "7804211306:AAHkJwg-ejrIB4evQ-EHQpCV8UJJB8eQaoY";
   const url = `https://api.telegram.org/bot${token}/sendMessage`;
-
   try {
-    await axios.post(url, {
-      chat_id: chatId,
-      text: message,
-    });
-    console.log("Telegram message sent successfully!");
+    await axios.post(url, { chat_id: chatId, text: message });
   } catch (error) {
-    console.error(`Failed to send Telegram message: ${error.message}`);
+    console.error(`Telegram Error: ${error.message}`);
   }
 };
 
-// Function to generate a unique order number
+// --- 輔助函式：生成訂單號 ---
 const generateOrderNumber = async () => {
   const lastOrder = await orderModel.findOne().sort({ orderNumber: -1 }).exec();
-  return lastOrder ? lastOrder.orderNumber + 1 : 1; // Start from 1 if no orders exist
+  return lastOrder ? lastOrder.orderNumber + 1 : 1;
 };
 
-// Function to reduce the size count of ordered products within a transaction
+// --- 輔助函式：扣減庫存 ---
 const reduceProductSizeCount = async (items, session) => {
   for (const item of items) {
     const { productId, size, quantity, name } = item;
-
-    try {
-      console.log(
-        `Updating productId: ${productId}, name: ${name}, size: ${size}, quantity: ${quantity}`
-      );
-
-      const result = await productModel.findOneAndUpdate(
-        { _id: productId, "sizes.size": size },
-        { $inc: { "sizes.$.count": -quantity } },
-        { session, new: true }
-      );
-
-      if (!result) {
-        console.error(
-          `Failed to update size for productId: ${productId}, size: ${size}`
-        );
-      } else {
-        const updatedSize = result.sizes.find((s) => s.size === size);
-        console.log(
-          `Updated productId: ${productId}, size: ${size}, new count: ${updatedSize.count}`
-        );
-
-        // Check if the new count is zero and send a notification
-        if (updatedSize.count === 0) {
-          const message = `Product out of stock:\nProduct Name: ${name}\nSize: ${size}`;
-          await sendTelegramNotification("-1002324020435", message);
-        }
-
-        // Check if the new count is less than 5 and send a notification
-        if (updatedSize.count <= 10 && updatedSize.count > 0) {
-          const message = `Product running low:\nProduct: ${name}\nSize: ${size} \nStock: ${updatedSize.count}`;
-          await sendTelegramNotification("-1002324020435", message);
-        }
+    const result = await productModel.findOneAndUpdate(
+      { _id: productId, "sizes.size": size },
+      { $inc: { "sizes.$.count": -quantity } },
+      { session, new: true }
+    );
+    if (result) {
+      const updatedSize = result.sizes.find((s) => s.size === size);
+      if (updatedSize.count === 0) {
+        await sendTelegramNotification("-1002324020435", `❌ 售罄通知:\n產品: ${name}\n尺寸: ${size}`);
+      } else if (updatedSize.count <= 10) {
+        await sendTelegramNotification("-1002324020435", `⚠️ 低庫存警報:\n產品: ${name}\n尺寸: ${size}\n剩餘: ${updatedSize.count}`);
       }
-    } catch (error) {
-      console.error(
-        `Error updating productId: ${productId}, size: ${size}`,
-        error
-      );
     }
   }
 };
 
-// Placing orders using COD Method
-const placeOrder = async (req, res) => {
+/**
+ * 通用處理下單邏輯
+ */
+const processOrder = async (req, res, methodLabel, isCOD = false) => {
   const session = await orderModel.startSession();
   session.startTransaction();
-
   try {
-    console.log("Placing order:", req.body);
-    const { userId, items, amount, address } = req.body; // Ensure items contain productId
+    const { userId, amount } = req.body;
+
+    // 🟢 因為前端用 FormData，這裡必須解析 JSON 字串
+    const items = JSON.parse(req.body.items);
+    const address = JSON.parse(req.body.address);
+
     const orderNumber = await generateOrderNumber();
+
+    // 🟢 處理圖片上傳 (Cloudinary)
+    let receiptUrl = "";
+    if (req.file) {
+      const imageUpload = await cloudinary.uploader.upload(req.file.path, {
+        resource_type: "image",
+        folder: "Payment_record",
+      });
+      receiptUrl = imageUpload.secure_url;
+    }
 
     const orderData = {
       userId,
       items,
       address,
       amount,
-      paymentMethod: "COD",
+      paymentMethod: methodLabel,
       payment: false,
       date: Date.now(),
       orderNumber,
+      receiptImage: receiptUrl, // 儲存截圖 URL (選填)
     };
 
     const newOrder = new orderModel(orderData);
     await newOrder.save({ session });
 
-    console.log("Reducing product size counts...");
     await reduceProductSizeCount(items, session);
 
-    // Update user's name in userModel with firstName
-    await userModel.findByIdAndUpdate(
-      userId,
-      {
-        name: address.firstName, // Assuming firstName is in the address object
-      },
-      { session }
-    );
+    // 更新用戶名稱及清空購物車
+    await userModel.findByIdAndUpdate(userId, { name: address.firstName, cartData: {} }, { session });
 
-    await userModel.findByIdAndUpdate(userId, { cartData: {} }, { session });
-
-    const message = `收到新訂單:\n訂單號碼 : ${orderNumber}\n金額: $${amount}\n付款方式 : 現金交收`;
+    // 發送 Telegram
+    const statusText = receiptUrl ? "✅ 已附上截圖" : "⚠️ 待補交截圖";
+    const message = `🔔 收到新訂單 (#${orderNumber})\n金額: $${amount}\n付款方式: ${methodLabel}\n截圖狀態: ${isCOD ? "N/A" : statusText}`;
     await sendTelegramNotification("-1002324020435", message);
 
     await session.commitTransaction();
     res.json({ success: true, message: "Order Placed", orderNumber });
   } catch (error) {
     await session.abortTransaction();
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: error.message });
   } finally {
     session.endSession();
   }
 };
 
-// Placing orders using PayMe Method
-const placeOrderPayme = async (req, res) => {
-  const session = await orderModel.startSession();
-  session.startTransaction();
+// --- 各種付款方式路由處理 ---
+const placeOrder = (req, res) => processOrder(req, res, "COD", true);
+const placeOrderPayme = (req, res) => processOrder(req, res, "PayMe");
+const placeOrderFps = (req, res) => processOrder(req, res, "FPS");
+const tradeInPersonPlaceOrderPayme = (req, res) => processOrder(req, res, "paymeTradeIn");
+const tradeInPersonPlaceOrderFps = (req, res) => processOrder(req, res, "fpsTradeIn");
 
+/**
+ * 🟢 新功能：使用者在訂單列表補傳截圖
+ */
+const updateOrderReceipt = async (req, res) => {
   try {
-    console.log("Placing PayMe order:", req.body);
-    const { userId, items, amount, address } = req.body; // Ensure items contain productId
-    const orderNumber = await generateOrderNumber();
+    const { orderId } = req.body;
+    if (!req.file) {
+      return res.json({ success: false, message: "請選擇圖片上傳" });
+    }
 
-    const orderData = {
-      userId,
-      items,
-      address,
-      amount,
-      paymentMethod: "PayMe",
-      payment: false,
-      date: Date.now(),
-      orderNumber,
-    };
+    const imageUpload = await cloudinary.uploader.upload(req.file.path, {
+      resource_type: "image",
+      folder: "Payment_record",
+    });
 
-    const newOrder = new orderModel(orderData);
-    await newOrder.save({ session });
-
-    // Reduce product size counts
-    await reduceProductSizeCount(items, session);
-
-    // Update user's name in userModel with firstName
-    await userModel.findByIdAndUpdate(
-      userId,
-      {
-        name: address.firstName, // Assuming firstName is in the address object
-      },
-      { session }
+    const updatedOrder = await orderModel.findByIdAndUpdate(
+      orderId,
+      { receiptImage: imageUpload.secure_url },
+      { new: true }
     );
 
-    await userModel.findByIdAndUpdate(userId, { cartData: {} }, { session });
-
-    // Send Telegram notification
-    const message = `收到新訂單:\n訂單號碼 : ${orderNumber}\n金額: $${amount}\n付款方式 : PayMe`;
+    // 補傳截圖後發送通知給 Admin
+    const message = `📸 訂單補交截圖 (#${updatedOrder.orderNumber})\n客戶: ${updatedOrder.address.firstName}\n金額: $${updatedOrder.amount}`;
     await sendTelegramNotification("-1002324020435", message);
 
-    await session.commitTransaction();
-    res.json({ success: true, message: "Order Placed", orderNumber });
+    res.json({ success: true, message: "收據已成功更新", receiptImage: imageUpload.secure_url });
   } catch (error) {
-    await session.abortTransaction();
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: error.message });
-  } finally {
-    session.endSession();
   }
 };
 
-// Placing orders using FPS Method
-const placeOrderFps = async (req, res) => {
-  const session = await orderModel.startSession();
-  session.startTransaction();
-
-  try {
-    console.log("Placing FPS order:", req.body);
-    const { userId, items, amount, address } = req.body; // Ensure items contain productId
-    const orderNumber = await generateOrderNumber();
-
-    const orderData = {
-      userId,
-      items,
-      address,
-      amount,
-      paymentMethod: "FPS",
-      payment: false,
-      date: Date.now(),
-      orderNumber,
-    };
-
-    const newOrder = new orderModel(orderData);
-    await newOrder.save({ session });
-
-    // Reduce product size counts
-    await reduceProductSizeCount(items, session);
-
-    // Update user's name in userModel with firstName
-    await userModel.findByIdAndUpdate(
-      userId,
-      {
-        name: address.firstName, // Assuming firstName is in the address object
-      },
-      { session }
-    );
-
-    await userModel.findByIdAndUpdate(userId, { cartData: {} }, { session });
-
-    // Send Telegram notification
-    const message = `收到新訂單:\n訂單號碼 : ${orderNumber}\n金額: $${amount}\n付款方式 : FPS`;
-    await sendTelegramNotification("-1002324020435", message);
-
-    await session.commitTransaction();
-    res.json({ success: true, message: "Order Placed", orderNumber });
-  } catch (error) {
-    await session.abortTransaction();
-    console.log(error);
-    res.json({ success: false, message: error.message });
-  } finally {
-    session.endSession();
-  }
-};
-
-// Placing orders using Trade in person by PayMe Method
-const tradeInPersonPlaceOrderPayme = async (req, res) => {
-  const session = await orderModel.startSession();
-  session.startTransaction();
-
-  try {
-    const { userId, items, amount, address } = req.body; // Ensure items contain productId
-    const orderNumber = await generateOrderNumber();
-
-    const orderData = {
-      userId,
-      items,
-      address,
-      amount,
-      paymentMethod: "paymeTradeIn",
-      payment: false,
-      date: Date.now(),
-      orderNumber,
-    };
-
-    const newOrder = new orderModel(orderData);
-    await newOrder.save({ session });
-
-    // Reduce product size counts
-    await reduceProductSizeCount(items, session);
-
-    // Update user's name in userModel with firstName
-    await userModel.findByIdAndUpdate(
-      userId,
-      {
-        name: address.firstName, // Assuming firstName is in the address object
-      },
-      { session }
-    );
-
-    await userModel.findByIdAndUpdate(userId, { cartData: {} }, { session });
-
-    // Send Telegram notification
-    const message = `收到新訂單:\n訂單號碼 : ${orderNumber}\n金額: $${amount}\n付款方式 : Trade in person by PayMe`;
-    await sendTelegramNotification("-1002324020435", message);
-
-    await session.commitTransaction();
-    res.json({ success: true, message: "Order Placed", orderNumber });
-  } catch (error) {
-    await session.abortTransaction();
-    console.log(error);
-    res.json({ success: false, message: error.message });
-  } finally {
-    session.endSession();
-  }
-};
-
-// Placing orders using Trade in person by FPS Method
-const tradeInPersonPlaceOrderFps = async (req, res) => {
-  const session = await orderModel.startSession();
-  session.startTransaction();
-
-  try {
-    const { userId, items, amount, address } = req.body; // Ensure items contain productId
-    const orderNumber = await generateOrderNumber();
-
-    const orderData = {
-      userId,
-      items,
-      address,
-      amount,
-      paymentMethod: "fpsTradeIn",
-      payment: false,
-      date: Date.now(),
-      orderNumber,
-    };
-
-    const newOrder = new orderModel(orderData);
-    await newOrder.save({ session });
-
-    // Reduce product size counts
-    await reduceProductSizeCount(items, session);
-
-    // Update user's name in userModel with firstName
-    await userModel.findByIdAndUpdate(
-      userId,
-      {
-        name: address.firstName, // Assuming firstName is in the address object
-      },
-      { session }
-    );
-
-    await userModel.findByIdAndUpdate(userId, { cartData: {} }, { session });
-
-    // Send Telegram notification
-    const message = `收到新訂單:\n訂單號碼 : ${orderNumber}\n金額: $${amount}\n付款方式 : Trade in person by FPS`;
-    await sendTelegramNotification("-1002324020435", message);
-
-    await session.commitTransaction();
-    res.json({ success: true, message: "Order Placed", orderNumber });
-  } catch (error) {
-    await session.abortTransaction();
-    console.log(error);
-    res.json({ success: false, message: error.message });
-  } finally {
-    session.endSession();
-  }
-};
-
-// All Orders data for admin Panel
+// --- 其他管理功能 ---
 const allOrders = async (req, res) => {
   try {
-    // This replaces the userId string with the actual user object (email only)
     const orders = await orderModel.find({}).populate('userId', 'email');
     res.json({ success: true, orders });
   } catch (error) {
@@ -345,68 +151,46 @@ const allOrders = async (req, res) => {
   }
 };
 
-// User Orders data for Frontend
 const userOrders = async (req, res) => {
   try {
     const { userId } = req.body;
-
     const orders = await orderModel.find({ userId });
     res.json({ success: true, orders });
   } catch (error) {
-    console.log(error);
     res.json({ success: false, message: error.message });
   }
 };
 
-// Update order status from Admin
 const updateStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body;
     await orderModel.findByIdAndUpdate(orderId, { status });
     res.json({ success: true, message: "Status Updated" });
   } catch (error) {
-    console.log(error);
     res.json({ success: false, message: error.message });
   }
 };
 
-// Update order amount
 const updateOrderAmount = async (req, res) => {
   try {
     const { orderId, amount } = req.body;
-
-    // Validate input
-    if (!orderId || amount == null) {
-      return res.json({ success: false, message: "Invalid input" });
-    }
-
-    // Update the order amount
-    const updatedOrder = await orderModel.findByIdAndUpdate(
-      orderId,
-      { amount },
-      { new: true } // Return the updated document
-    );
-
-    if (!updatedOrder) {
-      return res.json({ success: false, message: "Order not found" });
-    }
-
+    const updatedOrder = await orderModel.findByIdAndUpdate(orderId, { amount }, { new: true });
+    if (!updatedOrder) return res.json({ success: false, message: "Order not found" });
     res.json({ success: true, message: "Order amount updated", order: updatedOrder });
   } catch (error) {
-    console.log(error);
     res.json({ success: false, message: error.message });
   }
 };
 
-// Export functions
 export {
   placeOrder,
   placeOrderPayme,
   placeOrderFps,
   tradeInPersonPlaceOrderPayme,
   tradeInPersonPlaceOrderFps,
+  updateOrderReceipt, // 🟢 匯出新功能
   allOrders,
   userOrders,
   updateStatus,
-  updateOrderAmount, // Add this line to export the new function
+  updateOrderAmount,
 };

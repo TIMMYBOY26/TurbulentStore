@@ -6,7 +6,7 @@ import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-// --- Order Confirmation Modal ---
+// --- 1. 確認下單彈窗 ---
 const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;
   return (
@@ -30,28 +30,61 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
   );
 };
 
-// --- WhatsApp Success Modal (Back to English with Ticket Notice) ---
-const SuccessWhatsAppModal = ({ isOpen, onDirectRedirect, whatsappUrl, hasTicket }) => {
+// --- 2. 補交收據提醒彈窗 ---
+const PendingReceiptModal = ({ isOpen, onCancel, onProceed }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+      <div className="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl border border-amber-100">
+        <div className="text-center">
+          <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-amber-50 mb-4">
+            <svg className="h-7 w-7 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">No Receipt Attached</h2>
+          <p className="text-gray-500 text-sm leading-relaxed">
+            You can place the order now and upload the receipt later in the <b>"My Orders"</b> section. We will process your order once payment is verified.
+          </p>
+        </div>
+        <div className="flex flex-col gap-2 mt-6">
+          <button className="w-full py-3 bg-black text-white font-bold rounded-xl hover:bg-gray-800 transition-all" onClick={onProceed}>Place Order Anyway</button>
+          <button className="w-full py-3 text-gray-500 font-medium hover:underline transition-all" onClick={onCancel}>Go Back to Upload</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- 3. 成功下單後的彈窗 ---
+const SuccessOrderModal = ({ isOpen, onDirectRedirect, hasTicket, receiptUploaded }) => {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl text-center">
-        <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-50 mb-4 border-2 border-green-100">
-          <svg className="w-10 h-10 text-[#25D366]" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-4.721 7.454c-1.879 0-3.72-.507-5.322-1.464L3 21.679l1.325-4.834a9.155 9.155 0 0 1-1.41-4.815c0-5.06 4.117-9.177 9.177-9.177 2.451 0 4.755.955 6.486 2.687a9.117 9.117 0 0 1 2.688 6.49c0 5.06-4.118 9.177-9.178 9.177m9.178-20.627C19.758 1.177 17.226 0 14.544 0 9.034 0 4.548 4.486 4.548 9.996c0 1.761.459 3.478 1.328 5.004L3.622 24l9.191-2.411a9.92 9.92 0 0 0 4.437 1.057c5.508 0 9.995-4.486 9.995-9.996a9.932 9.932 0 0 0-2.697-7.054" />
+        <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-50 mb-6 border-2 border-green-100">
+          <svg className="h-10 w-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h2>
-        <div className="text-gray-600 font-bold mb-8 px-2 space-y-3 text-sm leading-relaxed">
-          <p className="text-blue-600 italic">請將付款記錄傳送至我們的 WhatsApp 以完成訂購程序</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Received!</h2>
+        <div className="mb-8 px-2 space-y-3 text-sm leading-relaxed">
+          {receiptUploaded ? (
+            <div className="bg-green-50 p-4 rounded-2xl">
+              <p className="text-green-700 font-bold">付款記錄已成功上傳 ✓</p>
+              <p className="text-xs text-green-600 mt-1">我們將儘快核實您的訂單，您可以在「My Orders」查看進度。</p>
+            </div>
+          ) : (
+            <div className="bg-blue-50 p-4 rounded-2xl">
+              <p className="text-blue-700 font-bold">等待付款證明</p>
+              <p className="text-xs text-blue-600 mt-1">請記得在「My Orders」頁面補傳付款截圖以完成訂購。</p>
+            </div>
+          )}
           {hasTicket && (
-            <p className="text-blue-600 italic">我們稍後會透過 WhatsApp 向您發送門票資訊</p>
+            <p className="text-gray-400 italic text-xs">※ 電子門票資訊將於付款核實後發送至您的電話</p>
           )}
         </div>
-        <div className="flex flex-col gap-3">
-          <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="w-full py-4 bg-[#25D366] text-white font-black rounded-2xl hover:bg-[#128C7E] transition-all shadow-lg text-lg uppercase">Send on WhatsApp</a>
-          <button onClick={onDirectRedirect} className="w-full py-4 bg-gray-100 text-gray-700 font-bold rounded-2xl hover:bg-gray-200 transition-all uppercase">I already sent!</button>
-        </div>
+        <button onClick={onDirectRedirect} className="w-full py-4 bg-black text-white font-bold rounded-2xl hover:bg-gray-800 transition-all uppercase shadow-lg active:scale-[0.98]">Check My Orders</button>
       </div>
     </div>
   );
@@ -61,21 +94,31 @@ const PlaceOrder = () => {
   const [method, setMethod] = useState("payme");
   const [deliveryType, setDeliveryType] = useState("sf");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPendingModalOpen, setIsPendingModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [hasTicket, setHasTicket] = useState(false);
-  const [waUrl, setWaUrl] = useState("");
   const [formData, setFormData] = useState({ firstName: "", phone: "" });
+  const [receiptImage, setReceiptImage] = useState(null);
 
   const { navigate, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
 
   const onChangeHandler = (e) => setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    if (method !== 'cod' && !receiptImage) {
+      setIsPendingModalOpen(true);
+    } else {
+      setIsModalOpen(true);
+    }
+  };
+
   const handleConfirmOrder = async () => {
     setIsModalOpen(false);
+    setIsPendingModalOpen(false);
     try {
       let orderItems = [];
       let containsTicket = false;
-
       for (const itemId in cartItems) {
         for (const size in cartItems[itemId]) {
           if (cartItems[itemId][size] > 0) {
@@ -87,9 +130,13 @@ const PlaceOrder = () => {
           }
         }
       }
-
       setHasTicket(containsTicket);
-      const orderData = { address: formData, items: orderItems, amount: getCartAmount() + delivery_fee };
+      const data = new FormData();
+      data.append("address", JSON.stringify(formData));
+      data.append("items", JSON.stringify(orderItems));
+      data.append("amount", getCartAmount() + delivery_fee);
+      if (receiptImage) data.append("image", receiptImage);
+
       const methodMap = {
         cod: "/api/order/place",
         payme: "/api/order/payme",
@@ -98,11 +145,9 @@ const PlaceOrder = () => {
         fpsTradeIn: "/api/order/tradeInPersonPlaceOrderFps",
       };
 
-      const response = await axios.post(backendUrl + methodMap[method], orderData, { headers: { token } });
-
+      const response = await axios.post(backendUrl + methodMap[method], data, { headers: { token } });
       if (response.data.success) {
         setCartItems({});
-        setWaUrl(`https://wa.me/85293442688`);
         setIsSuccessModalOpen(true);
       } else {
         toast.error(response.data.message);
@@ -121,15 +166,31 @@ const PlaceOrder = () => {
         <span className="font-semibold">{label}</span>
       </div>
       {method === id && (
-        <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-600 space-y-2">
+        <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-600 space-y-3">
           {qr && <img src={qr} className="w-32 h-32 mx-auto rounded-lg border shadow-sm" alt="QR" />}
           {isCash ? (
-            <p className="text-purple-600 font-bold italic">1. Contact via WhatsApp to schedule meetup after order</p>
+            <p className="text-purple-600 font-bold italic">Meetup will be arranged after order confirmation</p>
           ) : (
             <>
               {instructions}
-              <p className={`font-bold cursor-pointer underline hover:opacity-80 ${isTradeIn ? "text-purple-600" : "text-green-600"}`} onClick={(e) => { e.stopPropagation(); window.open("https://wa.me", "_blank"); }}>
-                2. Send us the payment record on WhatsApp
+              <div className="mt-2">
+                <label className="flex flex-col items-center justify-center w-full p-4 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors bg-white">
+                  {receiptImage ? (
+                    <div className="flex flex-col items-center text-center">
+                      <img src={URL.createObjectURL(receiptImage)} className="h-20 mb-2 rounded shadow-sm" alt="Preview" />
+                      <p className="text-xs text-green-600 font-bold uppercase tracking-widest">Receipt Selected ✓</p>
+                    </div>
+                  ) : (
+                    <div className="text-center py-2">
+                      <svg className="w-6 h-6 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                      <p className="text-[10px] uppercase font-bold tracking-widest text-gray-400">Upload Receipt (Optional)</p>
+                    </div>
+                  )}
+                  <input type="file" className="hidden" accept="image/*" onChange={(e) => setReceiptImage(e.target.files[0])} />
+                </label>
+              </div>
+              <p className="font-bold italic text-[11px] text-blue-600">
+                ※ If not uploaded now, please submit via "My Orders" page later.
               </p>
             </>
           )}
@@ -143,9 +204,10 @@ const PlaceOrder = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 sm:py-20">
       <ConfirmationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onConfirm={handleConfirmOrder} />
-      <SuccessWhatsAppModal isOpen={isSuccessModalOpen} onDirectRedirect={() => { setIsSuccessModalOpen(false); navigate("/orders"); }} whatsappUrl={waUrl} hasTicket={hasTicket} />
+      <PendingReceiptModal isOpen={isPendingModalOpen} onCancel={() => setIsPendingModalOpen(false)} onProceed={() => { setIsPendingModalOpen(false); setIsModalOpen(true); }} />
+      <SuccessOrderModal isOpen={isSuccessModalOpen} onDirectRedirect={() => { setIsSuccessModalOpen(false); navigate("/orders"); }} hasTicket={hasTicket} receiptUploaded={!!receiptImage} />
 
-      <form onSubmit={(e) => { e.preventDefault(); setIsModalOpen(true); }} className="flex flex-col lg:flex-row gap-12">
+      <form onSubmit={handleFormSubmit} className="flex flex-col lg:flex-row gap-12">
         <div className="flex-1 space-y-10">
           <section>
             <Title text1={"STEP 1:"} text2={"YOUR INFORMATION"} />
@@ -158,15 +220,17 @@ const PlaceOrder = () => {
           <section>
             <Title text1={"STEP 2:"} text2={"DELIVERY & PAYMENT"} />
             <div className="mt-6 space-y-4">
+
+              {/* SF Express Section */}
               <div className={`rounded-2xl border-2 transition-all cursor-pointer ${deliveryType === "sf" ? "border-blue-500 bg-blue-50/10 shadow-md" : "border-gray-100 bg-white"}`} onClick={() => { setDeliveryType("sf"); setMethod("payme"); }}>
                 <div className="p-5 flex justify-between items-center">
                   <div>
                     <h3 className="font-bold text-lg">SF Express Delivery</h3>
                     <p className="text-sm text-blue-600 italic">Free Delivery in HK Area</p>
                   </div>
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${deliveryType === "sf" ? "border-blue-500 bg-blue-500" : "border-gray-300"}`}>
+                  {/* <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${deliveryType === "sf" ? "border-blue-500 bg-blue-500" : "border-gray-300"}`}>
                     {deliveryType === "sf" && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
-                  </div>
+                  </div> */}
                 </div>
                 {deliveryType === "sf" && (
                   <div className="p-5 border-t border-blue-100 space-y-3 bg-white">
@@ -176,6 +240,8 @@ const PlaceOrder = () => {
                 )}
               </div>
 
+              {/* 🙈 Hidden In-Person Collection Section (Reserved for future use) */}
+              {/* 
               <div className={`rounded-2xl border-2 transition-all cursor-pointer ${deliveryType === "inPerson" ? "border-purple-500 bg-purple-50/10 shadow-md" : "border-gray-100 bg-white"}`} onClick={() => { setDeliveryType("inPerson"); setMethod("cod"); }}>
                 <div className="p-5 flex justify-between items-center">
                   <h3 className="font-bold text-lg">In-Person Collection</h3>
@@ -190,7 +256,9 @@ const PlaceOrder = () => {
                     <PaymentOption id="fpsTradeIn" label="By FPS" qr={assets.fpsCode} instructions={<p>1. FPS ID: 2394658</p>} isTradeIn={true} />
                   </div>
                 )}
-              </div>
+              </div> 
+              */}
+
             </div>
           </section>
         </div>
