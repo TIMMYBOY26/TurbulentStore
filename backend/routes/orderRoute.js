@@ -26,7 +26,7 @@ orderRouter.post("/update-amount", adminAuth, updateOrderAmount);
 // --- 用戶下單功能 (Payment Features) ---
 
 // 1. 現金支付 (COD) - 不涉及檔案上傳，維持原樣
-orderRouter.post("/place", authUser, placeOrder);
+orderRouter.post("/place", upload.none(), authUser, placeOrder);
 
 // 2. 在線支付 (PayMe / FPS) 
 // 🟢 順序關鍵：先 upload 解析 FormData，再 authUser 注入 userId
