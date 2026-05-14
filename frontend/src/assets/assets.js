@@ -19,7 +19,6 @@ import dropdown_icon from "./dropdown_icon.png";
 import support_icon from "./support_img.png";
 import exchange_icon from "./exchange_icon.png";
 import profile_icon from "./profile_icon.png";
-import quality_icon from "./quality_icon.png";
 import search_icon from "./search_icon.png";
 import music_icon from "./music_icon.png";
 import calender_icon from "./calendar.png";
@@ -37,6 +36,7 @@ import Monologue_hkhero from "./Monologue_hkhero.jpeg";
 import Taiwan_2 from "./TaiwanTour2.jpeg";
 import lightwall from "./lightwall.jpeg";
 import lightwallvideo from "./lightwallvideo.mp4";
+import HomeAdPopUp from "./popupAd.jpeg";
 
 export const assets = {
   logo,
@@ -52,7 +52,6 @@ export const assets = {
   dropdown_icon,
   exchange_icon,
   profile_icon,
-  quality_icon,
   search_icon,
   music_icon,
   calender_icon,
@@ -72,6 +71,7 @@ export const assets = {
   support_icon,
   Taiwan_hero,
   Monologue_hkhero,
+  HomeAdPopUp,
   Taiwan_2,
   herowhiteground,
   mono_fire_sell,

@@ -13,7 +13,7 @@ const Home = ({ hasSeenAd, setHasSeenAd }) => {
    * 💡 廣告活動開關 (Ad Campaign Toggle)
    * 巡演結束時設為 false；未來有新活動需要彈窗時，只需改回 true。
    */
-  const isAdCampaignActive = false;
+  const isAdCampaignActive = true;
 
   // 1. 處理頁面捲動鎖定 (Scroll Lock)
   useEffect(() => {
@@ -92,17 +92,16 @@ const Home = ({ hasSeenAd, setHasSeenAd }) => {
       {isAdCampaignActive && !isLoading && showAd && (
         <AdPopup
           onClose={handleCloseAd}
-          image={assets.Monologue_hkhero}
-          buttonText="Get Tickets Now"
-          link="https://www.offgrid.day/clubs/19/219?stage=show-detail"
+          image={assets.HomeAdPopUp}
+          buttonText="EXPLORE NEW ARRIVALS"
+          link="https://turbulent-store.vercel.app/collection"
         />
       )}
 
       {/* --- 3. PAGE CONTENT --- */}
       <div
-        className={`transition-all duration-1000 ease-out ${
-          isLoading ? "opacity-0 translate-y-10" : "opacity-100 translate-y-0"
-        }`}
+        className={`transition-all duration-1000 ease-out ${isLoading ? "opacity-0 translate-y-10" : "opacity-100 translate-y-0"
+          }`}
       >
         <LatestSong />
         <LatestCollection />

@@ -150,13 +150,12 @@ const Hero = () => {
         return (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-transform duration-1000 ease-in-out cursor-pointer ${
-              isActive
-                ? "translate-x-0 z-10"
-                : index > currentIndex
-                  ? "translate-x-full z-0"
-                  : "-translate-x-full z-0"
-            } ${slide.canvasColor} sm:bg-transparent`}
+            className={`absolute inset-0 transition-transform duration-1000 ease-in-out cursor-pointer ${isActive
+              ? "translate-x-0 z-10"
+              : index > currentIndex
+                ? "translate-x-full z-0"
+                : "-translate-x-full z-0"
+              } ${slide.canvasColor} sm:bg-transparent`}
           >
             {/* 內容容器：透過 max-w 和 mx-auto 讓內容在大螢幕置中靠攏 */}
             <div className="w-full h-full flex flex-col sm:flex-row relative z-10 max-w-[1440px] mx-auto">
