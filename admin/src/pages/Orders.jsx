@@ -2,21 +2,27 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { backendUrl, currency } from "../App";
 import { toast } from "react-toastify";
-import { assets } from "../assets/assets";
 
 const Orders = ({ token }) => {
   const [orders, setOrders] = useState([]);
   const [isIncomeVisible, setIsIncomeVisible] = useState(true);
-  const [isStatusVisible, setIsStatusVisible] = useState(true);
-
   const [newAmounts, setNewAmounts] = useState({});
   const [editingOrderId, setEditingOrderId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("All");
 
-  // 用於放大查看收據的狀態
+  // 圖片放大 Modal 狀態
   const [showModal, setShowModal] = useState(false);
   const [modalImage, setModalImage] = useState("");
+
+  const allStatuses = [
+    "Payment Processing",
+    "Goods Arrangement in Progress",
+    "Delivery in Progress",
+    "Shipped",
+    "Order Completed",
+    "Cancelled",
+  ];
 
   const fetchAllOrders = async () => {
     if (!token) return null;
@@ -24,7 +30,7 @@ const Orders = ({ token }) => {
       const response = await axios.post(
         backendUrl + "/api/order/list",
         {},
-        { headers: { token } }
+        { headers: { token } },
       );
       if (response.data.success) {
         setOrders(response.data.orders);
@@ -32,7 +38,6 @@ const Orders = ({ token }) => {
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.log("Error fetching data");
       toast.error(error.message);
     }
   };
@@ -42,10 +47,11 @@ const Orders = ({ token }) => {
       const response = await axios.post(
         backendUrl + "/api/order/status",
         { orderId, status: event.target.value },
-        { headers: { token } }
+        { headers: { token } },
       );
       if (response.data.success) {
         await fetchAllOrders();
+        toast.success("狀態已更新");
       }
     } catch (error) {
       toast.error(error.message);
@@ -55,224 +61,238 @@ const Orders = ({ token }) => {
   const updateOrderAmount = async (orderId) => {
     const amount = newAmounts[orderId];
     if (amount == null || amount <= 0) {
-      toast.error("Please enter a valid amount.");
+      setEditingOrderId(null);
       return;
     }
     try {
       const response = await axios.post(
         backendUrl + "/api/order/update-amount",
         { orderId, amount },
-        { headers: { token } }
+        { headers: { token } },
       );
       if (response.data.success) {
-        toast.success("Order amount updated successfully.");
+        toast.success("金額已更新");
         await fetchAllOrders();
-      } else {
-        toast.error(response.data.message);
       }
     } catch (error) {
       toast.error(error.message);
     }
   };
 
-  const handleAmountChange = (orderId, value) => {
-    setNewAmounts({ ...newAmounts, [orderId]: value });
-  };
-
-  const handleAmountBlur = (orderId) => {
-    setEditingOrderId(null);
-    updateOrderAmount(orderId);
-  };
-
-  const handleKeyPress = (event, orderId) => {
-    if (event.key === "Enter") handleAmountBlur(orderId);
-  };
-
   useEffect(() => {
     fetchAllOrders();
   }, [token]);
 
-  // 排序與過濾
-  const sortedOrders = [...orders].sort((a, b) => new Date(b.date) - new Date(a.date));
+  // 過濾邏輯：支援 訂單號、Email、姓名、電話 搜尋
+  const filteredOrders = orders.filter((order) => {
+    const term = searchTerm.toLowerCase();
+    const orderNo = String(order.orderNumber).toLowerCase().includes(term);
+    const email = (order.userId?.email || "").toLowerCase().includes(term);
+    const name = (order.address?.firstName || "").toLowerCase().includes(term);
+    const phone = (order.address?.phone || "").includes(term);
 
-  const filteredOrders = sortedOrders.filter((order) => {
-    const searchTermLower = searchTerm.toLowerCase();
-    const orderNumberMatch = String(order.orderNumber).toLowerCase().includes(searchTermLower);
-    const emailMatch = (order.userId?.email || order.userEmail || "").toLowerCase().includes(searchTermLower);
-    return orderNumberMatch || emailMatch;
+    const matchesSearch = orderNo || email || name || phone;
+    const matchesStatus =
+      selectedStatus === "All" || order.status === selectedStatus;
+
+    return matchesSearch && matchesStatus;
   });
 
-  const finalFilteredOrders = selectedStatus === "All"
-    ? filteredOrders
-    : filteredOrders.filter((order) => order.status === selectedStatus);
-
-  // 計算統計數據
-  const incomeByMonth = finalFilteredOrders.reduce((acc, order) => {
+  // 營收統計計算
+  const incomeByMonth = filteredOrders.reduce((acc, order) => {
     if (order.status === "Cancelled") return acc;
-    const month = new Date(order.date).toLocaleString("default", { month: "long", year: "numeric" });
-    if (!acc[month]) acc[month] = { totalIncome: 0, orderCount: 0, totalItems: 0 };
+    const month = new Date(order.date).toLocaleString("default", {
+      month: "long",
+      year: "numeric",
+    });
+    if (!acc[month]) acc[month] = { totalIncome: 0, orderCount: 0 };
     acc[month].totalIncome += order.amount;
     acc[month].orderCount += 1;
-    acc[month].totalItems += order.items.reduce((sum, item) => sum + item.quantity, 0);
     return acc;
   }, {});
-
-  const statusCounts = orders.reduce((acc, order) => {
-    acc[order.status] = (acc[order.status] || 0) + 1;
-    return acc;
-  }, {});
-
-  const allStatuses = ["Payment Processing", "Goods Arrangement in Progress", "Delivery in Progress", "Shipped", "Order Completed", "Cancelled"];
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "Order Completed": return "bg-green-500";
-      case "Delivery in Progress": return "bg-yellow-500";
-      case "Shipped": return "bg-blue-500";
-      case "Payment Processing": return "bg-orange-500";
-      case "Cancelled": return "bg-red-500";
-      default: return "bg-gray-500";
+      case "Order Completed":
+        return "bg-green-500";
+      case "Delivery in Progress":
+        return "bg-yellow-500";
+      case "Shipped":
+        return "bg-blue-500";
+      case "Payment Processing":
+        return "bg-orange-500";
+      case "Cancelled":
+        return "bg-red-500";
+      default:
+        return "bg-gray-500";
     }
   };
 
   return (
-    <div className="p-4 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen">
       {/* 圖片放大 Modal */}
       {showModal && (
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm transition-all"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
           onClick={() => setShowModal(false)}
         >
-          <div className="relative max-w-5xl w-full flex flex-col items-center">
-            <button className="absolute -top-12 right-0 text-white text-3xl font-light hover:rotate-90 transition-transform">✕</button>
-            <img
-              src={modalImage}
-              alt="Receipt Full"
-              className="max-w-full max-h-[85vh] object-contain rounded shadow-2xl shadow-blue-500/20"
-              onClick={(e) => e.stopPropagation()}
-            />
-            <p className="mt-4 text-gray-400 text-sm tracking-widest uppercase">Click anywhere to close</p>
-          </div>
+          <img
+            src={modalImage}
+            className="max-w-full max-h-[90vh] rounded shadow-2xl"
+            alt="Receipt"
+          />
         </div>
       )}
 
-      {/* 營收統計 */}
-      <div className="mb-8 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-        <button onClick={() => setIsIncomeVisible(!isIncomeVisible)} className="text-lg font-bold text-gray-800 flex items-center gap-2">
-          {isIncomeVisible ? "▼" : "▶"} Total Income by Month
+      {/* 營收統計區 */}
+      <div className="mb-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <button
+          onClick={() => setIsIncomeVisible(!isIncomeVisible)}
+          className="text-lg font-bold flex items-center gap-2 outline-none"
+        >
+          {isIncomeVisible ? "▼" : "▶"} 月營收統計 (當前過濾範圍)
         </button>
         {isIncomeVisible && (
-          <div className="overflow-x-auto mt-4">
-            <table className="min-w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-50 text-gray-600 text-left text-xs uppercase tracking-wider">
-                  <th className="p-3 border-b">Month</th>
-                  <th className="p-3 border-b">Income</th>
-                  <th className="p-3 border-b">Orders</th>
-                  <th className="p-3 border-b">Items</th>
-                </tr>
-              </thead>
-              <tbody className="text-sm">
-                {Object.entries(incomeByMonth).map(([month, data], index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td className="p-3 border-b font-medium">{month}</td>
-                    <td className="p-3 border-b text-blue-600 font-bold">{currency}{data.totalIncome.toFixed(2)}</td>
-                    <td className="p-3 border-b">{data.orderCount}</td>
-                    <td className="p-3 border-b text-gray-500">{data.totalItems}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+            {Object.entries(incomeByMonth).map(([month, data], i) => (
+              <div
+                key={i}
+                className="p-4 bg-blue-50 rounded-xl border border-blue-100"
+              >
+                <p className="text-xs text-blue-600 font-bold uppercase">
+                  {month}
+                </p>
+                <p className="text-2xl font-black text-blue-900">
+                  {currency}
+                  {data.totalIncome.toFixed(2)}
+                </p>
+                <p className="text-xs text-blue-400">
+                  {data.orderCount} 筆訂單
+                </p>
+              </div>
+            ))}
           </div>
         )}
       </div>
 
-      {/* 搜尋與過濾器 */}
+      {/* 搜尋與過濾 */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-        <h3 className="text-2xl font-black text-gray-800">ORDERS</h3>
+        <h3 className="text-2xl font-black text-gray-800 tracking-tight">
+          訂單管理
+        </h3>
         <div className="flex w-full md:w-auto gap-2">
           <input
             type="text"
-            placeholder="Search Order # or Email"
+            placeholder="搜尋單號 / 姓名 / 電話"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border border-gray-300 p-2 rounded-lg text-sm w-full md:w-64 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="border border-gray-200 p-2.5 rounded-xl text-sm w-full md:w-64 focus:ring-2 focus:ring-black outline-none transition-all"
           />
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="border border-gray-300 p-2 rounded-lg text-sm bg-white"
+            className="border border-gray-200 p-2.5 rounded-xl text-sm bg-white font-bold outline-none"
           >
-            <option value="All">All Status</option>
-            {allStatuses.map((status, index) => <option key={index} value={status}>{status}</option>)}
+            <option value="All">全部狀態</option>
+            {allStatuses.map((s, i) => (
+              <option key={i} value={s}>
+                {s}
+              </option>
+            ))}
           </select>
         </div>
       </div>
 
       {/* 訂單列表 */}
       <div className="space-y-4">
-        {finalFilteredOrders.map((order, index) => (
+        {filteredOrders.map((order, index) => (
           <div
-            className="grid grid-cols-1 sm:grid-cols-[100px_2fr_1fr_1fr_1fr_1fr] gap-4 items-start border border-gray-200 bg-white p-6 rounded-xl hover:border-blue-300 transition-colors shadow-sm"
             key={index}
+            className="grid grid-cols-1 lg:grid-cols-[120px_2fr_1.5fr_1fr_1fr_1.2fr] gap-6 items-start bg-white p-6 rounded-2xl border border-gray-100 hover:shadow-md transition-all"
           >
-            {/* 1. 收據預覽 */}
-            <div className="flex flex-col items-center gap-2">
-              <img className="w-8 opacity-20" alt="" />
+            {/* 1. 收據 */}
+            <div className="flex flex-col items-center">
               {order.receiptImage ? (
                 <div
                   className="relative cursor-pointer group"
-                  onClick={() => { setModalImage(order.receiptImage); setShowModal(true); }}
+                  onClick={() => {
+                    setModalImage(order.receiptImage);
+                    setShowModal(true);
+                  }}
                 >
                   <img
                     src={order.receiptImage}
+                    className="w-24 h-24 object-cover rounded-xl border-2 border-gray-50 group-hover:border-black transition-all"
                     alt="Receipt"
-                    className="w-20 h-20 object-cover rounded-lg border-2 border-blue-100 group-hover:border-blue-500 transition-all shadow-sm"
                   />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 rounded-lg transition-opacity">
-                    <span className="text-[10px] text-white font-bold bg-blue-600 px-2 py-0.5 rounded">VIEW</span>
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 rounded-xl transition-all">
+                    <span className="text-[10px] text-white font-bold bg-black px-2 py-1 rounded">
+                      查看
+                    </span>
                   </div>
                 </div>
               ) : (
-                <div className="w-20 h-20 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center text-gray-300">
-                  <span className="text-xl">✕</span>
-                  <span className="text-[9px] font-bold">NO RECEIPT</span>
+                <div className="w-24 h-24 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-300">
+                  <span className="text-xs font-bold">無收據</span>
                 </div>
               )}
             </div>
 
             {/* 2. 訂單內容 */}
             <div className="text-sm">
-              <p className="font-bold text-gray-900 mb-2">Order: {order.orderNumber}</p>
-              <div className="space-y-1 text-gray-600">
+              <p className="font-black text-lg mb-1">#{order.orderNumber}</p>
+              <div className="space-y-1">
                 {order.items.map((item, i) => (
-                  <p key={i} className="text-xs">
-                    • {item.name} x {item.quantity} <span className="text-blue-500">[{item.size}]</span>
+                  <p key={i} className="text-gray-600 text-xs">
+                    <span className="font-bold text-black">• {item.name}</span>{" "}
+                    x {item.quantity}{" "}
+                    <span className="text-blue-500 font-medium">
+                      ({item.size})
+                    </span>
                   </p>
                 ))}
               </div>
-              <div className="mt-4 pt-2 border-t border-gray-50">
-                <p className="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">Login Account</p>
-                <p className="text-xs text-blue-600 font-medium truncate">{order.userId?.email || order.userEmail || "Guest User"}</p>
+              <p className="mt-3 text-[10px] text-gray-400 font-bold uppercase">
+                登入帳號
+              </p>
+              <p className="text-xs text-gray-500 truncate">
+                {order.userId?.email || "Guest"}
+              </p>
+            </div>
+
+            {/* 3. 收件資訊 (核心修改處) */}
+            <div className="text-xs bg-blue-50/40 p-4 rounded-xl border border-blue-100/50">
+              <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-2">
+                收件人詳情
+              </p>
+              <p className="font-bold text-gray-900 text-sm mb-1">
+                {order.address.firstName}
+              </p>
+              <p className="flex items-center gap-1.5 text-gray-600 font-medium">
+                <span className="text-blue-400 text-sm">📞</span>{" "}
+                {order.address.phone}
+              </p>
+              <div className="mt-2 pt-2 border-t border-blue-100">
+                <p className="text-gray-700 leading-relaxed font-medium">
+                  {order.address.address || "未提供詳細地址"}
+                </p>
               </div>
             </div>
 
-            {/* 3. 收件資訊 */}
-            <div className="text-xs text-gray-600">
-              <p className="font-bold text-gray-800 mb-1">{order.address.firstName} {order.address.lastName}</p>
-              <p>{order.address.phone}</p>
-              <p className="mt-1 text-gray-400">{order.address.street}</p>
-              <p className="text-gray-400">{order.address.city}, {order.address.state}</p>
-            </div>
-
-            {/* 4. 付款方式 */}
+            {/* 4. 付款詳情 */}
             <div className="text-xs">
-              <p className="font-bold text-gray-800 mb-1">Payment</p>
-              <p className="text-gray-500 italic lowercase">{order.paymentMethod}</p>
-              <p className={`mt-2 font-black ${order.payment ? 'text-green-600' : 'text-orange-500'}`}>
-                {order.payment ? "PAID" : "PENDING"}
+              <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">
+                付款方式
               </p>
-              <p className="text-gray-400 text-[10px] mt-1">{new Date(order.date).toLocaleDateString()}</p>
+              <p className="font-bold text-gray-700">{order.paymentMethod}</p>
+              <div
+                className={`mt-2 inline-block px-2 py-1 rounded-md font-black ${order.payment ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}
+              >
+                {order.payment ? "已確認付款" : "等待確認"}
+              </div>
+              <p className="text-gray-400 mt-2">
+                {new Date(order.date).toLocaleDateString()}
+              </p>
             </div>
 
             {/* 5. 金額修改 */}
@@ -281,37 +301,57 @@ const Orders = ({ token }) => {
                 <input
                   type="number"
                   autoFocus
-                  value={newAmounts[order._id] || order.amount}
-                  onChange={(e) => handleAmountChange(order._id, e.target.value)}
-                  onBlur={() => handleAmountBlur(order._id)}
-                  onKeyPress={(e) => handleKeyPress(e, order._id)}
-                  className="w-20 text-right border-b-2 border-blue-500 outline-none font-bold text-lg bg-transparent"
+                  value={newAmounts[order._id] ?? order.amount}
+                  onChange={(e) =>
+                    setNewAmounts({
+                      ...newAmounts,
+                      [order._id]: e.target.value,
+                    })
+                  }
+                  onBlur={() => {
+                    setEditingOrderId(null);
+                    updateOrderAmount(order._id);
+                  }}
+                  onKeyDown={(e) => e.key === "Enter" && e.target.blur()}
+                  className="w-20 text-right border-b-2 border-black outline-none font-black text-xl bg-transparent"
                 />
               ) : (
                 <p
-                  className="text-lg font-black text-gray-800 cursor-pointer hover:text-blue-600 transition-colors"
+                  className="text-xl font-black text-gray-900 cursor-pointer hover:text-blue-600 transition-all"
                   onClick={() => {
                     setEditingOrderId(order._id);
                     setNewAmounts({ ...newAmounts, [order._id]: order.amount });
                   }}
                 >
-                  {currency}{order.amount}
+                  {currency}
+                  {order.amount}
                 </p>
               )}
+              <p className="text-[10px] text-gray-400 font-bold mt-1">
+                點擊金額可修改
+              </p>
             </div>
 
-            {/* 6. 狀態管理 */}
+            {/* 6. 狀態切換 */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${getStatusColor(order.status)}`}></span>
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</span>
+                <span
+                  className={`w-2 h-2 rounded-full ${getStatusColor(order.status)}`}
+                ></span>
+                <span className="text-[10px] font-black text-gray-400 uppercase">
+                  訂單狀態
+                </span>
               </div>
               <select
-                onChange={(event) => statusHandler(event, order._id)}
+                onChange={(e) => statusHandler(e, order._id)}
                 value={order.status}
-                className="text-xs p-2 bg-gray-50 border border-gray-200 rounded-lg font-bold outline-none focus:border-blue-500"
+                className="text-xs p-3 bg-gray-50 border border-gray-100 rounded-xl font-bold outline-none focus:ring-2 focus:ring-black transition-all cursor-pointer"
               >
-                {allStatuses.map((s, i) => <option key={i} value={s}>{s}</option>)}
+                {allStatuses.map((s, i) => (
+                  <option key={i} value={s}>
+                    {s}
+                  </option>
+                ))}
               </select>
             </div>
           </div>

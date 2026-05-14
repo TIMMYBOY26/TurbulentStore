@@ -6,7 +6,7 @@ import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-// --- 1. Confirm Order Modal ---
+// --- 彈窗組件 (保持一致) ---
 const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;
   return (
@@ -28,25 +28,21 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
               />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Confirm Order
-          </h2>
-          <p className="text-gray-500 font-medium">
-            Are you sure you want to place this order?
-          </p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">確認訂單</h2>
+          <p className="text-gray-500 font-medium">您確定要提交此訂單嗎？</p>
         </div>
         <div className="flex gap-3 mt-8">
           <button
             className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-all"
             onClick={onClose}
           >
-            Cancel
+            取消
           </button>
           <button
             className="flex-1 px-4 py-3 bg-black text-white font-bold rounded-xl hover:bg-gray-800 shadow-lg transition-all"
             onClick={onConfirm}
           >
-            Confirm
+            確認
           </button>
         </div>
       </div>
@@ -54,63 +50,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
   );
 };
 
-// --- 2. No Receipt Warning Modal ---
-const PendingReceiptModal = ({ isOpen, onCancel, onProceed }) => {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
-      <div className="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl border border-amber-100">
-        <div className="text-center">
-          <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-amber-50 mb-4">
-            <svg
-              className="h-7 w-7 text-amber-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">
-            No Receipt Attached
-          </h2>
-          <p className="text-gray-500 text-sm leading-relaxed">
-            You can place the order now and upload the receipt later in{" "}
-            <b>"My Orders"</b>. We will process your order once payment is
-            verified.
-          </p>
-        </div>
-        <div className="flex flex-col gap-2 mt-6">
-          <button
-            className="w-full py-3 bg-black text-white font-bold rounded-xl hover:bg-gray-800 transition-all"
-            onClick={onProceed}
-          >
-            Place Order Anyway
-          </button>
-          <button
-            className="w-full py-3 text-gray-500 font-medium hover:underline transition-all"
-            onClick={onCancel}
-          >
-            Go Back to Upload
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// --- 3. Success Modal ---
-const SuccessOrderModal = ({
-  isOpen,
-  onDirectRedirect,
-  hasTicket,
-  receiptUploaded,
-}) => {
+const SuccessOrderModal = ({ isOpen, onDirectRedirect }) => {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
@@ -130,37 +70,12 @@ const SuccessOrderModal = ({
             />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Order Received!
-        </h2>
-        <div className="mb-8 px-2 space-y-3 text-sm leading-relaxed">
-          {receiptUploaded ? (
-            <div className="bg-green-50 p-4 rounded-2xl">
-              <p className="text-green-700 font-bold">Receipt Uploaded ✓</p>
-              <p className="text-xs text-green-600 mt-1">
-                We will verify your order soon. Check "My Orders" for updates.
-              </p>
-            </div>
-          ) : (
-            <div className="bg-blue-50 p-4 rounded-2xl">
-              <p className="text-blue-700 font-bold">Pending Payment Proof</p>
-              <p className="text-xs text-blue-600 mt-1">
-                Please upload your payment screenshot in "My Orders" to
-                complete.
-              </p>
-            </div>
-          )}
-          {hasTicket && (
-            <p className="text-gray-400 italic text-xs">
-              ※ Ticket info will be sent to your phone after verification.
-            </p>
-          )}
-        </div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">訂單已收到！</h2>
         <button
           onClick={onDirectRedirect}
-          className="w-full py-4 bg-black text-white font-bold rounded-2xl hover:bg-gray-800 transition-all uppercase shadow-lg active:scale-[0.98]"
+          className="w-full py-4 bg-black text-white font-bold rounded-2xl hover:bg-gray-800 transition-all shadow-lg mt-4"
         >
-          Check My Orders
+          查看我的訂單
         </button>
       </div>
     </div>
@@ -171,10 +86,12 @@ const PlaceOrder = () => {
   const [method, setMethod] = useState("payme");
   const [deliveryType, setDeliveryType] = useState("sf");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPendingModalOpen, setIsPendingModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [hasTicket, setHasTicket] = useState(false);
-  const [formData, setFormData] = useState({ firstName: "", phone: "" });
+  const [formData, setFormData] = useState({
+    firstName: "",
+    phone: "",
+    address: "",
+  });
   const [receiptImage, setReceiptImage] = useState(null);
 
   const {
@@ -191,21 +108,77 @@ const PlaceOrder = () => {
   const onChangeHandler = (e) =>
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    if (method !== "cod" && !receiptImage) {
-      setIsPendingModalOpen(true);
-    } else {
-      setIsModalOpen(true);
-    }
-  };
+  // --- 優化後的 PaymentOption ---
+  const PaymentOption = ({ id, label, qr, instructions, isCash }) => (
+    <div
+      onClick={(e) => {
+        e.stopPropagation();
+        setMethod(id);
+      }}
+      className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer ${
+        method === id
+          ? "border-black bg-gray-50"
+          : "border-gray-100 hover:border-gray-200 bg-white"
+      }`}
+    >
+      <div className="flex items-center gap-3">
+        <div
+          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${method === id ? "border-black" : "border-gray-300"}`}
+        >
+          {method === id && (
+            <div className="w-2.5 h-2.5 bg-black rounded-full" />
+          )}
+        </div>
+        <span
+          className={`font-semibold ${method === id ? "text-black" : "text-gray-500"}`}
+        >
+          {label}
+        </span>
+      </div>
+      {method === id && (
+        <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-600 space-y-3 animate-in fade-in zoom-in-95 duration-300">
+          {qr && (
+            <img
+              src={qr}
+              className="w-32 h-32 mx-auto rounded-xl border shadow-sm"
+              alt="QR"
+            />
+          )}
+          {isCash ? (
+            <p className="text-purple-600 font-bold italic text-center">
+              下單後將聯絡面交詳情
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {instructions}
+              <label className="flex flex-col items-center justify-center w-full p-4 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-100 bg-white transition-colors">
+                {receiptImage ? (
+                  <p className="text-xs text-green-600 font-bold">
+                    已選擇收據 ✓ ({receiptImage.name.slice(0, 10)}...)
+                  </p>
+                ) : (
+                  <p className="text-[11px] uppercase font-bold tracking-tighter text-gray-400">
+                    點擊上傳付款截圖
+                  </p>
+                )}
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={(e) => setReceiptImage(e.target.files[0])}
+                />
+              </label>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 
   const handleConfirmOrder = async () => {
     setIsModalOpen(false);
-    setIsPendingModalOpen(false);
     try {
       let orderItems = [];
-      let containsTicket = false;
       for (const itemId in cartItems) {
         for (const size in cartItems[itemId]) {
           if (cartItems[itemId][size] > 0) {
@@ -217,14 +190,18 @@ const PlaceOrder = () => {
                 size,
                 quantity: cartItems[itemId][size],
               });
-              if (itemInfo.category === "Tickets") containsTicket = true;
             }
           }
         }
       }
-      setHasTicket(containsTicket);
+
+      const finalAddress =
+        deliveryType === "manual" ? "In-Person Delivery" : formData.address;
       const data = new FormData();
-      data.append("address", JSON.stringify(formData));
+      data.append(
+        "address",
+        JSON.stringify({ ...formData, address: finalAddress }),
+      );
       data.append("items", JSON.stringify(orderItems));
       data.append(
         "amount",
@@ -254,95 +231,6 @@ const PlaceOrder = () => {
     }
   };
 
-  const PaymentOption = ({ id, label, qr, instructions, isCash }) => (
-    <div
-      onClick={(e) => {
-        e.stopPropagation();
-        setMethod(id);
-      }}
-      className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${method === id ? "border-black bg-gray-50 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}
-    >
-      <div className="flex items-center gap-3">
-        <div
-          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${method === id ? "border-black" : "border-gray-300"}`}
-        >
-          {method === id && (
-            <div className="w-2.5 h-2.5 bg-black rounded-full" />
-          )}
-        </div>
-        <span className="font-semibold">{label}</span>
-      </div>
-      {method === id && (
-        <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-600 space-y-3">
-          {qr && (
-            <img
-              src={qr}
-              className="w-32 h-32 mx-auto rounded-lg border shadow-sm"
-              alt="QR"
-            />
-          )}
-          {isCash ? (
-            <p className="text-purple-600 font-bold italic">
-              Meetup details after order confirmation
-            </p>
-          ) : (
-            <>
-              {instructions}
-              <div className="mt-2">
-                <label className="flex flex-col items-center justify-center w-full p-4 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors bg-white">
-                  {receiptImage ? (
-                    <div className="flex flex-col items-center text-center">
-                      <img
-                        src={URL.createObjectURL(receiptImage)}
-                        className="h-20 mb-2 rounded shadow-sm"
-                        alt="Preview"
-                      />
-                      <p className="text-xs text-green-600 font-bold uppercase tracking-widest">
-                        Receipt Selected ✓
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="text-center py-2">
-                      <svg
-                        className="w-6 h-6 text-gray-400 mx-auto mb-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-                        />
-                      </svg>
-                      <p className="text-[15px] uppercase font-bold tracking-widest text-gray-400">
-                        Upload Receipt
-                      </p>
-                    </div>
-                  )}
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={(e) => setReceiptImage(e.target.files[0])}
-                  />
-                </label>
-              </div>
-              <p className="font-bold italic text-[11px] text-blue-600">
-                ※ If not uploaded now, please submit via "My Orders" later.
-              </p>
-            </>
-          )}
-        </div>
-      )}
-    </div>
-  );
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 sm:py-20">
       <ConfirmationModal
@@ -350,81 +238,97 @@ const PlaceOrder = () => {
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleConfirmOrder}
       />
-      <PendingReceiptModal
-        isOpen={isPendingModalOpen}
-        onCancel={() => setIsPendingModalOpen(false)}
-        onProceed={() => {
-          setIsPendingModalOpen(false);
-          setIsModalOpen(true);
-        }}
-      />
       <SuccessOrderModal
         isOpen={isSuccessModalOpen}
-        onDirectRedirect={() => {
-          setIsSuccessModalOpen(false);
-          navigate("/orders");
-        }}
-        hasTicket={hasTicket}
-        receiptUploaded={!!receiptImage}
+        onDirectRedirect={() => navigate("/orders")}
       />
 
       <form
-        onSubmit={handleFormSubmit}
+        onSubmit={(e) => {
+          e.preventDefault();
+          setIsModalOpen(true);
+        }}
         className="flex flex-col lg:flex-row gap-12"
       >
         <div className="flex-1 space-y-10">
           <section>
-            <Title text1={"STEP 1:"} text2={"YOUR INFO"} />
+            <Title text1={"步驟 1:"} text2={"個人資訊"} />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
               <input
                 required
                 name="firstName"
+                value={formData.firstName}
                 onChange={onChangeHandler}
-                className="w-full border-gray-200 border rounded-xl py-3 px-4 focus:ring-2 focus:ring-black outline-none bg-gray-50"
-                placeholder="Name"
+                className="w-full border-gray-200 border rounded-xl py-3 px-4 outline-none bg-gray-50 focus:border-black transition-all"
+                placeholder="姓名"
               />
               <input
                 required
                 name="phone"
+                value={formData.phone}
                 onChange={onChangeHandler}
-                className="w-full border-gray-200 border rounded-xl py-3 px-4 focus:ring-2 focus:ring-black outline-none bg-gray-50"
-                placeholder="Phone Number"
+                className="w-full border-gray-200 border rounded-xl py-3 px-4 outline-none bg-gray-50 focus:border-black transition-all"
+                placeholder="電話號碼"
                 maxLength={8}
-                pattern="[0-9]*"
               />
+              {deliveryType === "sf" && (
+                <textarea
+                  required
+                  name="address"
+                  value={formData.address}
+                  onChange={onChangeHandler}
+                  className="w-full border-gray-200 border rounded-xl py-3 px-4 outline-none bg-gray-50 sm:col-span-2 focus:border-black transition-all animate-in fade-in duration-300"
+                  placeholder="收貨地址 / 順豐站代碼"
+                  rows="2"
+                />
+              )}
             </div>
           </section>
 
           <section>
-            <Title text1={"STEP 2:"} text2={"DELIVERY & PAYMENT"} />
-            <div className="mt-6 space-y-4">
-              {/* SF Express Section */}
+            <Title text1={"步驟 2:"} text2={"配送與付款"} />
+            {/* 核心修正：將所有選項包裝在同一個 border 容器內 */}
+            <div className="mt-6 border border-gray-200 rounded-[2rem] overflow-hidden bg-white shadow-sm">
+              {/* 順豐快遞 */}
               <div
-                className={`rounded-2xl border-2 transition-all cursor-pointer overflow-hidden ${deliveryType === "sf" ? "border-blue-500 bg-blue-50/10 shadow-md" : "border-gray-100 bg-white"}`}
+                className={`transition-all duration-300 ${deliveryType === "sf" ? "bg-blue-50/20" : "hover:bg-gray-50"}`}
                 onClick={() => {
-                  setDeliveryType("sf");
-                  setMethod("payme");
+                  if (deliveryType !== "sf") {
+                    setDeliveryType("sf");
+                    setMethod("payme");
+                  }
                 }}
               >
-                <div className="p-5 flex justify-between items-center">
-                  <div>
-                    <h3 className="font-bold text-lg">SF Express Delivery</h3>
-                    <p className="text-sm text-blue-600 italic">
-                      Free Delivery in HK Area
-                    </p>
+                <div className="p-6 flex items-center justify-between cursor-pointer">
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${deliveryType === "sf" ? "border-blue-600" : "border-gray-300"}`}
+                    >
+                      {deliveryType === "sf" && (
+                        <div className="w-3 h-3 bg-blue-600 rounded-full" />
+                      )}
+                    </div>
+                    <span
+                      className={`font-bold text-lg ${deliveryType === "sf" ? "text-blue-700" : "text-gray-700"}`}
+                    >
+                      順豐快遞 (本地運費到付)
+                    </span>
                   </div>
                 </div>
                 {deliveryType === "sf" && (
-                  <div className="px-5 pb-5 pt-5 border-t border-blue-100 space-y-3 bg-white">
+                  <div
+                    className="px-6 pb-6 space-y-3 animate-in slide-in-from-top-2 duration-300"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <PaymentOption
                       id="payme"
-                      label="By PayMe"
+                      label="使用 PayMe"
                       qr={assets.paymeCode}
-                      instructions={<p>1. Pay via link/QR</p>}
+                      instructions={<p>1. 掃描 QR Code 付款</p>}
                     />
                     <PaymentOption
                       id="fps"
-                      label="By FPS"
+                      label="使用 轉數快 (FPS)"
                       qr={assets.fpsCode}
                       instructions={<p>1. FPS ID: 2394658</p>}
                     />
@@ -432,37 +336,52 @@ const PlaceOrder = () => {
                 )}
               </div>
 
-              {/* In-person Handover Section */}
+              <div className="border-t border-gray-100 mx-6"></div>
+
+              {/* 當面交收 */}
               <div
-                className={`rounded-2xl border-2 transition-all cursor-pointer overflow-hidden ${deliveryType === "manual" ? "border-purple-500 bg-purple-50/10 shadow-md" : "border-gray-100 bg-white"}`}
+                className={`transition-all duration-300 ${deliveryType === "manual" ? "bg-purple-50/20" : "hover:bg-gray-50"}`}
                 onClick={() => {
-                  setDeliveryType("manual");
-                  setMethod("paymeTradeIn");
+                  if (deliveryType !== "manual") {
+                    setDeliveryType("manual");
+                    setMethod("paymeTradeIn");
+                  }
                 }}
               >
-                <div className="p-5 flex justify-between items-center">
-                  <div>
-                    <h3 className="font-bold text-lg">In-person Handover</h3>
-                    <p className="text-sm text-purple-600 italic"></p>
+                <div className="p-6 flex items-center justify-between cursor-pointer">
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${deliveryType === "manual" ? "border-purple-600" : "border-gray-300"}`}
+                    >
+                      {deliveryType === "manual" && (
+                        <div className="w-3 h-3 bg-purple-600 rounded-full" />
+                      )}
+                    </div>
+                    <span
+                      className={`font-bold text-lg ${deliveryType === "manual" ? "text-purple-700" : "text-gray-700"}`}
+                    >
+                      當面交收
+                    </span>
                   </div>
                 </div>
                 {deliveryType === "manual" && (
-                  <div className="px-5 pb-5 pt-5 border-t border-purple-100 space-y-3 bg-white">
+                  <div
+                    className="px-6 pb-6 space-y-3 animate-in slide-in-from-top-2 duration-300"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <PaymentOption
                       id="paymeTradeIn"
-                      label="By PayMe (In-person)"
+                      label="PayMe (面交預付)"
                       qr={assets.paymeCode}
-                      instructions={<p>1. Pay via link/QR</p>}
                     />
                     <PaymentOption
                       id="fpsTradeIn"
-                      label="By FPS (In-person)"
+                      label="FPS (面交預付)"
                       qr={assets.fpsCode}
-                      instructions={<p>1. FPS ID: 2394658</p>}
                     />
                     <PaymentOption
                       id="cod"
-                      label="Cash on Delivery (面交現付)"
+                      label="面交現付 (Cash)"
                       isCash={true}
                     />
                   </div>
@@ -472,22 +391,19 @@ const PlaceOrder = () => {
           </section>
         </div>
 
-        <div className="lg:w-[400px]">
-          <div className="bg-white border border-gray-100 shadow-xl rounded-3xl p-8 sticky top-10 text-center">
+        {/* 右側結帳欄 */}
+        <div className="lg:w-[380px]">
+          <div className="bg-white border border-gray-100 shadow-2xl rounded-[2.5rem] p-8 sticky top-10 text-center">
             <CartTotal step="3" selectedMethod={method} />
             <button
               type="submit"
-              className="w-full bg-black text-white py-4 rounded-2xl font-bold text-lg hover:bg-gray-800 transition-all mt-8 shadow-lg uppercase"
+              className="w-full bg-black text-white py-5 rounded-2xl font-bold text-xl mt-8 hover:bg-gray-800 transition-all shadow-lg active:scale-95"
             >
-              Place Order
+              確認下單
             </button>
-            <button
-              type="button"
-              onClick={() => navigate("/cart")}
-              className="w-full text-gray-400 font-medium py-2 mt-4 hover:text-black transition-colors text-sm"
-            >
-              ← Back to Cart
-            </button>
+            <p className="mt-4 text-xs text-gray-400">
+              點擊確認即代表同意本站服務條款
+            </p>
           </div>
         </div>
       </form>
