@@ -10,7 +10,7 @@ const LatestCollection = () => {
   useEffect(() => {
     // Set the latest products to the last 4 items in the products array
     if (products.length > 0) {
-      setLatestProduct(products.slice(-4).reverse());
+      setLatestProduct(products.slice(-5).reverse());
     }
   }, [products]);
 

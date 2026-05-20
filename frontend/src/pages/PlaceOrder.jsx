@@ -180,7 +180,7 @@ const PlaceOrder = () => {
           )}
           {isCash ? (
             <p className="text-purple-600 font-bold italic text-center">
-              下單後將聯絡您確認面交時間與地點
+              下單後請聯絡9344 2688 與我們確認面交時間與地點
             </p>
           ) : (
             <div className="space-y-2">
