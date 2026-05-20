@@ -37,6 +37,7 @@ import Taiwan_2 from "./TaiwanTour2.jpeg";
 import lightwall from "./lightwall.jpeg";
 import lightwallvideo from "./lightwallvideo.mp4";
 import HomeAdPopUp from "./popupAd.jpeg";
+import MonoProductHero from "./mono product hero.jpeg";
 
 export const assets = {
   logo,
@@ -75,6 +76,7 @@ export const assets = {
   Taiwan_2,
   herowhiteground,
   mono_fire_sell,
+  MonoProductHero,
 };
 
 // export const products = [

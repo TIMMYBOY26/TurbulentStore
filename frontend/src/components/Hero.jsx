@@ -14,12 +14,30 @@ const Hero = () => {
   const heroBackground = assets.herowhiteground;
 
   const slides = [
+    // {
+    //   id: 1,
+    //   image: assets.MonoProductHero,
+    //   titleLine1: "《MONOLOGUE》",
+    //   titleLine2: "LATEST MERCH RELEASE",
+    //   showMobileText: true, // false = 手機版隱藏文字 (照你代碼註解邏輯)
+    //   hideOrderBtn: false,
+    //   canvasColor: "bg-white",
+    //   textColor: "sm:text-black",
+    //   btnBorder: "sm:border-black",
+    //   btnBg: "sm:bg-black",
+    //   btnText: "sm:text-white",
+    //   orderBtnText: "ORDER",
+    //   streamBtnText: "INFO",
+    //   orderLink: "http://localhost:5173/collection",
+    //   streamUrl: "/shows/69ba358fd800308dd2f833c3",
+    //   heroLink: "/shows/69ba358fd800308dd2f833c3",
+    // },
     {
       id: 1,
-      image: assets.Monologue_hkhero,
+      image: assets.Monologue_hero,
       titleLine1: "《MONOLOGUE》",
       titleLine2: "LATEST MERCH RELEASE",
-      showMobileText: true, // false = 手機版隱藏文字 (照你代碼註解邏輯)
+      showMobileText: true, // true = 手機版顯示文字
       hideOrderBtn: false,
       canvasColor: "bg-white",
       textColor: "sm:text-black",
@@ -28,9 +46,9 @@ const Hero = () => {
       btnText: "sm:text-white",
       orderBtnText: "ORDER",
       streamBtnText: "INFO",
-      orderLink: "https://www.offgrid.day/clubs/19/219?stage=show-detail",
-      streamUrl: "/shows/69ba358fd800308dd2f833c3",
-      heroLink: "/shows/69ba358fd800308dd2f833c3",
+      orderLink: "https://turbulent-store.vercel.app/collection",
+      streamUrl: "https://turbulent-store.vercel.app/collection",
+      heroLink: "https://turbulent-store.vercel.app/collection",
     },
     // {
     //   id: 2,
