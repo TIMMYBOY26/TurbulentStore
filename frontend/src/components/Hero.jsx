@@ -35,7 +35,7 @@ const Hero = () => {
     {
       id: 1,
       image: assets.MonoProductHero,
-      titleLine1: "《MONOLOGUE》",
+      titleLine1: " ",
       titleLine2: "LATEST MERCH RELEASE",
       showMobileText: true, // true = 手機版顯示文字
       hideOrderBtn: false,
