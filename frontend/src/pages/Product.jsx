@@ -21,10 +21,18 @@ const Product = () => {
 
   const isUpcomingProduct = productId === "69876c55266afcf9ab41b2ae";
 
+  // 核心新增：判斷是否所有尺寸都售罄
+  const isAllSoldOut =
+    productData && productData.sizes && productData.sizes.length > 0
+      ? productData.sizes.every((item) => item.count === 0)
+      : false;
+
   useEffect(() => {
-    const handleEsc = (e) => { if (e.key === 'Escape') setIsZoomed(false); };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
+    const handleEsc = (e) => {
+      if (e.key === "Escape") setIsZoomed(false);
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
   const fetchProductData = async () => {
@@ -41,7 +49,7 @@ const Product = () => {
   }, [productId, products]);
 
   useEffect(() => {
-    document.body.style.overflow = isZoomed ? 'hidden' : 'auto';
+    document.body.style.overflow = isZoomed ? "hidden" : "auto";
   }, [isZoomed]);
 
   const handleTouchStart = (e) => setStartX(e.touches[0].clientX);
@@ -58,15 +66,19 @@ const Product = () => {
   };
 
   const handlePrevImage = () => {
-    setCurrentImageIndex((prev) => (prev === 0 ? productData.image.length - 1 : prev - 1));
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? productData.image.length - 1 : prev - 1,
+    );
   };
 
   const handleNextImage = () => {
-    setCurrentImageIndex((prev) => (prev === productData.image.length - 1 ? 0 : prev + 1));
+    setCurrentImageIndex((prev) =>
+      prev === productData.image.length - 1 ? 0 : prev + 1,
+    );
   };
 
   const handleAddToCart = () => {
-    if (isUpcomingProduct) return;
+    if (isUpcomingProduct || isAllSoldOut) return; // 售罄時阻斷點擊
     if (token) {
       if (!size) {
         toast.error("Please select a size");
@@ -90,6 +102,13 @@ const Product = () => {
     ));
   };
 
+  // 封裝大按鈕的文字邏輯，讓 React 渲染時更乾淨
+  const getButtonText = () => {
+    if (isUpcomingProduct) return "Coming Soon";
+    if (isAllSoldOut) return "Sold Out";
+    return token ? "Add to Bag" : "Login to Add";
+  };
+
   return (
     <>
       {isLoading && (
@@ -101,57 +120,107 @@ const Product = () => {
             <div className="w-2.5 bg-white border-2 border-gray-200 rounded-full animate-[wave_1.2s_ease-in-out_0.45s_infinite] h-10"></div>
             <div className="w-2.5 bg-[#003366] rounded-full animate-[wave_1.2s_ease-in-out_0.6s_infinite] h-6"></div>
           </div>
-          <p className="mt-10 text-[10px] font-black tracking-[0.6em] text-black uppercase animate-pulse">TURBULENT</p>
+          <p className="mt-10 text-[10px] font-black tracking-[0.6em] text-black uppercase animate-pulse">
+            TURBULENT
+          </p>
         </div>
       )}
 
       {showCartNotice && (
         <div className="fixed top-24 right-5 sm:right-10 z-50 animate-toast-in">
           <div className="relative overflow-hidden min-w-[280px] bg-white/40 backdrop-blur-2xl border rounded-2xl p-5 shadow-2xl flex items-center gap-4">
-            <div className="w-11 h-11 rounded-xl bg-black flex items-center justify-center text-white">✓</div>
-            <div><p className="text-[10px] font-black uppercase">Success</p><p className="text-xs font-semibold">Added to cart!</p></div>
+            <div className="w-11 h-11 rounded-xl bg-black flex items-center justify-center text-white">
+              ✓
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase">Success</p>
+              <p className="text-xs font-semibold">Added to cart!</p>
+            </div>
             <div className="absolute bottom-0 left-0 h-1 bg-black animate-progress-shrink" />
           </div>
         </div>
       )}
 
       {isZoomed && productData && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 backdrop-blur-2xl animate-in fade-in duration-300 cursor-zoom-out" onClick={() => setIsZoomed(false)}>
-          <button className="absolute top-6 right-6 z-[110] p-3 bg-black text-white rounded-full">✕</button>
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 backdrop-blur-2xl animate-in fade-in duration-300 cursor-zoom-out"
+          onClick={() => setIsZoomed(false)}
+        >
+          <button className="absolute top-6 right-6 z-[110] p-3 bg-black text-white rounded-full">
+            ✕
+          </button>
           <div className="relative w-full h-full flex items-center justify-center p-4">
-            <img src={productData.image[currentImageIndex]} className="max-w-full max-h-[90vh] object-contain animate-in zoom-in-95" alt="" onClick={(e) => e.stopPropagation()} />
+            <img
+              src={productData.image[currentImageIndex]}
+              className="max-w-full max-h-[90vh] object-contain animate-in zoom-in-95"
+              alt=""
+              onClick={(e) => e.stopPropagation()}
+            />
           </div>
         </div>
       )}
 
       {productData && (
-        <div className={`pt-2 sm:pt-6 transition-opacity duration-1000 ${isLoading ? "opacity-0" : "opacity-100"}`}>
+        <div
+          className={`pt-2 sm:pt-6 transition-opacity duration-1000 ${isLoading ? "opacity-0" : "opacity-100"}`}
+        >
           <ToastContainer position="top-right" autoClose={2000} />
 
           <div className="flex flex-col sm:flex-row gap-6 sm:gap-12 px-4 sm:px-0">
             <div className="flex-1 flex flex-col-reverse sm:flex-row gap-3">
               <div className="hidden sm:flex sm:flex-col overflow-y-auto sm:w-[18%] gap-2">
                 {productData.image.map((item, index) => (
-                  <img onClick={() => setCurrentImageIndex(index)} src={item} key={index} className={`w-full cursor-pointer border rounded-md transition-all ${currentImageIndex === index ? "border-black opacity-100" : "opacity-50 border-transparent hover:opacity-80"}`} alt="" />
+                  <img
+                    onClick={() => setCurrentImageIndex(index)}
+                    src={item}
+                    key={index}
+                    className={`w-full cursor-pointer border rounded-md transition-all ${currentImageIndex === index ? "border-black opacity-100" : "opacity-50 border-transparent hover:opacity-80"}`}
+                    alt=""
+                  />
                 ))}
               </div>
 
               <div className="w-full sm:w-[82%] flex flex-col">
                 <div className="relative overflow-hidden rounded-xl bg-white aspect-[3/4]">
-                  <div className="flex flex-nowrap transition-transform duration-500 ease-out sm:hidden h-full" style={{ transform: `translateX(-${currentImageIndex * 100}%)` }} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
+                  <div
+                    className="flex flex-nowrap transition-transform duration-500 ease-out sm:hidden h-full"
+                    style={{
+                      transform: `translateX(-${currentImageIndex * 100}%)`,
+                    }}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                  >
                     {productData.image.map((img, idx) => (
-                      <div key={idx} className="w-full min-w-full flex-shrink-0 flex items-center justify-center">
-                        <img src={img} onClick={() => setIsZoomed(true)} className="w-full h-full object-contain" alt="" />
+                      <div
+                        key={idx}
+                        className="w-full min-w-full flex-shrink-0 flex items-center justify-center"
+                      >
+                        <img
+                          src={img}
+                          onClick={() => setIsZoomed(true)}
+                          className="w-full h-full object-contain"
+                          alt=""
+                        />
                       </div>
                     ))}
                   </div>
                   <div className="hidden sm:block w-full h-full">
-                    <img key={currentImageIndex} src={productData.image[currentImageIndex]} onClick={() => setIsZoomed(true)} className="w-full h-full object-contain cursor-zoom-in animate-in fade-in duration-300" alt="" />
+                    <img
+                      key={currentImageIndex}
+                      src={productData.image[currentImageIndex]}
+                      onClick={() => setIsZoomed(true)}
+                      className="w-full h-full object-contain cursor-zoom-in animate-in fade-in duration-300"
+                      alt=""
+                    />
                   </div>
                 </div>
                 <div className="flex justify-center gap-2 mt-2 sm:hidden">
                   {productData.image.map((_, idx) => (
-                    <div key={idx} className={`h-1 transition-all duration-300 rounded-full ${currentImageIndex === idx ? "w-6 bg-black" : "w-1.5 bg-gray-300"}`} />
+                    <div
+                      key={idx}
+                      className={`h-1 transition-all duration-300 rounded-full ${currentImageIndex === idx ? "w-6 bg-black" : "w-1.5 bg-gray-300"}`}
+                    />
                   ))}
                 </div>
               </div>
@@ -167,7 +236,12 @@ const Product = () => {
                 ))}
               </h1>
 
-              {Number(productData.price) > 0 && <p className="mt-5 text-3xl font-medium">{currency}{productData.price}</p>}
+              {Number(productData.price) > 0 && (
+                <p className="mt-5 text-3xl font-medium">
+                  {currency}
+                  {productData.price}
+                </p>
+              )}
 
               <div className="mt-5 text-gray-500 text-sm leading-relaxed">
                 {formatDescription(productData.description)}
@@ -176,33 +250,60 @@ const Product = () => {
               <div className="flex flex-col gap-4 my-8">
                 {productData.category !== "Tickets" ? (
                   <>
-                    <p className="text-black font-bold text-xs uppercase tracking-widest">* Select Size</p>
-                    <div className="flex gap-2">
+                    <p className="text-black font-bold text-xs uppercase tracking-widest">
+                      * Select
+                    </p>
+                    <div className="flex gap-2 flex-wrap">
                       {productData.sizes.map((item) => (
                         <button
                           key={item.size}
                           disabled={item.count === 0 || isUpcomingProduct}
                           onClick={() => setSize(item.size)}
-                          className={`border-2 py-3 px-5 font-bold text-xs transition-colors ${item.size === size ? "bg-black text-white" : "bg-white"} ${(item.count === 0 || isUpcomingProduct) && "opacity-30 cursor-not-allowed"}`}
+                          className={`border-2 py-3 px-4 font-bold text-xs transition-colors ${item.size === size ? "bg-black text-white" : "bg-white"} ${item.count === 0 || isUpcomingProduct ? "opacity-30 cursor-not-allowed bg-gray-50 text-gray-400 border-gray-200" : "border-black"}`}
                         >
-                          {item.size}
+                          {/* 尺寸售罄時顯示 Sold Out */}
+                          {item.size}{" "}
+                          {item.count === 0 && (
+                            <span className="text-[10px] font-normal block sm:inline sm:ml-1">
+                              (Sold Out)
+                            </span>
+                          )}
                         </button>
                       ))}
                     </div>
-                    <button onClick={handleAddToCart} className="bg-black text-white px-8 py-4 text-xs font-black tracking-[0.2em] mt-4 uppercase hover:bg-gray-900 transition-colors shadow-xl active:scale-[0.98]">
-                      {isUpcomingProduct ? "Coming Soon" : token ? "Add to Bag" : "Login to Add"}
+
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={isUpcomingProduct || isAllSoldOut}
+                      className={`px-8 py-4 text-xs font-black tracking-[0.2em] mt-4 uppercase transition-all shadow-xl active:scale-[0.98]
+                        ${
+                          isUpcomingProduct || isAllSoldOut
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none active:scale-100"
+                            : "bg-black text-white hover:bg-gray-900"
+                        }`}
+                    >
+                      {getButtonText()}
                     </button>
                   </>
                 ) : (
                   <div className="mt-4 py-6 border-t flex flex-col gap-4">
                     {productData.ticketType === "external" ? (
                       <button
-                        onClick={() => productData.isTicketAvailable && window.open(productData.externalLink || 'https://www.offgrid.day', '_blank')}
+                        onClick={() =>
+                          productData.isTicketAvailable &&
+                          window.open(
+                            productData.externalLink ||
+                              "https://www.offgrid.day",
+                            "_blank",
+                          )
+                        }
                         disabled={!productData.isTicketAvailable}
                         className={`px-8 py-4 text-xs font-black tracking-[0.2em] uppercase shadow-lg text-center transition-all duration-300
                           ${productData.isTicketAvailable ? "bg-black text-white cursor-pointer hover:bg-gray-800 active:scale-[0.98]" : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"}`}
                       >
-                        {productData.isTicketAvailable ? "GET TICKETS NOW" : "TICKETS COMING SOON"}
+                        {productData.isTicketAvailable
+                          ? "GET TICKETS NOW"
+                          : "TICKETS COMING SOON"}
                       </button>
                     ) : (
                       <button
@@ -220,7 +321,11 @@ const Product = () => {
                         className={`px-8 py-4 text-xs font-black tracking-[0.2em] uppercase shadow-lg text-center transition-all duration-300
                           ${productData.isTicketAvailable ? "bg-black text-white cursor-pointer hover:bg-gray-800 active:scale-[0.98]" : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"}`}
                       >
-                        {productData.isTicketAvailable ? (token ? "ADD TICKET TO BAG" : "LOGIN TO GET TICKETS") : "TICKETS SOLD OUT"}
+                        {productData.isTicketAvailable
+                          ? token
+                            ? "ADD TICKET TO BAG"
+                            : "LOGIN TO GET TICKETS"
+                          : "TICKETS SOLD OUT"}
                       </button>
                     )}
                   </div>
@@ -228,7 +333,10 @@ const Product = () => {
               </div>
             </div>
           </div>
-          <RelatedProducts category={productData.category} currentProductId={productId} />
+          <RelatedProducts
+            category={productData.category}
+            currentProductId={productId}
+          />
         </div>
       )}
 

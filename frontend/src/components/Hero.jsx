@@ -18,22 +18,40 @@ const Hero = () => {
       id: 1,
       image: assets.Monologue_hkhero,
       titleLine1: "《MONOLOGUE》",
-      titleLine2: "專輯發佈巡演最終站 香港",
-      showMobileText: false, // false = 手機版隱藏文字 (照你代碼註解邏輯)
-      hideOrderBtn: true,
+      titleLine2: "LATEST MERCH RELEASE",
+      showMobileText: true, // false = 手機版隱藏文字 (照你代碼註解邏輯)
+      hideOrderBtn: false,
       canvasColor: "bg-white",
       textColor: "sm:text-black",
       btnBorder: "sm:border-black",
       btnBg: "sm:bg-black",
       btnText: "sm:text-white",
-      orderBtnText: "TICKETS",
-      streamBtnText: "TOUR INFO",
+      orderBtnText: "ORDER",
+      streamBtnText: "INFO",
       orderLink: "https://www.offgrid.day/clubs/19/219?stage=show-detail",
       streamUrl: "/shows/69ba358fd800308dd2f833c3",
       heroLink: "/shows/69ba358fd800308dd2f833c3",
     },
+    // {
+    //   id: 2,
+    //   image: assets.Monologue_hkhero,
+    //   titleLine1: "《MONOLOGUE》",
+    //   titleLine2: "專輯發佈巡演最終站 香港",
+    //   showMobileText: false, // false = 手機版隱藏文字 (照你代碼註解邏輯)
+    //   hideOrderBtn: true,
+    //   canvasColor: "bg-white",
+    //   textColor: "sm:text-black",
+    //   btnBorder: "sm:border-black",
+    //   btnBg: "sm:bg-black",
+    //   btnText: "sm:text-white",
+    //   orderBtnText: "TICKETS",
+    //   streamBtnText: "TOUR INFO",
+    //   orderLink: "https://www.offgrid.day/clubs/19/219?stage=show-detail",
+    //   streamUrl: "/shows/69ba358fd800308dd2f833c3",
+    //   heroLink: "/shows/69ba358fd800308dd2f833c3",
+    // },
     {
-      id: 2,
+      id: 3,
       image: assets.Monologue_hero,
       titleLine1: "《MONOLOGUE》",
       titleLine2: "The New Album Out Now",
@@ -50,27 +68,27 @@ const Hero = () => {
       streamUrl: "https://orcd.co/monologue_turbulent",
       heroLink: "/shows/6973054cc4bb617639eacce5",
     },
+    // {
+    //   id: 4,
+    //   image: assets.Taiwan_hero,
+    //   titleLine1: "《MONOLOGUE》",
+    //   titleLine2: "專輯發佈台灣巡演",
+    //   showMobileText: false,
+    //   hideOrderBtn: true,
+    //   canvasColor: "bg-white",
+    //   textColor: "sm:text-black",
+    //   btnBorder: "sm:border-black",
+    //   btnBg: "sm:bg-black",
+    //   btnText: "sm:text-white",
+    //   orderBtnText: "TICKETS",
+    //   streamBtnText: "TOUR INFO",
+    //   orderLink:
+    //     "https://www.offgrid.day/clubs/19/214?stage=compilation-detail&compilationId=8",
+    //   streamUrl: "/shows/69876c55266afcf9ab41b2ae",
+    //   heroLink: "/shows/69876c55266afcf9ab41b2ae",
+    // },
     {
-      id: 3,
-      image: assets.Taiwan_hero,
-      titleLine1: "《MONOLOGUE》",
-      titleLine2: "專輯發佈台灣巡演",
-      showMobileText: false,
-      hideOrderBtn: true,
-      canvasColor: "bg-white",
-      textColor: "sm:text-black",
-      btnBorder: "sm:border-black",
-      btnBg: "sm:bg-black",
-      btnText: "sm:text-white",
-      orderBtnText: "TICKETS",
-      streamBtnText: "TOUR INFO",
-      orderLink:
-        "https://www.offgrid.day/clubs/19/214?stage=compilation-detail&compilationId=8",
-      streamUrl: "/shows/69876c55266afcf9ab41b2ae",
-      heroLink: "/shows/69876c55266afcf9ab41b2ae",
-    },
-    {
-      id: 4,
+      id: 5,
       image: assets.mono_fire_sell,
       titleLine1: "《MONOLOGUE》",
       titleLine2: "🔥上架火氣音樂平台🔥",
@@ -82,7 +100,7 @@ const Hero = () => {
       btnBg: "sm:bg-black",
       btnText: "sm:text-white",
       orderBtnText: "ORDER",
-      streamBtnText: "TOUR INFO",
+      streamBtnText: "INFO",
       orderLink: "https://www.fireonshop.com/products/turbulent-monologue",
       streamUrl: "/shows/69ba358fd800308dd2f833c3",
       heroLink: "https://www.fireonshop.com/products/turbulent-monologue",
@@ -150,12 +168,13 @@ const Hero = () => {
         return (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-transform duration-1000 ease-in-out cursor-pointer ${isActive
-              ? "translate-x-0 z-10"
-              : index > currentIndex
-                ? "translate-x-full z-0"
-                : "-translate-x-full z-0"
-              } ${slide.canvasColor} sm:bg-transparent`}
+            className={`absolute inset-0 transition-transform duration-1000 ease-in-out cursor-pointer ${
+              isActive
+                ? "translate-x-0 z-10"
+                : index > currentIndex
+                  ? "translate-x-full z-0"
+                  : "-translate-x-full z-0"
+            } ${slide.canvasColor} sm:bg-transparent`}
           >
             {/* 內容容器：透過 max-w 和 mx-auto 讓內容在大螢幕置中靠攏 */}
             <div className="w-full h-full flex flex-col sm:flex-row relative z-10 max-w-[1440px] mx-auto">
