@@ -34,7 +34,7 @@ const Hero = () => {
     // },
     {
       id: 1,
-      image: assets.Monologue_hero,
+      image: assets.MonoProductHero,
       titleLine1: "《MONOLOGUE》",
       titleLine2: "LATEST MERCH RELEASE",
       showMobileText: true, // true = 手機版顯示文字
@@ -47,7 +47,8 @@ const Hero = () => {
       orderBtnText: "ORDER",
       streamBtnText: "INFO",
       orderLink: "https://turbulent-store.vercel.app/collection",
-      streamUrl: "https://turbulent-store.vercel.app/collection",
+      streamUrl:
+        "https://www.instagram.com/p/DXElctalJz1/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==",
       heroLink: "https://turbulent-store.vercel.app/collection",
     },
     // {
@@ -69,7 +70,7 @@ const Hero = () => {
     //   heroLink: "/shows/69ba358fd800308dd2f833c3",
     // },
     {
-      id: 3,
+      id: 2,
       image: assets.Monologue_hero,
       titleLine1: "《MONOLOGUE》",
       titleLine2: "The New Album Out Now",
@@ -105,24 +106,24 @@ const Hero = () => {
     //   streamUrl: "/shows/69876c55266afcf9ab41b2ae",
     //   heroLink: "/shows/69876c55266afcf9ab41b2ae",
     // },
-    {
-      id: 5,
-      image: assets.mono_fire_sell,
-      titleLine1: "《MONOLOGUE》",
-      titleLine2: "🔥上架火氣音樂平台🔥",
-      showMobileText: false,
-      hideOrderBtn: false,
-      canvasColor: "bg-white",
-      textColor: "sm:text-black",
-      btnBorder: "sm:border-black",
-      btnBg: "sm:bg-black",
-      btnText: "sm:text-white",
-      orderBtnText: "ORDER",
-      streamBtnText: "INFO",
-      orderLink: "https://www.fireonshop.com/products/turbulent-monologue",
-      streamUrl: "/shows/69ba358fd800308dd2f833c3",
-      heroLink: "https://www.fireonshop.com/products/turbulent-monologue",
-    },
+    // {
+    //   id: 5,
+    //   image: assets.mono_fire_sell,
+    //   titleLine1: "《MONOLOGUE》",
+    //   titleLine2: "🔥上架火氣音樂平台🔥",
+    //   showMobileText: false,
+    //   hideOrderBtn: false,
+    //   canvasColor: "bg-white",
+    //   textColor: "sm:text-black",
+    //   btnBorder: "sm:border-black",
+    //   btnBg: "sm:bg-black",
+    //   btnText: "sm:text-white",
+    //   orderBtnText: "ORDER",
+    //   streamBtnText: "INFO",
+    //   orderLink: "https://www.fireonshop.com/products/turbulent-monologue",
+    //   streamUrl: "/shows/69ba358fd800308dd2f833c3",
+    //   heroLink: "https://www.fireonshop.com/products/turbulent-monologue",
+    // },
   ];
 
   const handleLink = (path) => {

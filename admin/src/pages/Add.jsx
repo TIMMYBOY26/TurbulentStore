@@ -207,6 +207,7 @@ const Add = ({ token }) => {
                 <option value="CD">CD</option>
                 <option value="Tickets">Tickets</option>
                 <option value="KEYCHAIN">KEYCHAIN</option>
+                <option value="TOWEL">TOWEL</option>
               </select>
             </div>
 
@@ -325,6 +326,7 @@ const Add = ({ token }) => {
                 "CD",
                 "TICKETS",
                 "KEYCHAIN",
+                "TOWEL",
               ].map((size) => (
                 <div
                   key={size}

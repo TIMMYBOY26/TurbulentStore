@@ -37,7 +37,7 @@ import Taiwan_2 from "./TaiwanTour2.jpeg";
 import lightwall from "./lightwall.jpeg";
 import lightwallvideo from "./lightwallvideo.mp4";
 import HomeAdPopUp from "./popupAd.jpeg";
-import MonoProductHero from "./mono product hero.jpeg";
+import MonoProductHero from "./Monologue merch hero.png";
 
 export const assets = {
   logo,

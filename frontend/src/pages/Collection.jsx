@@ -168,6 +168,15 @@ const Collection = () => {
                 />
                 KEYCHAIN
               </p>
+              <p className="flex gap-2">
+                <input
+                  className="w-3"
+                  type="checkbox"
+                  value={"TOWEL"}
+                  onChange={toggleCategory}
+                />
+                TOWEL
+              </p>
             </div>
           </div>
         </div>
