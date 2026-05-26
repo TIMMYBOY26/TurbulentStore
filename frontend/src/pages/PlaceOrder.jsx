@@ -89,11 +89,47 @@ const SuccessOrderModal = ({ isOpen, onDirectRedirect }) => {
   );
 };
 
+// --- 全螢幕加載等待組件 (🎯 已成功替換為首頁 TURBULENT 音波與文字動畫) ---
+const LoadingOverlay = ({ isOpen }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white animate-in fade-in duration-300">
+      {/* 5 條音波條動態結構 */}
+      <div className="flex items-end gap-2 h-16">
+        <div className="w-2.5 bg-[#003366] rounded-full animate-[wave_1.2s_ease-in-out_infinite] h-6"></div>
+        <div className="w-2.5 bg-[#ADD8E6] rounded-full animate-[wave_1.2s_ease-in-out_0.15s_infinite] h-10"></div>
+        <div className="w-2.5 bg-black rounded-full animate-[wave_1.2s_ease-in-out_0.3s_infinite] h-14"></div>
+        <div className="w-2.5 bg-white border-2 border-gray-200 rounded-full animate-[wave_1.2s_ease-in-out_0.45s_infinite] h-10"></div>
+        <div className="w-2.5 bg-[#003366] rounded-full animate-[wave_1.2s_ease-in-out_0.6s_infinite] h-6"></div>
+      </div>
+
+      {/* 品牌大寫閃爍文字 */}
+      <p className="mt-10 text-[10px] font-black tracking-[0.6em] text-black uppercase animate-pulse text-center">
+        TURBULENT
+      </p>
+
+      {/* 輔助狀態提示小字 */}
+      <p className="mt-3 text-xs text-gray-400 font-medium tracking-wide">
+        正在上傳收據與建立訂單，請稍候...
+      </p>
+
+      {/* 注入 CSS 動態波浪 Keyframes */}
+      <style>{`
+        @keyframes wave {
+          0%, 100% { height: 1.5rem; transform: translateY(0); }
+          50% { height: 4rem; transform: translateY(-5px); }
+        }
+      `}</style>
+    </div>
+  );
+};
+
 const PlaceOrder = () => {
   const [method, setMethod] = useState("payme");
   const [deliveryType, setDeliveryType] = useState("sf");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // 加載狀態鎖
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -133,6 +169,9 @@ const PlaceOrder = () => {
   const handleSubmitCheck = (e) => {
     e.preventDefault();
 
+    // 如果正在上傳中，阻擋任何提交動作
+    if (isLoading) return;
+
     // 核心規則：如果不是面交現付，且沒有上傳收據，直接跳出警告並阻擋
     if (isReceiptRequired && !receiptImage) {
       toast.error("請先上傳付款截圖/收據，才能確認下單！");
@@ -142,77 +181,10 @@ const PlaceOrder = () => {
     setIsModalOpen(true);
   };
 
-  // --- 付款選項組件 ---
-  const PaymentOption = ({ id, label, qr, instructions, isCash }) => (
-    <div
-      onClick={(e) => {
-        e.stopPropagation();
-        setMethod(id);
-      }}
-      className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer ${
-        method === id
-          ? "border-black bg-gray-50"
-          : "border-gray-100 hover:border-gray-200 bg-white"
-      }`}
-    >
-      <div className="flex items-center gap-3">
-        <div
-          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${method === id ? "border-black" : "border-gray-300"}`}
-        >
-          {method === id && (
-            <div className="w-2.5 h-2.5 bg-black rounded-full" />
-          )}
-        </div>
-        <span
-          className={`font-semibold ${method === id ? "text-black" : "text-gray-500"}`}
-        >
-          {label}
-        </span>
-      </div>
-      {method === id && (
-        <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-600 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-          {qr && (
-            <img
-              src={qr}
-              className="w-32 h-32 mx-auto rounded-xl border shadow-sm"
-              alt="QR Code"
-            />
-          )}
-          {isCash ? (
-            <p className="text-purple-600 font-bold italic text-center">
-              下單後請聯絡9344 2688 與我們確認面交時間與地點
-            </p>
-          ) : (
-            <div className="space-y-2">
-              {instructions}
-              <label
-                className={`flex flex-col items-center justify-center w-full p-4 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${receiptImage ? "border-green-500 bg-green-50/30" : "border-gray-300 hover:bg-gray-100 bg-white"}`}
-              >
-                {receiptImage ? (
-                  <p className="text-xs text-green-600 font-bold">
-                    ✓ 已選擇收據: {receiptImage.name.slice(0, 15)}...
-                  </p>
-                ) : (
-                  <p className="text-[11px] uppercase font-bold tracking-tighter text-red-500 flex items-center gap-1">
-                    <span>*</span> 點擊上傳付款截圖 (必填)
-                  </p>
-                )}
-                <input
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={(e) => setReceiptImage(e.target.files[0])}
-                />
-              </label>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-
   const handleConfirmOrder = async () => {
     setIsModalOpen(false);
+    setIsLoading(true); // 開啟全螢幕加載，鎖定操作
+
     try {
       let orderItems = [];
       for (const itemId in cartItems) {
@@ -275,11 +247,87 @@ const PlaceOrder = () => {
     } catch (error) {
       console.error(error);
       toast.error(error.response?.data?.message || "訂單提交失敗");
+    } finally {
+      setIsLoading(false); // 無論 API 成功或失敗，皆解除加載狀態
     }
   };
 
+  // --- 付款選項組件 ---
+  const PaymentOption = ({ id, label, qr, instructions, isCash }) => (
+    <div
+      onClick={(e) => {
+        e.stopPropagation();
+        if (isLoading) return; // 加載中禁止切換付款方式
+        setMethod(id);
+      }}
+      className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer ${
+        method === id
+          ? "border-black bg-gray-50"
+          : "border-gray-100 hover:border-gray-200 bg-white"
+      }`}
+    >
+      <div className="flex items-center gap-3">
+        <div
+          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${method === id ? "border-black" : "border-gray-300"}`}
+        >
+          {method === id && (
+            <div className="w-2.5 h-2.5 bg-black rounded-full" />
+          )}
+        </div>
+        <span
+          className={`font-semibold ${method === id ? "text-black" : "text-gray-500"}`}
+        >
+          {label}
+        </span>
+      </div>
+      {method === id && (
+        <div className="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-600 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+          {qr && (
+            <img
+              src={qr}
+              className="w-32 h-32 mx-auto rounded-xl border shadow-sm"
+              alt="QR Code"
+            />
+          )}
+          {isCash ? (
+            <p className="text-purple-600 font-bold italic text-center">
+              下單後請聯絡9344 2688 與我們確認面交時間與地點
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {instructions}
+              <label
+                className={`flex flex-col items-center justify-center w-full p-4 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${receiptImage ? "border-green-500 bg-green-50/30" : "border-gray-300 hover:bg-gray-100 bg-white"}`}
+              >
+                {receiptImage ? (
+                  <p className="text-xs text-green-600 font-bold">
+                    ✓ 已選擇收據: {receiptImage.name.slice(0, 15)}...
+                  </p>
+                ) : (
+                  <p className="text-[11px] uppercase font-bold tracking-tighter text-red-500 flex items-center gap-1">
+                    <span>*</span> 點擊上傳付款截圖 (必填)
+                  </p>
+                )}
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  disabled={isLoading}
+                  onChange={(e) => setReceiptImage(e.target.files[0])}
+                />
+              </label>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 sm:py-20">
+      {/* 全螢幕加載遮罩層 */}
+      <LoadingOverlay isOpen={isLoading} />
+
       <ConfirmationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -301,28 +349,31 @@ const PlaceOrder = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
               <input
                 required
+                disabled={isLoading}
                 name="firstName"
                 value={formData.firstName}
                 onChange={onChangeHandler}
-                className="w-full border-gray-200 border rounded-xl py-3 px-4 outline-none bg-gray-50 focus:border-black transition-all"
+                className="w-full border-gray-200 border rounded-xl py-3 px-4 outline-none bg-gray-50 focus:border-black transition-all disabled:opacity-60"
                 placeholder="收貨人姓名"
               />
               <input
                 required
+                disabled={isLoading}
                 name="phone"
                 value={formData.phone}
                 onChange={onChangeHandler}
-                className="w-full border-gray-200 border rounded-xl py-3 px-4 outline-none bg-gray-50 focus:border-black transition-all"
+                className="w-full border-gray-200 border rounded-xl py-3 px-4 outline-none bg-gray-50 focus:border-black transition-all disabled:opacity-60"
                 placeholder="電話號碼"
                 maxLength={8}
               />
               {deliveryType === "sf" && (
                 <textarea
                   required
+                  disabled={isLoading}
                   name="address"
                   value={formData.address}
                   onChange={onChangeHandler}
-                  className="w-full border-gray-200 border rounded-xl py-3 px-4 outline-none bg-gray-50 sm:col-span-2 focus:border-black transition-all animate-in fade-in duration-300"
+                  className="w-full border-gray-200 border rounded-xl py-3 px-4 outline-none bg-gray-50 sm:col-span-2 focus:border-black transition-all animate-in fade-in duration-300 disabled:opacity-60"
                   placeholder="順豐站/智能櫃代碼 或 收貨地址"
                   rows="2"
                 />
@@ -335,8 +386,9 @@ const PlaceOrder = () => {
             <div className="mt-6 border border-gray-200 rounded-[2rem] overflow-hidden bg-white shadow-sm">
               {/* 順豐選項 */}
               <div
-                className={`transition-all duration-300 ${deliveryType === "sf" ? "bg-blue-50/20" : "hover:bg-gray-50"}`}
+                className={`transition-all duration-300 ${deliveryType === "sf" ? "bg-blue-50/20" : "hover:bg-gray-50"} ${isLoading ? "pointer-events-none" : ""}`}
                 onClick={() => {
+                  if (isLoading) return;
                   setDeliveryType("sf");
                   setMethod("payme");
                 }}
@@ -382,8 +434,9 @@ const PlaceOrder = () => {
 
               {/* 面交選項 */}
               <div
-                className={`transition-all duration-300 ${deliveryType === "manual" ? "bg-purple-50/20" : "hover:bg-gray-50"}`}
+                className={`transition-all duration-300 ${deliveryType === "manual" ? "bg-purple-50/20" : "hover:bg-gray-50"} ${isLoading ? "pointer-events-none" : ""}`}
                 onClick={() => {
+                  if (isLoading) return;
                   setDeliveryType("manual");
                   setMethod("paymeTradeIn");
                 }}
@@ -438,13 +491,14 @@ const PlaceOrder = () => {
 
             <button
               type="submit"
+              disabled={isLoading || (isReceiptRequired && !receiptImage)}
               className={`w-full py-5 rounded-2xl font-bold text-xl mt-8 transition-all shadow-lg active:scale-95 transition-transform ${
-                isReceiptRequired && !receiptImage
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                isLoading || (isReceiptRequired && !receiptImage)
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed active:scale-100"
                   : "bg-black text-white hover:bg-gray-800"
               }`}
             >
-              確認下單
+              {isLoading ? "處理中..." : "確認下單"}
             </button>
 
             {/* 動態提示文字 */}
